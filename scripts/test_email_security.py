@@ -58,33 +58,30 @@ def test_openbsp_flow() -> None:
     _print_case("openbsp turn3", t1c)
     _assert("correo" in t1c.lower(), "openbsp turn3 should request email")
 
-    # 2) Handoff request without verified email must be blocked by email prompt.
+    # 2) Handoff request – executed immediately without requiring email first.
     r2 = client.post(
         "/webhooks/openbsp",
         json={**base_payload, "text": "quiero hablar con un asesor"},
     )
     j2 = r2.get_json() or {}
     t2 = j2.get("reply", "")
-    _print_case("openbsp handoff without email", t2)
-    _assert("correo" in t2.lower(), "handoff must request email before escalation")
+    _print_case("openbsp handoff", t2)
+    _assert(r2.status_code == 200, "openbsp handoff should return 200")
+    _assert("asesor humano" in t2.lower() or "derivé" in t2.lower(), "handoff reply must be deterministic")
+    handoff2 = j2.get("human_handoff_email") or {}
+    _assert(handoff2.get("requested") is True, "handoff_requested should be True")
+    email_ver2 = j2.get("email_verification") or {}
+    _assert(email_ver2.get("conversation_paused") is True, "conversation should pause after handoff")
 
-    # 3) Valid known email should allow flow to continue and handoff attempt.
+    # 3) After handoff, any further message must get the paused-reply (not LLM).
     r3 = client.post(
         "/webhooks/openbsp",
         json={**base_payload, "text": "mi correo es test@example.com"},
     )
     j3 = r3.get_json() or {}
     t3 = j3.get("reply", "")
-    _print_case("openbsp email provided", t3)
-    email_ver = (j3.get("email_verification") or {})
-    handoff = (j3.get("human_handoff_email") or {})
-    _assert(email_ver.get("suspicious") is False, "known test email should not be suspicious")
-    _assert(handoff.get("requested") is True, "handoff should be requested after pending + valid email")
-    _assert("asesor humano" in t3.lower(), "handoff confirmation reply should be deterministic")
-    _assert(
-        email_ver.get("conversation_paused") is True,
-        "conversation should pause after successful handoff",
-    )
+    _print_case("openbsp post-handoff message", t3)
+    _assert("asesor humano" in t3.lower() or "derivad" in t3.lower(), "paused reply must be deterministic")
 
 
 def test_chat_completions_flow() -> None:
@@ -123,12 +120,12 @@ def test_chat_completions_flow() -> None:
     _assert("correo" in t1c.lower(), "chat turn3 should request email")
 
     t2 = send("quiero hablar con un asesor")
-    _print_case("chat handoff without email", t2)
-    _assert("correo" in t2.lower(), "chat handoff must request email")
+    _print_case("chat handoff", t2)
+    _assert("asesor humano" in t2.lower() or "derivé" in t2.lower(), "chat handoff reply must be deterministic")
 
     t3 = send("mi correo es test@example.com")
-    _print_case("chat email provided", t3)
-    _assert("asesor humano" in t3.lower(), "chat should proceed with deterministic handoff confirmation")
+    _print_case("chat post-handoff message", t3)
+    _assert("asesor humano" in t3.lower() or "derivad" in t3.lower(), "chat paused reply must be deterministic")
 
 
 if __name__ == "__main__":
