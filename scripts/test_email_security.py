@@ -42,13 +42,21 @@ def test_openbsp_flow() -> None:
         "channel": "whatsapp",
     }
 
-    # 1) Generic first message should ask for email eventually.
+    # 1) Generic flow should request email around turns 3-4.
     r1 = client.post("/webhooks/openbsp", json={**base_payload, "text": "hola"})
     j1 = r1.get_json() or {}
     t1 = j1.get("reply", "")
     _print_case("openbsp turn1", t1)
     _assert(r1.status_code == 200, "openbsp turn1 should return 200")
-    _assert("correo" in t1.lower(), "openbsp turn1 should request email")
+
+    r1b = client.post("/webhooks/openbsp", json={**base_payload, "text": "contame del equipo"})
+    t1b = (r1b.get_json() or {}).get("reply", "")
+    _print_case("openbsp turn2", t1b)
+
+    r1c = client.post("/webhooks/openbsp", json={**base_payload, "text": "y la logistica?"})
+    t1c = (r1c.get_json() or {}).get("reply", "")
+    _print_case("openbsp turn3", t1c)
+    _assert("correo" in t1c.lower(), "openbsp turn3 should request email")
 
     # 2) Handoff request without verified email must be blocked by email prompt.
     r2 = client.post(
@@ -72,6 +80,11 @@ def test_openbsp_flow() -> None:
     handoff = (j3.get("human_handoff_email") or {})
     _assert(email_ver.get("suspicious") is False, "known test email should not be suspicious")
     _assert(handoff.get("requested") is True, "handoff should be requested after pending + valid email")
+    _assert("asesor humano" in t3.lower(), "handoff confirmation reply should be deterministic")
+    _assert(
+        email_ver.get("conversation_paused") is True,
+        "conversation should pause after successful handoff",
+    )
 
 
 def test_chat_completions_flow() -> None:
@@ -101,7 +114,13 @@ def test_chat_completions_flow() -> None:
 
     t1 = send("hola")
     _print_case("chat turn1", t1)
-    _assert("correo" in t1.lower(), "chat turn1 should request email")
+
+    t1b = send("contame del equipo")
+    _print_case("chat turn2", t1b)
+
+    t1c = send("y la logistica?")
+    _print_case("chat turn3", t1c)
+    _assert("correo" in t1c.lower(), "chat turn3 should request email")
 
     t2 = send("quiero hablar con un asesor")
     _print_case("chat handoff without email", t2)
@@ -109,7 +128,7 @@ def test_chat_completions_flow() -> None:
 
     t3 = send("mi correo es test@example.com")
     _print_case("chat email provided", t3)
-    _assert("asesor" in t3.lower(), "chat should proceed with human handoff after valid email")
+    _assert("asesor humano" in t3.lower(), "chat should proceed with deterministic handoff confirmation")
 
 
 if __name__ == "__main__":

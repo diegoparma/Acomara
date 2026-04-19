@@ -79,8 +79,8 @@ def should_request_email(session_vars: dict[str, Any]) -> bool:
     if session_vars.get("email_compromised"):
         return False
     
-    # Request from first turn onward (no session persistence guarantee)
-    return turn_count >= 1
+    # Request specifically around turns 3-4 in normal flow.
+    return 3 <= turn_count <= 4
 
 
 def extract_email_from_text(text: str) -> str | None:

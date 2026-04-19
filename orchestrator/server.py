@@ -590,6 +590,10 @@ def send_handoff_email(
             f"contact_id: {sanitize_for_email(msg['contact_id'])}",
             f"contact_address: {sanitize_for_email(msg['contact_address'])}",
             f"channel: {sanitize_for_email(msg['channel'])}",
+            f"conversation_turn_count: {sanitize_for_email(str(session_vars.get('conversation_turn_count', '')))}",
+            f"verified_email: {sanitize_for_email(str(session_vars.get('verified_email', '')))}",
+            f"email_verified_real: {sanitize_for_email(str(session_vars.get('email_verified_real', False)))}",
+            f"pause_reason: {sanitize_for_email(str(session_vars.get('pause_reason', 'human_handoff_in_progress')))}",
             "",
             f"ultimo_mensaje_cliente: {sanitize_for_email(msg['text'])}",
             f"ultimo_reply_bot: {sanitize_for_email(session_vars.get('last_assistant_reply', ''))}",
@@ -879,6 +883,19 @@ def build_version_text() -> str:
     )
 
 
+def build_paused_reply(session_vars: dict[str, Any]) -> str:
+    reason = str(session_vars.get("pause_reason") or "").strip().lower()
+    if reason == "human_handoff_in_progress":
+        return (
+            "Tu solicitud ya fue derivada a un asesor humano. "
+            "En breve te va a contactar un miembro del equipo por este medio."
+        )
+    return (
+        "Thank you for your interest. We detected a security concern with your email. "
+        "A member of our team will contact you shortly to verify your information and proceed safely."
+    )
+
+
 @app.get("/health")
 def health() -> Any:
     payload = build_version_payload()
@@ -1040,14 +1057,51 @@ def webhook_openbsp() -> Any:
                     session_vars["email_check_failed"] = True
                     session_vars["email_check_failed_at_ts"] = int(time.time())
 
-        # If conversation is paused due to compromised email, generate pause message
+        now_ts = int(time.time())
+
+        # --- HANDOFF DETECTION (before LLM) ---
+        # Runs before generate_reply so we can return a deterministic reply
+        # without wasting an LLM call and without the LLM generating its own
+        # confirmation loop ("¿Quieres que te conecte?").
+        handoff_requested = wants_human_handoff(msg["text"], session_vars)
+        handoff_attempted = False
+        handoff_status = 0
+        handoff_data: dict[str, Any] = {}
+        handoff_sent = False
+
         if session_vars.get("conversation_paused"):
-            reply = (
-                "Thank you for your interest. We detected a security concern with your email. "
-                "A member of our team will contact you shortly to verify your information and proceed safely."
+            # Conversation already paused – deterministic reply, skip LLM.
+            reply = build_paused_reply(session_vars)
+            hits = []
+        elif handoff_requested:
+            # Human handoff requested: execute immediately, skip the LLM entirely.
+            cooldown_ok = should_send_handoff_email(
+                session_vars,
+                runtime["handoff_email_cooldown_seconds"],
+                now_ts,
             )
+            if cooldown_ok:
+                handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
+                    runtime,
+                    msg,
+                    session_vars,
+                )
+            else:
+                handoff_data = {"info": "handoff email skipped by cooldown"}
+            # Deterministic reply regardless of whether the email succeeded or not.
+            # Never return an LLM reply when a handoff is requested.
+            reply = (
+                "Perfecto, ya derivé tu solicitud a un asesor humano. "
+                "En breve te va a contactar un miembro del equipo por este medio."
+            )
+            session_vars["conversation_paused"] = True
+            session_vars["pause_reason"] = "human_handoff_in_progress"
+            session_vars["handoff_pending_confirmation"] = False
+            session_vars["paused_at_ts"] = now_ts
+            handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
         else:
+            # Normal LLM path.
             hits = retrieve_top_k(
                 client,
                 runtime["embed_model"],
@@ -1069,49 +1123,6 @@ def webhook_openbsp() -> Any:
                 follow_up = "\n\nPara poder ayudarte mejor, ¿cuál es tu correo electrónico?"
                 reply = f"{reply}{follow_up}"
                 session_vars["email_requested"] = True
-
-        now_ts = int(time.time())
-        handoff_requested = wants_human_handoff(msg["text"], session_vars)
-        if (
-            not handoff_requested
-            and session_vars.get("handoff_pending_confirmation")
-            and session_vars.get("email_verified_real")
-        ):
-            # User already requested handoff earlier and just completed email verification.
-            handoff_requested = True
-
-        requires_email_before_handoff = (
-            handoff_requested
-            and not session_vars.get("email_verified_real")
-            and not session_vars.get("conversation_paused")
-        )
-        handoff_attempted = False
-        handoff_status = 0
-        handoff_data: dict[str, Any] = {}
-        if requires_email_before_handoff:
-            reply = (
-                "Para conectarte con un asesor humano, primero necesito validar tu correo "
-                "por seguridad. ¿Cuál es tu correo electrónico?"
-            )
-            session_vars["email_requested"] = True
-            session_vars["handoff_pending_confirmation"] = True
-            handoff_data = {"info": "handoff blocked until email is verified"}
-        elif handoff_requested and not session_vars.get("conversation_paused"):
-            cooldown_ok = should_send_handoff_email(
-                session_vars,
-                runtime["handoff_email_cooldown_seconds"],
-                now_ts,
-            )
-            if cooldown_ok:
-                handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
-                    runtime,
-                    msg,
-                    session_vars,
-                )
-            else:
-                handoff_data = {"info": "handoff email skipped by cooldown"}
-
-        handoff_sent = handoff_attempted and handoff_status in (200, 201, 202)
 
         updated_vars = {
             **session_vars,
@@ -1409,11 +1420,41 @@ def chat_completions_compatible() -> Any:
                     session_vars["email_check_failed"] = True
                     session_vars["email_check_failed_at_ts"] = int(time.time())
 
+        now_ts = int(time.time())
+
+        # --- HANDOFF DETECTION (before LLM) ---
+        handoff_requested = wants_human_handoff(msg["text"], session_vars)
+        handoff_attempted = False
+        handoff_status = 0
+        handoff_data: dict[str, Any] = {}
+        handoff_sent = False
+
         if session_vars.get("conversation_paused"):
-            reply = (
-                "Thank you for your interest. We detected a security concern with your email. "
-                "A member of our team will contact you shortly to verify your information and proceed safely."
+            reply = build_paused_reply(session_vars)
+            hits = []
+        elif handoff_requested:
+            cooldown_ok = should_send_handoff_email(
+                session_vars,
+                runtime["handoff_email_cooldown_seconds"],
+                now_ts,
             )
+            if cooldown_ok:
+                handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
+                    runtime,
+                    msg,
+                    session_vars,
+                )
+            else:
+                handoff_data = {"info": "handoff email skipped by cooldown"}
+            reply = (
+                "Perfecto, ya derivé tu solicitud a un asesor humano. "
+                "En breve te va a contactar un miembro del equipo por este medio."
+            )
+            session_vars["conversation_paused"] = True
+            session_vars["pause_reason"] = "human_handoff_in_progress"
+            session_vars["handoff_pending_confirmation"] = False
+            session_vars["paused_at_ts"] = now_ts
+            handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
         else:
             hits = retrieve_top_k(
@@ -1436,48 +1477,6 @@ def chat_completions_compatible() -> Any:
                 follow_up = "\n\nPara poder ayudarte mejor, ¿cuál es tu correo electrónico?"
                 reply = f"{reply}{follow_up}"
                 session_vars["email_requested"] = True
-
-        now_ts = int(time.time())
-        handoff_requested = wants_human_handoff(msg["text"], session_vars)
-        if (
-            not handoff_requested
-            and session_vars.get("handoff_pending_confirmation")
-            and session_vars.get("email_verified_real")
-        ):
-            handoff_requested = True
-
-        requires_email_before_handoff = (
-            handoff_requested
-            and not session_vars.get("email_verified_real")
-            and not session_vars.get("conversation_paused")
-        )
-        handoff_attempted = False
-        handoff_status = 0
-        handoff_data: dict[str, Any] = {}
-        if requires_email_before_handoff:
-            reply = (
-                "Para conectarte con un asesor humano, primero necesito validar tu correo "
-                "por seguridad. ¿Cuál es tu correo electrónico?"
-            )
-            session_vars["email_requested"] = True
-            session_vars["handoff_pending_confirmation"] = True
-            handoff_data = {"info": "handoff blocked until email is verified"}
-        elif handoff_requested and not session_vars.get("conversation_paused"):
-            cooldown_ok = should_send_handoff_email(
-                session_vars,
-                runtime["handoff_email_cooldown_seconds"],
-                now_ts,
-            )
-            if cooldown_ok:
-                handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
-                    runtime,
-                    msg,
-                    session_vars,
-                )
-            else:
-                handoff_data = {"info": "handoff email skipped by cooldown"}
-
-        handoff_sent = handoff_attempted and handoff_status in (200, 201, 202)
 
         updated_vars = {
             **session_vars,
