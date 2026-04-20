@@ -51,6 +51,9 @@ I18N_PHRASES = {
         "handoff_ask_email": "Para conectarte con un asesor, primero necesito tu correo electrónico para poder derivarte correctamente. ¿Cuál es tu correo?",
         "handoff_executed": "Perfecto, ya derivé tu solicitud a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
         "handoff_pending": "Todavía necesito tu correo electrónico para derivarte con el asesor. ¿Cuál es tu correo?",
+        "proactive_email_request": "Si te parece, compartime tu correo electrónico ahora y lo verifico para dejar lista una posible derivación con un asesor.",
+        "proactive_email_saved": "Gracias. Ya verifiqué tu correo y quedó registrado. Si después querés que te conecte con un asesor, ya lo tengo listo.",
+        "proactive_email_check_failed": "Gracias. Ya recibí tu correo, pero no pude validarlo en este momento. Igual quedó registrado por si necesitás derivación con un asesor.",
         "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
         "paused_suspicious": "Gracias por tu interés. Detectamos una alerta de seguridad con tu correo electrónico. Un miembro de nuestro equipo te va a contactar en breve para verificar tus datos y continuar de forma segura.",
     },
@@ -59,6 +62,9 @@ I18N_PHRASES = {
         "handoff_ask_email": "To connect you with an advisor, I first need your email address. What is your email?",
         "handoff_executed": "Perfect, I've forwarded your request to a human advisor. A team member will contact you shortly.",
         "handoff_pending": "I still need your email address to connect you with an advisor. What is your email?",
+        "proactive_email_request": "If you'd like, share your email now and I'll verify it so a possible handoff to an advisor is ready.",
+        "proactive_email_saved": "Thanks. I already verified your email and saved it. If you want me to connect you with an advisor later, it's ready.",
+        "proactive_email_check_failed": "Thanks. I received your email, but I couldn't validate it right now. It was still saved in case you need a handoff to an advisor.",
         "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
         "paused_suspicious": "Thank you for your interest. We detected a security concern with your email. A team member will contact you shortly to verify your information and proceed safely.",
     },
@@ -67,6 +73,9 @@ I18N_PHRASES = {
         "handoff_ask_email": "Para conectá-lo com um consultor, primeiro preciso do seu endereço de email. Qual é o seu email?",
         "handoff_executed": "Perfeito, encaminhei sua solicitação para um consultor humano. Um membro da equipe o contatará em breve.",
         "handoff_pending": "Ainda preciso do seu endereço de email para conectá-lo com um consultor. Qual é o seu email?",
+        "proactive_email_request": "Se você quiser, compartilhe seu email agora e eu o verifico para deixar pronta uma possível transferência para um consultor.",
+        "proactive_email_saved": "Obrigado. Já verifiquei seu email e ele ficou registrado. Se depois você quiser falar com um consultor, já está pronto.",
+        "proactive_email_check_failed": "Obrigado. Recebi seu email, mas não consegui validá-lo agora. Mesmo assim ele ficou registrado caso você precise de transferência para um consultor.",
         "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
         "paused_suspicious": "Obrigado pelo seu interesse. Detectamos uma preocupação de segurança com seu email. Um membro da equipe o contatará em breve para verificar suas informações.",
     },
@@ -475,6 +484,7 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "last_assistant_reply": "",
         "handoff_requested": False,
         "handoff_pending_confirmation": False,
+        "proactive_email_capture_pending": False,
         "handoff_email_last_sent_ts": None,
         "handoff_email_last_to": "",
         "email_requested": False,
@@ -1230,6 +1240,20 @@ def webhook_openbsp() -> Any:
                     session_vars["email_check_failed_at_ts"] = int(time.time())
 
         now_ts = int(time.time())
+        proactive_email_capture_pending = bool(session_vars.get("proactive_email_capture_pending"))
+        proactive_email_verified = (
+            bool(extracted_email)
+            and proactive_email_capture_pending
+            and not bool(session_vars.get("handoff_pending_confirmation"))
+            and bool(session_vars.get("email_verified_real"))
+        )
+        proactive_email_check_failed = (
+            bool(extracted_email)
+            and proactive_email_capture_pending
+            and not bool(session_vars.get("handoff_pending_confirmation"))
+            and bool(session_vars.get("email_check_failed"))
+            and not email_suspicious
+        )
 
         # --- HANDOFF DETECTION (before LLM) ---
         # Detect explicit handoff requests. Affirmative detection was removed to
@@ -1284,6 +1308,18 @@ def webhook_openbsp() -> Any:
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
+        elif proactive_email_verified:
+            lang = get_session_language(session_vars)
+            reply = get_phrase("proactive_email_saved", lang)
+            session_vars["proactive_email_capture_pending"] = False
+            session_vars["email_requested"] = False
+            hits = []
+        elif proactive_email_check_failed:
+            lang = get_session_language(session_vars)
+            reply = get_phrase("proactive_email_check_failed", lang)
+            session_vars["proactive_email_capture_pending"] = False
+            session_vars["email_requested"] = False
+            hits = []
         elif session_vars.get("handoff_pending_confirmation"):
             # Handoff was requested earlier but user didn't provide email yet.
             lang = get_session_language(session_vars)
@@ -1306,6 +1342,11 @@ def webhook_openbsp() -> Any:
                 hits,
                 session_vars,
             )
+            if should_request_email(session_vars):
+                lang = get_session_language(session_vars)
+                reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
+                session_vars["email_requested"] = True
+                session_vars["proactive_email_capture_pending"] = True
 
         updated_vars = {
             **session_vars,
@@ -1615,6 +1656,20 @@ def chat_completions_compatible() -> Any:
                     session_vars["email_check_failed_at_ts"] = int(time.time())
 
         now_ts = int(time.time())
+        proactive_email_capture_pending = bool(session_vars.get("proactive_email_capture_pending"))
+        proactive_email_verified = (
+            bool(extracted_email)
+            and proactive_email_capture_pending
+            and not bool(session_vars.get("handoff_pending_confirmation"))
+            and bool(session_vars.get("email_verified_real"))
+        )
+        proactive_email_check_failed = (
+            bool(extracted_email)
+            and proactive_email_capture_pending
+            and not bool(session_vars.get("handoff_pending_confirmation"))
+            and bool(session_vars.get("email_check_failed"))
+            and not email_suspicious
+        )
 
         # --- HANDOFF DETECTION (before LLM) ---
         handoff_requested = wants_human_handoff(msg["text"], session_vars)
@@ -1662,6 +1717,18 @@ def chat_completions_compatible() -> Any:
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
+        elif proactive_email_verified:
+            lang = get_session_language(session_vars)
+            reply = get_phrase("proactive_email_saved", lang)
+            session_vars["proactive_email_capture_pending"] = False
+            session_vars["email_requested"] = False
+            hits = []
+        elif proactive_email_check_failed:
+            lang = get_session_language(session_vars)
+            reply = get_phrase("proactive_email_check_failed", lang)
+            session_vars["proactive_email_capture_pending"] = False
+            session_vars["email_requested"] = False
+            hits = []
         elif session_vars.get("handoff_pending_confirmation"):
             lang = get_session_language(session_vars)
             reply = get_phrase("handoff_pending", lang)
@@ -1682,6 +1749,11 @@ def chat_completions_compatible() -> Any:
                 hits,
                 session_vars,
             )
+            if should_request_email(session_vars):
+                lang = get_session_language(session_vars)
+                reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
+                session_vars["email_requested"] = True
+                session_vars["proactive_email_capture_pending"] = True
 
         updated_vars = {
             **session_vars,

@@ -61,6 +61,7 @@ def test_openbsp_flow() -> None:
     t1c = (r1c.get_json() or {}).get("reply", "")
     _print_case("openbsp turn3", t1c)
     _assert(r1c.status_code == 200, "openbsp turn3 should return 200")
+    _assert("correo" in t1c.lower(), "openbsp turn3 should proactively request email")
 
     # 2) Handoff request without email → must ask for email, NOT execute handoff yet.
     r2 = client.post(
@@ -131,6 +132,7 @@ def test_chat_completions_flow() -> None:
     t1c = send("y la logistica?")
     _print_case("chat turn3", t1c)
     _assert(len(t1c) > 0, "chat turn3 should return a reply")
+    _assert("correo" in t1c.lower() or "email" in t1c.lower(), "chat turn3 should proactively request email")
 
     t2 = send("quiero hablar con un asesor humano")
     _print_case("chat handoff triggers email request", t2)
@@ -257,6 +259,86 @@ def test_suspicious_email_uses_spanish_and_admin_fallback() -> None:
     _assert(fallback_alert_mock.call_count == 1, "fallback admin email should be attempted when primary fails")
 
 
+def test_proactive_email_capture_enables_direct_handoff() -> None:
+    client = app.test_client()
+    conv_id = f"reg-proactive-openbsp-{uuid4()}"
+    base_payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    client.post("/webhooks/openbsp", json={**base_payload, "text": "hola"})
+    client.post("/webhooks/openbsp", json={**base_payload, "text": "contame del equipo"})
+    turn3 = client.post("/webhooks/openbsp", json={**base_payload, "text": "y la logistica?"})
+    turn3_reply = (turn3.get_json() or {}).get("reply", "")
+    _print_case("openbsp proactive email prompt", turn3_reply)
+    _assert("correo" in turn3_reply.lower(), "turn3 should ask for email proactively")
+
+    email_reply = (
+        client.post(
+            "/webhooks/openbsp",
+            json={**base_payload, "text": "mi correo es test@example.com"},
+        ).get_json()
+        or {}
+    ).get("reply", "")
+    _print_case("openbsp proactive email saved", email_reply)
+    _assert("verifiqu" in email_reply.lower() or "registrado" in email_reply.lower(), "verified proactive email should get deterministic acknowledgement")
+
+    handoff_reply = (
+        client.post(
+            "/webhooks/openbsp",
+            json={**base_payload, "text": "quiero hablar con un asesor humano"},
+        ).get_json()
+        or {}
+    ).get("reply", "")
+    _print_case("openbsp direct handoff after proactive email", handoff_reply)
+    _assert("derivé" in handoff_reply.lower() or "advisor" in handoff_reply.lower() or "asesor humano" in handoff_reply.lower(), "handoff should execute directly after proactive verified email")
+
+
+def test_proactive_email_capture_chat_flow() -> None:
+    client = app.test_client()
+    conv_id = f"reg-proactive-chat-{uuid4()}"
+    headers = {
+        "Authorization": "Bearer test-orchestrator-key",
+        "conversation-id": conv_id,
+        "organization-id": "test-org",
+        "organization-address": "test-org-address",
+        "contact-id": "test-contact",
+        "contact-address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    def send(text: str) -> str:
+        payload = {
+            "model": "gpt-5.4",
+            "messages": [{"role": "user", "content": text}],
+            "stream": False,
+        }
+        response = client.post("/v1/chat/completions", headers=headers, json=payload)
+        data = response.get_json() or {}
+        content = (((data.get("choices") or [{}])[0].get("message") or {}).get("content") or "")
+        _assert(response.status_code == 200, f"chat endpoint failed for message: {text}")
+        return content
+
+    send("hola")
+    send("contame del equipo")
+    turn3 = send("y la logistica?")
+    _print_case("chat proactive email prompt", turn3)
+    _assert("correo" in turn3.lower() or "email" in turn3.lower(), "chat turn3 should ask for email proactively")
+
+    email_reply = send("mi correo es test@example.com")
+    _print_case("chat proactive email saved", email_reply)
+    _assert("verifiqu" in email_reply.lower() or "registrado" in email_reply.lower(), "chat should acknowledge proactive verified email")
+
+    handoff_reply = send("quiero hablar con un asesor humano")
+    _print_case("chat direct handoff after proactive email", handoff_reply)
+    _assert("derivé" in handoff_reply.lower() or "asesor humano" in handoff_reply.lower(), "chat handoff should execute directly after proactive verified email")
+
+
 def test_multilanguage_fixed_phrases() -> None:
     """Test that fixed phrases respect conversation_language from session."""
     client = app.test_client()
@@ -325,5 +407,7 @@ if __name__ == "__main__":
     test_reset_command_openbsp()
     test_reset_command_chat_completions()
     test_suspicious_email_uses_spanish_and_admin_fallback()
+    test_proactive_email_capture_enables_direct_handoff()
+    test_proactive_email_capture_chat_flow()
     test_multilanguage_fixed_phrases()
     print("All regression checks passed.")
