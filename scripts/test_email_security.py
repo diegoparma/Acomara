@@ -10,7 +10,11 @@ from __future__ import annotations
 
 from pathlib import Path
 import sys
+from unittest.mock import patch
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 from uuid import uuid4
+import json
 
 from dotenv import load_dotenv
 
@@ -214,6 +218,104 @@ def test_reset_command_chat_completions() -> None:
     _assert("bienvenido" in fresh_reply.lower(), "chat conversation should restart after /reset")
 
 
+def test_suspicious_email_uses_spanish_and_admin_fallback() -> None:
+    client = app.test_client()
+    conv_id = f"reg-suspicious-{uuid4()}"
+    base_payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    with patch("orchestrator.server.check_email_reputation", return_value=(True, True)):
+        with patch(
+            "orchestrator.server.try_send_compromised_email_alert",
+            return_value=(True, 500, {"error": "smtp failed"}),
+        ) as primary_alert_mock:
+            with patch(
+                "orchestrator.server.try_send_handoff_email",
+                return_value=(True, 200, {"ok": True, "provider": "smtp"}),
+            ) as fallback_alert_mock:
+                client.post(
+                    "/webhooks/openbsp",
+                    json={**base_payload, "text": "quiero hablar con un asesor humano"},
+                )
+                suspicious_resp = client.post(
+                    "/webhooks/openbsp",
+                    json={**base_payload, "text": "mi correo es ake-prospect-xyz@testing.invalid"},
+                )
+
+    suspicious_reply = (suspicious_resp.get_json() or {}).get("reply", "")
+    _print_case("openbsp suspicious email paused reply", suspicious_reply)
+    _assert(suspicious_resp.status_code == 200, "suspicious email flow should return 200")
+    _assert("gracias" in suspicious_reply.lower(), "suspicious paused reply must stay in spanish")
+    _assert("thank you" not in suspicious_reply.lower(), "suspicious paused reply must not switch to english")
+    _assert(primary_alert_mock.call_count == 1, "primary suspicious alert should be attempted once")
+    _assert(fallback_alert_mock.call_count == 1, "fallback admin email should be attempted when primary fails")
+
+
+def test_multilanguage_fixed_phrases() -> None:
+    """Test that fixed phrases respect conversation_language from session."""
+    client = app.test_client()
+    conv_id = f"reg-lang-en-{uuid4()}"
+    base_payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    # Mock session_get to return conversation_language="en" for this test
+    with patch("orchestrator.server.try_session_get") as mock_get:
+        def get_side_effect(base_url, cid):
+            if cid == conv_id:
+                return {
+                    "variables": {
+                        "conversation_language": "en",
+                        "conversation_language_source": "manual",
+                        "conversation_turn_count": 0,
+                    },
+                }
+            return None
+        
+        mock_get.side_effect = get_side_effect
+        
+        # 1. Trigger handoff in English session
+        resp1 = client.post(
+            "/webhooks/openbsp",
+            json={**base_payload, "text": "quiero hablar con un asesor humano"},
+        )
+        reply1 = (resp1.get_json() or {}).get("reply", "")
+        _print_case("English handoff trigger", reply1)
+        _assert("email" in reply1.lower(), "handoff should ask for email")
+        _assert("To connect" in reply1 or "email" in reply1.lower(), "handoff message should be in English")
+        _assert("correo" not in reply1.lower(), "message should not have Spanish words")
+
+    # 2. After reset, language should go back to Spanish (default)
+    reset_resp = client.post(
+        "/webhooks/openbsp",
+        json={**base_payload, "text": "/reset"},
+    )
+    reset_reply = (reset_resp.get_json() or {}).get("reply", "")
+    _print_case("post-reset (Spanish default)", reset_reply)
+    _assert("reiniciada" in reset_reply.lower(), "reset should be in Spanish by default")
+
+    # 3. Next handoff after reset should be in Spanish
+    resp2 = client.post(
+        "/webhooks/openbsp",
+        json={**base_payload, "text": "quiero hablar con un asesor humano"},
+    )
+    reply2 = (resp2.get_json() or {}).get("reply", "")
+    _print_case("Spanish handoff after reset", reply2)
+    _assert("correo" in reply2.lower(), "handoff should ask for email in Spanish")
+    _assert("Para conectarte" in reply2 or "correo" in reply2.lower(), "handoff message should be in Spanish after reset")
+
+
 if __name__ == "__main__":
     load_dotenv(Path(".env"))
 
@@ -222,4 +324,6 @@ if __name__ == "__main__":
     test_chat_completions_flow()
     test_reset_command_openbsp()
     test_reset_command_chat_completions()
+    test_suspicious_email_uses_spanish_and_admin_fallback()
+    test_multilanguage_fixed_phrases()
     print("All regression checks passed.")

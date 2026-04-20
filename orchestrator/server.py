@@ -44,6 +44,62 @@ SYSTEM_PROMPT_PATH = ROOT / "docs" / "sales-agent" / "02-system-prompt.md"
 app = Flask(__name__)
 
 
+# i18n: Internationalization layer for fixed phrases
+I18N_PHRASES = {
+    "es": {
+        "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
+        "handoff_ask_email": "Para conectarte con un asesor, primero necesito tu correo electrónico para poder derivarte correctamente. ¿Cuál es tu correo?",
+        "handoff_executed": "Perfecto, ya derivé tu solicitud a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
+        "handoff_pending": "Todavía necesito tu correo electrónico para derivarte con el asesor. ¿Cuál es tu correo?",
+        "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
+        "paused_suspicious": "Gracias por tu interés. Detectamos una alerta de seguridad con tu correo electrónico. Un miembro de nuestro equipo te va a contactar en breve para verificar tus datos y continuar de forma segura.",
+    },
+    "en": {
+        "reset_acknowledge": "Conversation restarted. How can I help you?",
+        "handoff_ask_email": "To connect you with an advisor, I first need your email address. What is your email?",
+        "handoff_executed": "Perfect, I've forwarded your request to a human advisor. A team member will contact you shortly.",
+        "handoff_pending": "I still need your email address to connect you with an advisor. What is your email?",
+        "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
+        "paused_suspicious": "Thank you for your interest. We detected a security concern with your email. A team member will contact you shortly to verify your information and proceed safely.",
+    },
+    "pt": {
+        "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
+        "handoff_ask_email": "Para conectá-lo com um consultor, primeiro preciso do seu endereço de email. Qual é o seu email?",
+        "handoff_executed": "Perfeito, encaminhei sua solicitação para um consultor humano. Um membro da equipe o contatará em breve.",
+        "handoff_pending": "Ainda preciso do seu endereço de email para conectá-lo com um consultor. Qual é o seu email?",
+        "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
+        "paused_suspicious": "Obrigado pelo seu interesse. Detectamos uma preocupação de segurança com seu email. Um membro da equipe o contatará em breve para verificar suas informações.",
+    },
+}
+
+
+def get_session_language(session_vars: dict[str, Any] | None) -> str:
+    """Get conversation language from session variables. Default: Spanish.
+    
+    Reads conversation_language field set by session agent.
+    Falls back to 'es' if missing or invalid.
+    """
+    if not session_vars or not isinstance(session_vars, dict):
+        return "es"
+    lang = session_vars.get("conversation_language", "").strip().lower()
+    if lang in I18N_PHRASES:
+        return lang
+    return "es"
+
+
+def get_phrase(key: str, language: str | None = None) -> str:
+    """Get phrase by key and language with safe fallback.
+    
+    If language not provided or phrase not found, falls back to Spanish,
+    then returns key itself as last resort.
+    """
+    lang = language or "es"
+    if lang not in I18N_PHRASES:
+        lang = "es"
+    phrases = I18N_PHRASES[lang]
+    return phrases.get(key, I18N_PHRASES["es"].get(key, f"[{key}]"))
+
+
 def auth_error(message: str, code: int = 401) -> Any:
     return (
         jsonify(
@@ -404,7 +460,11 @@ def try_session_delete(
 
 
 def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
-    """Build a canonical clean session state for /reset."""
+    """Build a canonical clean session state for /reset.
+    
+    NOTE: Intentionally does NOT preserve conversation_language.
+    This allows testing across different idiomas during reset flow.
+    """
     return {
         "conversation_turn_count": 0,
         "conversation_paused": False,
@@ -425,6 +485,9 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "suspicious_email": "",
         "suspicious_email_alert_sent": False,
         "suspicious_email_alert_sent_ts": None,
+        "suspicious_email_alert_last_status": None,
+        "suspicious_email_alert_method": "",
+        "suspicious_email_alert_last_response": {},
         "email_check_failed": False,
         "email_check_failed_at_ts": None,
     }
@@ -809,6 +872,52 @@ def try_send_compromised_email_alert(
         return True, 0, {"error": str(exc)}
 
 
+def try_send_suspicious_admin_alert(
+    runtime: dict[str, Any],
+    msg: dict[str, str],
+    email: str,
+    session_vars: dict[str, Any],
+) -> tuple[bool, int, dict[str, Any], bool, str]:
+    """Send suspicious-email admin alert with a fallback notification path.
+
+    Returns: (attempted, status, response, sent, method)
+    """
+    attempted, status, data = try_send_compromised_email_alert(
+        runtime,
+        msg,
+        email,
+        session_vars,
+    )
+    if attempted and status in (200, 201, 202):
+        return attempted, status, data, True, "security_alert"
+
+    fallback_attempted, fallback_status, fallback_data = try_send_handoff_email(
+        runtime,
+        msg,
+        {
+            **session_vars,
+            "verified_email": email,
+            "email_verified_real": False,
+            "pause_reason": "suspicious_email_requires_manual_validation",
+        },
+    )
+    fallback_sent = fallback_attempted and fallback_status in (200, 201, 202)
+    return (
+        attempted or fallback_attempted,
+        fallback_status if fallback_attempted else status,
+        {
+            "primary": {"attempted": attempted, "status": status, "response": data},
+            "fallback": {
+                "attempted": fallback_attempted,
+                "status": fallback_status,
+                "response": fallback_data,
+            },
+        },
+        fallback_sent,
+        "handoff_fallback",
+    )
+
+
 def extract_last_user_text(messages: Any) -> str:
     if not isinstance(messages, list):
         return ""
@@ -946,16 +1055,12 @@ def build_version_text() -> str:
 
 
 def build_paused_reply(session_vars: dict[str, Any]) -> str:
+    """Build paused-conversation reply in conversation language."""
+    lang = get_session_language(session_vars)
     reason = str(session_vars.get("pause_reason") or "").strip().lower()
     if reason == "human_handoff_in_progress":
-        return (
-            "Tu solicitud ya fue derivada a un asesor humano. "
-            "En breve te va a contactar un miembro del equipo por este medio."
-        )
-    return (
-        "Thank you for your interest. We detected a security concern with your email. "
-        "A member of our team will contact you shortly to verify your information and proceed safely."
-    )
+        return get_phrase("paused_handoff", lang)
+    return get_phrase("paused_suspicious", lang)
 
 
 @app.get("/health")
@@ -1102,15 +1207,17 @@ def webhook_openbsp() -> Any:
                         
                         # Send alert to admin once when suspicious email is detected.
                         if not session_vars.get("suspicious_email_alert_sent"):
-                            alert_attempted, alert_status, alert_data = try_send_compromised_email_alert(
+                            alert_attempted, alert_status, alert_data, alert_sent, alert_method = try_send_suspicious_admin_alert(
                                 runtime,
                                 msg,
                                 extracted_email,
                                 session_vars,
                             )
-                            email_suspicious_alert_sent = (
-                                alert_attempted and alert_status in (200, 201, 202)
-                            )
+                            email_suspicious_alert_sent = alert_sent
+                            if alert_attempted:
+                                session_vars["suspicious_email_alert_last_status"] = alert_status
+                                session_vars["suspicious_email_alert_method"] = alert_method
+                                session_vars["suspicious_email_alert_last_response"] = alert_data
                         
                         if email_suspicious_alert_sent:
                             session_vars["suspicious_email_alert_sent_ts"] = int(time.time())
@@ -1147,16 +1254,15 @@ def webhook_openbsp() -> Any:
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
             # Need email before executing handoff.
-            reply = (
-                "Para conectarte con un asesor, primero necesito tu correo electrónico "
-                "para poder derivarte correctamente. ¿Cuál es tu correo?"
-            )
+            lang = get_session_language(session_vars)
+            reply = get_phrase("handoff_ask_email", lang)
             session_vars["handoff_pending_confirmation"] = True
             session_vars["email_requested"] = True
             handoff_data = {"info": "handoff pending email verification"}
             hits = []
         elif handoff_requested:
             # Email already verified – execute handoff immediately, skip LLM.
+            lang = get_session_language(session_vars)
             cooldown_ok = should_send_handoff_email(
                 session_vars,
                 runtime["handoff_email_cooldown_seconds"],
@@ -1171,10 +1277,7 @@ def webhook_openbsp() -> Any:
             else:
                 handoff_data = {"info": "handoff email skipped by cooldown"}
             # Deterministic reply regardless of whether the email succeeded.
-            reply = (
-                "Perfecto, ya derivé tu solicitud a un asesor humano. "
-                "En breve te va a contactar un miembro del equipo por este medio."
-            )
+            reply = get_phrase("handoff_executed", lang)
             session_vars["conversation_paused"] = True
             session_vars["pause_reason"] = "human_handoff_in_progress"
             session_vars["handoff_pending_confirmation"] = False
@@ -1183,10 +1286,8 @@ def webhook_openbsp() -> Any:
             hits = []
         elif session_vars.get("handoff_pending_confirmation"):
             # Handoff was requested earlier but user didn't provide email yet.
-            reply = (
-                "Todavía necesito tu correo electrónico para derivarte con el asesor. "
-                "¿Cuál es tu correo?"
-            )
+            lang = get_session_language(session_vars)
+            reply = get_phrase("handoff_pending", lang)
             hits = []
         else:
             # Normal LLM path.
@@ -1254,6 +1355,7 @@ def webhook_openbsp() -> Any:
                     "email": suspicious_email_value,
                     "status": "sent_to_admin",
                     "reason": "Email appears unverified or new, requires manual validation",
+                    "method": updated_vars.get("suspicious_email_alert_method", "security_alert"),
                 },
             )
         
@@ -1492,15 +1594,17 @@ def chat_completions_compatible() -> Any:
                         )
 
                         if not session_vars.get("suspicious_email_alert_sent"):
-                            alert_attempted, alert_status, alert_data = try_send_compromised_email_alert(
+                            alert_attempted, alert_status, alert_data, alert_sent, alert_method = try_send_suspicious_admin_alert(
                                 runtime,
                                 msg,
                                 extracted_email,
                                 session_vars,
                             )
-                            email_suspicious_alert_sent = (
-                                alert_attempted and alert_status in (200, 201, 202)
-                            )
+                            email_suspicious_alert_sent = alert_sent
+                            if alert_attempted:
+                                session_vars["suspicious_email_alert_last_status"] = alert_status
+                                session_vars["suspicious_email_alert_method"] = alert_method
+                                session_vars["suspicious_email_alert_last_response"] = alert_data
 
                         if email_suspicious_alert_sent:
                             session_vars["suspicious_email_alert_sent_ts"] = int(time.time())
@@ -1530,15 +1634,14 @@ def chat_completions_compatible() -> Any:
             reply = build_paused_reply(session_vars)
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
-            reply = (
-                "Para conectarte con un asesor, primero necesito tu correo electrónico "
-                "para poder derivarte correctamente. ¿Cuál es tu correo?"
-            )
+            lang = get_session_language(session_vars)
+            reply = get_phrase("handoff_ask_email", lang)
             session_vars["handoff_pending_confirmation"] = True
             session_vars["email_requested"] = True
             handoff_data = {"info": "handoff pending email verification"}
             hits = []
         elif handoff_requested:
+            lang = get_session_language(session_vars)
             cooldown_ok = should_send_handoff_email(
                 session_vars,
                 runtime["handoff_email_cooldown_seconds"],
@@ -1552,10 +1655,7 @@ def chat_completions_compatible() -> Any:
                 )
             else:
                 handoff_data = {"info": "handoff email skipped by cooldown"}
-            reply = (
-                "Perfecto, ya derivé tu solicitud a un asesor humano. "
-                "En breve te va a contactar un miembro del equipo por este medio."
-            )
+            reply = get_phrase("handoff_executed", lang)
             session_vars["conversation_paused"] = True
             session_vars["pause_reason"] = "human_handoff_in_progress"
             session_vars["handoff_pending_confirmation"] = False
@@ -1563,10 +1663,8 @@ def chat_completions_compatible() -> Any:
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
         elif session_vars.get("handoff_pending_confirmation"):
-            reply = (
-                "Todavía necesito tu correo electrónico para derivarte con el asesor. "
-                "¿Cuál es tu correo?"
-            )
+            lang = get_session_language(session_vars)
+            reply = get_phrase("handoff_pending", lang)
             hits = []
         else:
             hits = retrieve_top_k(
@@ -1633,6 +1731,7 @@ def chat_completions_compatible() -> Any:
                     "email": suspicious_email_value,
                     "status": "sent_to_admin",
                     "reason": "Email appears unverified or new, requires manual validation",
+                    "method": updated_vars.get("suspicious_email_alert_method", "security_alert"),
                 },
             )
         try_session_append_event(
