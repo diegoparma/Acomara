@@ -918,8 +918,10 @@ def webhook_openbsp() -> Any:
     if not msg["text"]:
         return jsonify({"error": "Could not extract inbound message text"}), 400
 
-    command = msg["text"].strip().lower()
-    if command == "/new":
+    text_lower = msg["text"].strip().lower()
+    
+    # Commands are case-insensitive and can have trailing text
+    if text_lower.startswith("/new"):
         session_base_url = _env("SESSION_AGENT_BASE_URL")
         try_session_delete(session_base_url, msg["conversation_id"])
         return jsonify(
@@ -945,7 +947,7 @@ def webhook_openbsp() -> Any:
                 },
             }
         )
-    if command == "/version":
+    if text_lower.startswith("/version"):
         return jsonify(
             {
                 "ok": True,
@@ -1293,8 +1295,9 @@ def chat_completions_compatible() -> Any:
             400,
         )
 
-    # Handle commands.
-    if user_text.strip().lower() == "/new":
+    # Handle commands (case-insensitive, allow trailing text)
+    text_lower = user_text.strip().lower()
+    if text_lower.startswith("/new"):
         headers = request.headers
         conversation_id = headers.get("conversation-id", "openbsp-conversation")
         session_base_url = _env("SESSION_AGENT_BASE_URL")
@@ -1322,7 +1325,7 @@ def chat_completions_compatible() -> Any:
             },
         }
         return jsonify(completion)
-    if user_text.strip().lower() == "/version":
+    if text_lower.startswith("/version"):
         reply = build_version_text()
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",
