@@ -513,42 +513,38 @@ def normalize_for_intent(text: str) -> str:
 
 
 def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -> bool:
+    """Return True only when the user *explicitly* requests a human agent.
+
+    Affirmative detection ("si", "ok", etc.) was deliberately removed because
+    the LLM often mentions "asesor" in normal replies, which caused every
+    short affirmative to be misdetected as a handoff request.
+    """
     normalized = normalize_for_intent(text)
     triggers = (
-        "asesor",
-        "asesora",
-        "humano",
-        "persona",
-        "representante",
-        "agente humano",
-        "operador",
-        "operadora",
-        "quiero hablar",
-        "hablar con alguien",
+        "contactar con un asesor",
+        "contactar asesor",
+        "hablar con un asesor",
         "hablar con una persona",
-        "pasame con",
+        "hablar con alguien",
+        "hablar con un humano",
+        "pasame con un asesor",
         "pasame con un humano",
+        "pasame con alguien",
+        "quiero hablar con",
+        "quiero un asesor",
+        "quiero un humano",
+        "necesito un asesor",
+        "necesito hablar",
+        "agente humano",
+        "representante humano",
+        "operador humano",
         "speak to human",
-        "human agent",
-        "connect me",
+        "talk to a human",
         "talk to someone",
+        "human agent",
+        "connect me with",
     )
-    if any(trigger in normalized for trigger in triggers):
-        return True
-    # Detect affirmative replies when agent previously offered handoff
-    if session_vars is not None:
-        last_reply = normalize_for_intent(
-            str(session_vars.get("last_assistant_reply", ""))
-        )
-        handoff_offered = any(
-            phrase in last_reply
-            for phrase in ("asesor", "operador", "humano", "human advisor", "connect you")
-        )
-        if handoff_offered:
-            affirmatives = ("si", "si!", "yes", "dale", "ok", "claro", "por favor", "quiero", "sure")
-            if any(normalized.strip() == a or normalized.strip().startswith(a + " ") for a in affirmatives):
-                return True
-    return False
+    return any(trigger in normalized for trigger in triggers)
 
 
 def should_send_handoff_email(
@@ -1060,10 +1056,17 @@ def webhook_openbsp() -> Any:
         now_ts = int(time.time())
 
         # --- HANDOFF DETECTION (before LLM) ---
-        # Runs before generate_reply so we can return a deterministic reply
-        # without wasting an LLM call and without the LLM generating its own
-        # confirmation loop ("¿Quieres que te conecte?").
+        # Detect explicit handoff requests. Affirmative detection was removed to
+        # avoid false positives when the LLM casually mentions "asesor".
         handoff_requested = wants_human_handoff(msg["text"], session_vars)
+        # If user already triggered handoff and email was just verified, proceed.
+        if (
+            not handoff_requested
+            and session_vars.get("handoff_pending_confirmation")
+            and session_vars.get("email_verified_real")
+        ):
+            handoff_requested = True
+
         handoff_attempted = False
         handoff_status = 0
         handoff_data: dict[str, Any] = {}
@@ -1073,8 +1076,18 @@ def webhook_openbsp() -> Any:
             # Conversation already paused – deterministic reply, skip LLM.
             reply = build_paused_reply(session_vars)
             hits = []
+        elif handoff_requested and not session_vars.get("email_verified_real"):
+            # Need email before executing handoff.
+            reply = (
+                "Para conectarte con un asesor, primero necesito tu correo electrónico "
+                "para poder derivarte correctamente. ¿Cuál es tu correo?"
+            )
+            session_vars["handoff_pending_confirmation"] = True
+            session_vars["email_requested"] = True
+            handoff_data = {"info": "handoff pending email verification"}
+            hits = []
         elif handoff_requested:
-            # Human handoff requested: execute immediately, skip the LLM entirely.
+            # Email already verified – execute handoff immediately, skip LLM.
             cooldown_ok = should_send_handoff_email(
                 session_vars,
                 runtime["handoff_email_cooldown_seconds"],
@@ -1088,8 +1101,7 @@ def webhook_openbsp() -> Any:
                 )
             else:
                 handoff_data = {"info": "handoff email skipped by cooldown"}
-            # Deterministic reply regardless of whether the email succeeded or not.
-            # Never return an LLM reply when a handoff is requested.
+            # Deterministic reply regardless of whether the email succeeded.
             reply = (
                 "Perfecto, ya derivé tu solicitud a un asesor humano. "
                 "En breve te va a contactar un miembro del equipo por este medio."
@@ -1099,6 +1111,13 @@ def webhook_openbsp() -> Any:
             session_vars["handoff_pending_confirmation"] = False
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
+            hits = []
+        elif session_vars.get("handoff_pending_confirmation"):
+            # Handoff was requested earlier but user didn't provide email yet.
+            reply = (
+                "Todavía necesito tu correo electrónico para derivarte con el asesor. "
+                "¿Cuál es tu correo?"
+            )
             hits = []
         else:
             # Normal LLM path.
@@ -1117,12 +1136,6 @@ def webhook_openbsp() -> Any:
                 hits,
                 session_vars,
             )
-
-            # Ask for email after a few turns if not already captured/verified.
-            if should_request_email(session_vars) and not extracted_email:
-                follow_up = "\n\nPara poder ayudarte mejor, ¿cuál es tu correo electrónico?"
-                reply = f"{reply}{follow_up}"
-                session_vars["email_requested"] = True
 
         updated_vars = {
             **session_vars,
@@ -1424,6 +1437,13 @@ def chat_completions_compatible() -> Any:
 
         # --- HANDOFF DETECTION (before LLM) ---
         handoff_requested = wants_human_handoff(msg["text"], session_vars)
+        if (
+            not handoff_requested
+            and session_vars.get("handoff_pending_confirmation")
+            and session_vars.get("email_verified_real")
+        ):
+            handoff_requested = True
+
         handoff_attempted = False
         handoff_status = 0
         handoff_data: dict[str, Any] = {}
@@ -1431,6 +1451,15 @@ def chat_completions_compatible() -> Any:
 
         if session_vars.get("conversation_paused"):
             reply = build_paused_reply(session_vars)
+            hits = []
+        elif handoff_requested and not session_vars.get("email_verified_real"):
+            reply = (
+                "Para conectarte con un asesor, primero necesito tu correo electrónico "
+                "para poder derivarte correctamente. ¿Cuál es tu correo?"
+            )
+            session_vars["handoff_pending_confirmation"] = True
+            session_vars["email_requested"] = True
+            handoff_data = {"info": "handoff pending email verification"}
             hits = []
         elif handoff_requested:
             cooldown_ok = should_send_handoff_email(
@@ -1456,6 +1485,12 @@ def chat_completions_compatible() -> Any:
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
+        elif session_vars.get("handoff_pending_confirmation"):
+            reply = (
+                "Todavía necesito tu correo electrónico para derivarte con el asesor. "
+                "¿Cuál es tu correo?"
+            )
+            hits = []
         else:
             hits = retrieve_top_k(
                 client,
@@ -1472,11 +1507,6 @@ def chat_completions_compatible() -> Any:
                 hits,
                 session_vars,
             )
-
-            if should_request_email(session_vars) and not extracted_email:
-                follow_up = "\n\nPara poder ayudarte mejor, ¿cuál es tu correo electrónico?"
-                reply = f"{reply}{follow_up}"
-                session_vars["email_requested"] = True
 
         updated_vars = {
             **session_vars,

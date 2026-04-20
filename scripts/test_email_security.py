@@ -56,32 +56,41 @@ def test_openbsp_flow() -> None:
     r1c = client.post("/webhooks/openbsp", json={**base_payload, "text": "y la logistica?"})
     t1c = (r1c.get_json() or {}).get("reply", "")
     _print_case("openbsp turn3", t1c)
-    _assert("correo" in t1c.lower(), "openbsp turn3 should request email")
+    _assert(r1c.status_code == 200, "openbsp turn3 should return 200")
 
-    # 2) Handoff request – executed immediately without requiring email first.
+    # 2) Handoff request without email → must ask for email, NOT execute handoff yet.
     r2 = client.post(
         "/webhooks/openbsp",
-        json={**base_payload, "text": "quiero hablar con un asesor"},
+        json={**base_payload, "text": "quiero hablar con un asesor humano"},
     )
     j2 = r2.get_json() or {}
     t2 = j2.get("reply", "")
-    _print_case("openbsp handoff", t2)
+    _print_case("openbsp handoff triggers email request", t2)
     _assert(r2.status_code == 200, "openbsp handoff should return 200")
-    _assert("asesor humano" in t2.lower() or "derivé" in t2.lower(), "handoff reply must be deterministic")
-    handoff2 = j2.get("human_handoff_email") or {}
-    _assert(handoff2.get("requested") is True, "handoff_requested should be True")
+    _assert("correo" in t2.lower(), "handoff must ask for email before executing")
     email_ver2 = j2.get("email_verification") or {}
-    _assert(email_ver2.get("conversation_paused") is True, "conversation should pause after handoff")
+    _assert(email_ver2.get("conversation_paused") is not True, "conversation must NOT be paused yet")
 
-    # 3) After handoff, any further message must get the paused-reply (not LLM).
+    # 3) User provides email → HIBP check passes → handoff executes.
     r3 = client.post(
         "/webhooks/openbsp",
         json={**base_payload, "text": "mi correo es test@example.com"},
     )
     j3 = r3.get_json() or {}
     t3 = j3.get("reply", "")
-    _print_case("openbsp post-handoff message", t3)
-    _assert("asesor humano" in t3.lower() or "derivad" in t3.lower(), "paused reply must be deterministic")
+    _print_case("openbsp email provided → handoff executed", t3)
+    _assert("asesor humano" in t3.lower() or "derivé" in t3.lower(), "handoff reply must be deterministic")
+    email_ver3 = j3.get("email_verification") or {}
+    _assert(email_ver3.get("conversation_paused") is True, "conversation should pause after handoff")
+
+    # 4) Any further message must get the paused-reply.
+    r4 = client.post(
+        "/webhooks/openbsp",
+        json={**base_payload, "text": "hola de nuevo"},
+    )
+    t4 = (r4.get_json() or {}).get("reply", "")
+    _print_case("openbsp post-handoff", t4)
+    _assert("asesor humano" in t4.lower() or "derivad" in t4.lower(), "paused reply must be deterministic")
 
 
 def test_chat_completions_flow() -> None:
@@ -117,15 +126,19 @@ def test_chat_completions_flow() -> None:
 
     t1c = send("y la logistica?")
     _print_case("chat turn3", t1c)
-    _assert("correo" in t1c.lower(), "chat turn3 should request email")
+    _assert(len(t1c) > 0, "chat turn3 should return a reply")
 
-    t2 = send("quiero hablar con un asesor")
-    _print_case("chat handoff", t2)
-    _assert("asesor humano" in t2.lower() or "derivé" in t2.lower(), "chat handoff reply must be deterministic")
+    t2 = send("quiero hablar con un asesor humano")
+    _print_case("chat handoff triggers email request", t2)
+    _assert("correo" in t2.lower(), "chat handoff must ask for email first")
 
     t3 = send("mi correo es test@example.com")
-    _print_case("chat post-handoff message", t3)
-    _assert("asesor humano" in t3.lower() or "derivad" in t3.lower(), "chat paused reply must be deterministic")
+    _print_case("chat email provided → handoff executed", t3)
+    _assert("asesor humano" in t3.lower() or "derivé" in t3.lower(), "chat handoff reply must be deterministic")
+
+    t4 = send("hola de nuevo")
+    _print_case("chat post-handoff", t4)
+    _assert("asesor humano" in t4.lower() or "derivad" in t4.lower(), "chat paused reply must be deterministic")
 
 
 if __name__ == "__main__":
