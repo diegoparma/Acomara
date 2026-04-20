@@ -403,6 +403,55 @@ def try_session_delete(
         app.logger.warning("session_delete exception: %s", exc)
 
 
+def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
+    """Build a canonical clean session state for /reset."""
+    return {
+        "conversation_turn_count": 0,
+        "conversation_paused": False,
+        "pause_reason": "",
+        "paused_email": "",
+        "paused_at_ts": now_ts,
+        "last_user_message": "",
+        "last_assistant_reply": "",
+        "handoff_requested": False,
+        "handoff_pending_confirmation": False,
+        "handoff_email_last_sent_ts": None,
+        "handoff_email_last_to": "",
+        "email_requested": False,
+        "email_verified": False,
+        "verified_email": "",
+        "email_verified_real": False,
+        "email_suspicious": False,
+        "suspicious_email": "",
+        "suspicious_email_alert_sent": False,
+        "suspicious_email_alert_sent_ts": None,
+        "email_check_failed": False,
+        "email_check_failed_at_ts": None,
+    }
+
+
+def reset_session_state(
+    session_base_url: str | None,
+    msg: dict[str, str],
+    session_agent_id: str,
+) -> None:
+    """Reset state even if hard delete fails in remote session storage."""
+    now_ts = int(time.time())
+    try_session_delete(session_base_url, msg["conversation_id"])
+    try_session_upsert(
+        session_base_url,
+        msg,
+        session_agent_id,
+        build_reset_session_vars(now_ts),
+    )
+    try_session_append_event(
+        session_base_url,
+        msg["conversation_id"],
+        "session_reset",
+        {"source": "command", "command": "/reset", "at_ts": now_ts},
+    )
+
+
 def retrieve_top_k(
     client: OpenAI,
     embed_model: str,
@@ -510,6 +559,23 @@ def normalize_for_intent(text: str) -> str:
     folded = unicodedata.normalize("NFKD", text)
     ascii_text = folded.encode("ascii", "ignore").decode("ascii")
     return " ".join(ascii_text.lower().split())
+
+
+def extract_command(text: str) -> str | None:
+    """Extract slash command token from user text.
+
+    Accepts commands like:
+    - /reset
+    - /RESET
+    - /reset hola
+    """
+    stripped = (text or "").strip()
+    if not stripped.startswith("/"):
+        return None
+    parts = stripped.split()
+    if not parts:
+        return None
+    return parts[0].lower()
 
 
 def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -> bool:
@@ -918,12 +984,13 @@ def webhook_openbsp() -> Any:
     if not msg["text"]:
         return jsonify({"error": "Could not extract inbound message text"}), 400
 
-    text_lower = msg["text"].strip().lower()
-    
-    # Commands are case-insensitive and can have trailing text
-    if text_lower.startswith("/new"):
+    command = extract_command(msg["text"])
+
+    # /reset is the canonical reset command. /new remains as backward-compatible alias.
+    if command in ("/reset", "/new"):
         session_base_url = _env("SESSION_AGENT_BASE_URL")
-        try_session_delete(session_base_url, msg["conversation_id"])
+        session_agent_id = _env("SESSION_AGENT_ID", "sales-agent-v1") or "sales-agent-v1"
+        reset_session_state(session_base_url, msg, session_agent_id)
         return jsonify(
             {
                 "ok": True,
@@ -947,7 +1014,7 @@ def webhook_openbsp() -> Any:
                 },
             }
         )
-    if text_lower.startswith("/version"):
+    if command == "/version":
         return jsonify(
             {
                 "ok": True,
@@ -1295,13 +1362,21 @@ def chat_completions_compatible() -> Any:
             400,
         )
 
-    # Handle commands (case-insensitive, allow trailing text)
-    text_lower = user_text.strip().lower()
-    if text_lower.startswith("/new"):
-        headers = request.headers
-        conversation_id = headers.get("conversation-id", "openbsp-conversation")
+    headers_dict = validate_and_normalize_headers(request.headers)
+    command = extract_command(user_text)
+    if command in ("/reset", "/new"):
         session_base_url = _env("SESSION_AGENT_BASE_URL")
-        try_session_delete(session_base_url, conversation_id)
+        session_agent_id = _env("SESSION_AGENT_ID", "sales-agent-v1") or "sales-agent-v1"
+        command_msg = {
+            "text": user_text,
+            "conversation_id": headers_dict["conversation_id"],
+            "organization_id": headers_dict["organization_id"],
+            "organization_address": headers_dict["organization_address"],
+            "contact_id": headers_dict["contact_id"],
+            "contact_address": headers_dict["contact_address"],
+            "channel": headers_dict["channel"],
+        }
+        reset_session_state(session_base_url, command_msg, session_agent_id)
         
         # Return success response with reset message
         reply = "Conversación reiniciada. ¿En qué te puedo ayudar?"
@@ -1325,7 +1400,7 @@ def chat_completions_compatible() -> Any:
             },
         }
         return jsonify(completion)
-    if text_lower.startswith("/version"):
+    if command == "/version":
         reply = build_version_text()
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",
@@ -1348,7 +1423,6 @@ def chat_completions_compatible() -> Any:
         }
         return jsonify(completion)
 
-    headers_dict = validate_and_normalize_headers(request.headers)
     msg = {
         "text": user_text,
         "conversation_id": headers_dict["conversation_id"],

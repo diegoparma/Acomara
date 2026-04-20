@@ -141,10 +141,85 @@ def test_chat_completions_flow() -> None:
     _assert("asesor humano" in t4.lower() or "derivad" in t4.lower(), "chat paused reply must be deterministic")
 
 
+def test_reset_command_openbsp() -> None:
+    client = app.test_client()
+    conv_id = f"reg-reset-openbsp-{uuid4()}"
+    base_payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    # Drive the session into paused state via handoff.
+    client.post("/webhooks/openbsp", json={**base_payload, "text": "hola"})
+    client.post("/webhooks/openbsp", json={**base_payload, "text": "quiero hablar con un asesor humano"})
+    client.post("/webhooks/openbsp", json={**base_payload, "text": "mi correo es test@example.com"})
+    paused_reply = (client.post("/webhooks/openbsp", json={**base_payload, "text": "seguimos"}).get_json() or {}).get("reply", "")
+    _assert("derivad" in paused_reply.lower(), "session should be paused before /reset")
+
+    # Reset command should delete session and return fresh-start reply.
+    reset_reply = (client.post("/webhooks/openbsp", json={**base_payload, "text": "/reset hola"}).get_json() or {}).get("reply", "")
+    _print_case("openbsp /reset", reset_reply)
+    _assert("reiniciada" in reset_reply.lower(), "/reset should acknowledge reset")
+
+    # Next message should behave like a new conversation (not paused reply).
+    fresh_reply = (client.post("/webhooks/openbsp", json={**base_payload, "text": "hola"}).get_json() or {}).get("reply", "")
+    _print_case("openbsp post-/reset", fresh_reply)
+    _assert("bienvenido" in fresh_reply.lower(), "conversation should restart after /reset")
+
+
+def test_reset_command_chat_completions() -> None:
+    client = app.test_client()
+    conv_id = f"reg-reset-chat-{uuid4()}"
+    headers = {
+        "Authorization": "Bearer test-orchestrator-key",
+        "conversation-id": conv_id,
+        "organization-id": "test-org",
+        "organization-address": "test-org-address",
+        "contact-id": "test-contact",
+        "contact-address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    def send(text: str) -> str:
+        payload = {
+            "model": "gpt-5.4",
+            "messages": [{"role": "user", "content": text}],
+            "stream": False,
+        }
+        response = client.post("/v1/chat/completions", headers=headers, json=payload)
+        data = response.get_json() or {}
+        content = (((data.get("choices") or [{}])[0].get("message") or {}).get("content") or "")
+        _assert(response.status_code == 200, f"chat endpoint failed for message: {text}")
+        return content
+
+    # Drive the session into paused state via handoff.
+    send("hola")
+    send("quiero hablar con un asesor humano")
+    send("mi correo es test@example.com")
+    paused_reply = send("seguimos")
+    _assert("derivad" in paused_reply.lower(), "session should be paused before /reset")
+
+    # Reset command should clear session.
+    reset_reply = send("/reset hola")
+    _print_case("chat /reset", reset_reply)
+    _assert("reiniciada" in reset_reply.lower(), "chat /reset should acknowledge reset")
+
+    # Next message should behave like a new conversation.
+    fresh_reply = send("hola")
+    _print_case("chat post-/reset", fresh_reply)
+    _assert("bienvenido" in fresh_reply.lower(), "chat conversation should restart after /reset")
+
+
 if __name__ == "__main__":
     load_dotenv(Path(".env"))
 
     print("Running regression tests for email/handoff flows...")
     test_openbsp_flow()
     test_chat_completions_flow()
+    test_reset_command_openbsp()
+    test_reset_command_chat_completions()
     print("All regression checks passed.")
