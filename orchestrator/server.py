@@ -56,6 +56,7 @@ I18N_PHRASES = {
         "proactive_email_check_failed": "Gracias. Ya recibí tu correo, pero no pude validarlo en este momento. Igual quedó registrado por si necesitás derivación con un asesor.",
         "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
         "paused_suspicious": "Gracias por tu interés. Detectamos una alerta de seguridad con tu correo electrónico. Un miembro de nuestro equipo te va a contactar en breve para verificar tus datos y continuar de forma segura.",
+        "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
@@ -67,6 +68,7 @@ I18N_PHRASES = {
         "proactive_email_check_failed": "Thanks. I received your email, but I couldn't validate it right now. It was still saved in case you need a handoff to an advisor.",
         "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
         "paused_suspicious": "Thank you for your interest. We detected a security concern with your email. A team member will contact you shortly to verify your information and proceed safely.",
+        "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
     },
     "pt": {
         "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
@@ -78,6 +80,7 @@ I18N_PHRASES = {
         "proactive_email_check_failed": "Obrigado. Recebi seu email, mas não consegui validá-lo agora. Mesmo assim ele ficou registrado caso você precise de transferência para um consultor.",
         "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
         "paused_suspicious": "Obrigado pelo seu interesse. Detectamos uma preocupação de segurança com seu email. Um membro da equipe o contatará em breve para verificar suas informações.",
+        "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
     },
 }
 
@@ -1070,6 +1073,8 @@ def build_paused_reply(session_vars: dict[str, Any]) -> str:
     reason = str(session_vars.get("pause_reason") or "").strip().lower()
     if reason == "human_handoff_in_progress":
         return get_phrase("paused_handoff", lang)
+    if reason == "proactive_email_request":
+        return get_phrase("paused_proactive_email", lang)
     return get_phrase("paused_suspicious", lang)
 
 
@@ -1313,6 +1318,7 @@ def webhook_openbsp() -> Any:
             reply = get_phrase("proactive_email_saved", lang)
             session_vars["proactive_email_capture_pending"] = False
             session_vars["email_requested"] = False
+            session_vars["conversation_paused"] = False
             hits = []
         elif proactive_email_check_failed:
             lang = get_session_language(session_vars)
@@ -1324,6 +1330,10 @@ def webhook_openbsp() -> Any:
             # Handoff was requested earlier but user didn't provide email yet.
             lang = get_session_language(session_vars)
             reply = get_phrase("handoff_pending", lang)
+            hits = []
+        elif session_vars.get("conversation_paused"):
+            # Conversation paused for other reasons (e.g., suspicious email)
+            reply = build_paused_reply(session_vars)
             hits = []
         else:
             # Normal LLM path.
@@ -1722,6 +1732,7 @@ def chat_completions_compatible() -> Any:
             reply = get_phrase("proactive_email_saved", lang)
             session_vars["proactive_email_capture_pending"] = False
             session_vars["email_requested"] = False
+            session_vars["conversation_paused"] = False
             hits = []
         elif proactive_email_check_failed:
             lang = get_session_language(session_vars)
@@ -1732,6 +1743,10 @@ def chat_completions_compatible() -> Any:
         elif session_vars.get("handoff_pending_confirmation"):
             lang = get_session_language(session_vars)
             reply = get_phrase("handoff_pending", lang)
+            hits = []
+        elif session_vars.get("conversation_paused"):
+            # Conversation paused for other reasons (e.g., suspicious email)
+            reply = build_paused_reply(session_vars)
             hits = []
         else:
             hits = retrieve_top_k(

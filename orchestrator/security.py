@@ -97,16 +97,18 @@ def extract_email_from_text(text: str) -> str | None:
 
 def pause_conversation(
     session_vars: dict[str, Any],
-    email: str,
+    email: str | None,
     reason: str,
 ) -> dict[str, Any]:
     """
-    Mark conversation as paused due to security concern.
+    Mark conversation as paused due to security concern or other reason.
     """
-    return {
+    updated = {
         **session_vars,
         "conversation_paused": True,
         "pause_reason": reason,
-        "paused_email": email,
         "paused_at_ts": int(time.time()),
     }
+    if email:
+        updated["paused_email"] = email
+    return updated
