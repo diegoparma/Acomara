@@ -576,15 +576,14 @@ def generate_reply(
         "Cliente pregunta:\n{question}\n\n"
         "Variables de sesion actuales:\n{session_vars}\n\n"
         "Evidencia interna recuperada:\n{context}\n\n"
-        "Instrucciones:\n"
-        "- Responde SOLO con datos respaldados por evidencia recuperada.\n"
-        "- Si falta informacion, dilo y ofrece pasar a asesor humano.\n"
-        "- Cierra con una sola accion siguiente concreta.\n"
-        "- Se muy breve: maximo 3 bullets o 4 lineas cortas.\n"
-        "- Limita la respuesta a ~450 caracteres, salvo que el usuario pida detalle.\n"
-        "- Haz como maximo 1 pregunta final opcional.\n"
-        "- Responde exactamente en el mismo idioma del ultimo mensaje del usuario, sin mezclar idiomas.\n"
-        "- Mantiene tono comercial profesional y claro."
+        "Instrucciones CRÍTICAS:\n"
+        "- Devuelve la respuesta del FAQ exactamente como aparece en la evidencia recuperada.\n"
+        "- NO parafrasees, resumas, mejores ni agregues información.\n"
+        "- NO traduzces ni adaptes la respuesta si el FAQ está en otro idioma.\n"
+        "- Si la evidencia está en otro idioma, devuélvela tal como está.\n"
+        "- Si no hay evidencia suficiente, di claramente que no está en la documentación.\n"
+        "- Responde en el idioma del usuario SOLO para instrucciones o disculpas, no para la respuesta del FAQ.\n"
+        "- NO agregues preguntas finales ni acciones siguientes más allá de lo que está en el FAQ."
     ).format(
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
