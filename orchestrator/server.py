@@ -85,18 +85,44 @@ I18N_PHRASES = {
 }
 
 
-def get_session_language(session_vars: dict[str, Any] | None) -> str:
-    """Get conversation language from session variables. Default: Spanish.
-    
+def detect_language_from_text(text: str) -> str:
+    """Simple language detection from message content.
+
+    Looks for common keywords in Spanish, Portuguese, and English.
+    Returns detected language code (es/pt/en) or 'en' as default.
+    """
+    text_lower = text.lower()
+
+    es_keywords = ("hola", "qué", "cómo", "dónde", "cuándo", "gracias", "por favor", "sí", "no", "ayuda", "pregunta", "información", "quisiera", "quiero", "necesito", "tengo")
+    pt_keywords = ("oi", "olá", "como", "onde", "obrigado", "por favor", "sim", "não", "ajuda", "pergunta", "informação", "gostaria", "preciso", "tenho", "está")
+
+    es_count = sum(1 for kw in es_keywords if kw in text_lower)
+    pt_count = sum(1 for kw in pt_keywords if kw in text_lower)
+
+    if es_count > pt_count and es_count > 0:
+        return "es"
+    if pt_count > 0:
+        return "pt"
+    return "en"
+
+
+def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str = "") -> str:
+    """Get conversation language from session variables. Default: English.
+
     Reads conversation_language field set by session agent.
-    Falls back to 'es' if missing or invalid.
+    Falls back to language detection from message text if not set.
+    Falls back to 'en' if detection fails.
     """
     if not session_vars or not isinstance(session_vars, dict):
-        return "es"
+        if fallback_text:
+            return detect_language_from_text(fallback_text)
+        return "en"
     lang = session_vars.get("conversation_language", "").strip().lower()
     if lang in I18N_PHRASES:
         return lang
-    return "es"
+    if fallback_text:
+        return detect_language_from_text(fallback_text)
+    return "en"
 
 
 def get_phrase(key: str, language: str | None = None) -> str:
@@ -570,7 +596,7 @@ def generate_reply(
     session_vars: dict[str, Any],
 ) -> str:
     context = hits_to_context(hits)
-    user_lang = get_session_language(session_vars)
+    user_lang = get_session_language(session_vars, msg["text"])
 
     lang_instruction = {
         "es": "Responde en español.",
@@ -1291,7 +1317,7 @@ def webhook_openbsp() -> Any:
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
             # Need email before executing handoff.
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("handoff_ask_email", lang)
             session_vars["handoff_pending_confirmation"] = True
             session_vars["email_requested"] = True
@@ -1299,7 +1325,7 @@ def webhook_openbsp() -> Any:
             hits = []
         elif handoff_requested:
             # Email already verified – execute handoff immediately, skip LLM.
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             cooldown_ok = should_send_handoff_email(
                 session_vars,
                 runtime["handoff_email_cooldown_seconds"],
@@ -1322,21 +1348,21 @@ def webhook_openbsp() -> Any:
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
         elif proactive_email_verified:
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("proactive_email_saved", lang)
             session_vars["proactive_email_capture_pending"] = False
             session_vars["email_requested"] = False
             session_vars["conversation_paused"] = False
             hits = []
         elif proactive_email_check_failed:
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("proactive_email_check_failed", lang)
             session_vars["proactive_email_capture_pending"] = False
             session_vars["email_requested"] = False
             hits = []
         elif session_vars.get("handoff_pending_confirmation"):
             # Handoff was requested earlier but user didn't provide email yet.
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("handoff_pending", lang)
             hits = []
         elif session_vars.get("conversation_paused"):
@@ -1361,7 +1387,7 @@ def webhook_openbsp() -> Any:
                 session_vars,
             )
             if should_request_email(session_vars):
-                lang = get_session_language(session_vars)
+                lang = get_session_language(session_vars, msg.get("text", ""))
                 reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
@@ -1707,14 +1733,14 @@ def chat_completions_compatible() -> Any:
             reply = build_paused_reply(session_vars)
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("handoff_ask_email", lang)
             session_vars["handoff_pending_confirmation"] = True
             session_vars["email_requested"] = True
             handoff_data = {"info": "handoff pending email verification"}
             hits = []
         elif handoff_requested:
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             cooldown_ok = should_send_handoff_email(
                 session_vars,
                 runtime["handoff_email_cooldown_seconds"],
@@ -1736,20 +1762,20 @@ def chat_completions_compatible() -> Any:
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
             hits = []
         elif proactive_email_verified:
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("proactive_email_saved", lang)
             session_vars["proactive_email_capture_pending"] = False
             session_vars["email_requested"] = False
             session_vars["conversation_paused"] = False
             hits = []
         elif proactive_email_check_failed:
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("proactive_email_check_failed", lang)
             session_vars["proactive_email_capture_pending"] = False
             session_vars["email_requested"] = False
             hits = []
         elif session_vars.get("handoff_pending_confirmation"):
-            lang = get_session_language(session_vars)
+            lang = get_session_language(session_vars, msg.get("text", ""))
             reply = get_phrase("handoff_pending", lang)
             hits = []
         elif session_vars.get("conversation_paused"):
@@ -1773,7 +1799,7 @@ def chat_completions_compatible() -> Any:
                 session_vars,
             )
             if should_request_email(session_vars):
-                lang = get_session_language(session_vars)
+                lang = get_session_language(session_vars, msg.get("text", ""))
                 reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
