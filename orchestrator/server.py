@@ -570,6 +570,14 @@ def generate_reply(
     session_vars: dict[str, Any],
 ) -> str:
     context = hits_to_context(hits)
+    user_lang = get_session_language(session_vars)
+
+    lang_instruction = {
+        "es": "Responde en español.",
+        "en": "Respond in English.",
+        "pt": "Responda em português.",
+    }.get(user_lang, "Respond in the user's language.")
+
     user_prompt = (
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
@@ -577,19 +585,20 @@ def generate_reply(
         "Variables de sesion actuales:\n{session_vars}\n\n"
         "Evidencia interna recuperada:\n{context}\n\n"
         "Instrucciones CRÍTICAS:\n"
+        "- {lang_instruction}\n"
         "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada.\n"
         "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
-        "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación.\n"
-        "- Responde TODO en el idioma del usuario (incluyendo la respuesta del FAQ traducida si aplica)."
+        "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
     ).format(
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],
         session_vars=json.dumps(session_vars, ensure_ascii=False),
         context=context,
+        lang_instruction=lang_instruction,
     )
 
     resp = client.responses.create(
