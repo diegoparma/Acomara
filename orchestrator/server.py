@@ -499,11 +499,11 @@ def try_session_delete(
 
 def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
     """Build a canonical clean session state for /reset.
-    
-    NOTE: Intentionally does NOT preserve conversation_language.
-    This allows testing across different idiomas during reset flow.
+
+    Defaults conversation_language to English.
     """
     return {
+        "conversation_language": "en",
         "conversation_turn_count": 0,
         "conversation_paused": False,
         "pause_reason": "",
@@ -1395,6 +1395,10 @@ def webhook_openbsp() -> Any:
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
 
+        # Update conversation_language based on detected language from current message
+        detected_lang = get_session_language(session_vars, msg["text"])
+        session_vars["conversation_language"] = detected_lang
+
         updated_vars = {
             **session_vars,
             "last_user_message": msg["text"],
@@ -1817,6 +1821,10 @@ def chat_completions_compatible() -> Any:
                 reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
+
+        # Update conversation_language based on detected language from current message
+        detected_lang = get_session_language(session_vars, msg["text"])
+        session_vars["conversation_language"] = detected_lang
 
         updated_vars = {
             **session_vars,
