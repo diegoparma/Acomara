@@ -1168,31 +1168,6 @@ def webhook_openbsp() -> Any:
                 },
             }
         )
-    if command == "/version":
-        return jsonify(
-            {
-                "ok": True,
-                "conversation_id": msg["conversation_id"],
-                "contact_id": msg["contact_id"],
-                "reply": build_version_text(),
-                "sources": [],
-                "openbsp_send": {"attempted": False, "status": 0, "response": {"info": "command"}},
-                "human_handoff_email": {
-                    "requested": False,
-                    "attempted": False,
-                    "sent": False,
-                    "status": 0,
-                    "response": {"info": "command"},
-                },
-                "email_verification": {
-                    "enabled": True,
-                    "suspicious": False,
-                    "alert_sent": False,
-                    "conversation_paused": False,
-                },
-            }
-        )
-
     try:
         runtime = ensure_runtime()
         client = OpenAI(api_key=runtime["api_key"])
@@ -1202,6 +1177,34 @@ def webhook_openbsp() -> Any:
         snapshot = try_session_get(session_base_url, msg["conversation_id"])
         if snapshot and isinstance(snapshot.get("variables"), dict):
             session_vars = snapshot["variables"]
+
+        if command == "/version":
+            detected_lang = get_session_language(session_vars, msg["text"])
+            version_text = build_version_text()
+            version_with_lang = f"{version_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
+            return jsonify(
+                {
+                    "ok": True,
+                    "conversation_id": msg["conversation_id"],
+                    "contact_id": msg["contact_id"],
+                    "reply": version_with_lang,
+                    "sources": [],
+                    "openbsp_send": {"attempted": False, "status": 0, "response": {"info": "command"}},
+                    "human_handoff_email": {
+                        "requested": False,
+                        "attempted": False,
+                        "sent": False,
+                        "status": 0,
+                        "response": {"info": "command"},
+                    },
+                    "email_verification": {
+                        "enabled": True,
+                        "suspicious": False,
+                        "alert_sent": False,
+                        "conversation_paused": False,
+                    },
+                }
+            )
 
         # Increment conversation turn counter
         current_turn = session_vars.get("conversation_turn_count", 0)
@@ -1587,8 +1590,29 @@ def chat_completions_compatible() -> Any:
             },
         }
         return jsonify(completion)
+    msg = {
+        "text": user_text,
+        "conversation_id": headers_dict["conversation_id"],
+        "organization_id": headers_dict["organization_id"],
+        "organization_address": headers_dict["organization_address"],
+        "contact_id": headers_dict["contact_id"],
+        "contact_address": headers_dict["contact_address"],
+        "channel": headers_dict["channel"],
+    }
+
     if command == "/version":
-        reply = build_version_text()
+        try:
+            runtime = ensure_runtime()
+            session_vars: dict[str, Any] = {}
+            session_base_url = runtime["session_base_url"]
+            snapshot = try_session_get(session_base_url, msg["conversation_id"])
+            if snapshot and isinstance(snapshot.get("variables"), dict):
+                session_vars = snapshot["variables"]
+            detected_lang = get_session_language(session_vars, msg["text"])
+            version_text = build_version_text()
+            reply = f"{version_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
+        except Exception:
+            reply = build_version_text()
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",
             "object": "chat.completion",
@@ -1609,16 +1633,6 @@ def chat_completions_compatible() -> Any:
             },
         }
         return jsonify(completion)
-
-    msg = {
-        "text": user_text,
-        "conversation_id": headers_dict["conversation_id"],
-        "organization_id": headers_dict["organization_id"],
-        "organization_address": headers_dict["organization_address"],
-        "contact_id": headers_dict["contact_id"],
-        "contact_address": headers_dict["contact_address"],
-        "channel": headers_dict["channel"],
-    }
 
     try:
         runtime = ensure_runtime()
