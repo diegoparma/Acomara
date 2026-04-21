@@ -55,7 +55,7 @@ I18N_PHRASES = {
         "proactive_email_saved": "Gracias. Ya verifiqué tu correo y quedó registrado. Si después querés que te conecte con un asesor, ya lo tengo listo.",
         "proactive_email_check_failed": "Gracias. Ya recibí tu correo, pero no pude validarlo en este momento. Igual quedó registrado por si necesitás derivación con un asesor.",
         "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
-        "paused_suspicious": "Gracias por tu interés. Detectamos una alerta de seguridad con tu correo electrónico. Un miembro de nuestro equipo te va a contactar en breve para verificar tus datos y continuar de forma segura.",
+        "paused_suspicious": "Excelente, te vamos a estar contactando en breve.",
         "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
     },
     "en": {
@@ -67,7 +67,7 @@ I18N_PHRASES = {
         "proactive_email_saved": "Thanks. I already verified your email and saved it. If you want me to connect you with an advisor later, it's ready.",
         "proactive_email_check_failed": "Thanks. I received your email, but I couldn't validate it right now. It was still saved in case you need a handoff to an advisor.",
         "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
-        "paused_suspicious": "Thank you for your interest. We detected a security concern with your email. A team member will contact you shortly to verify your information and proceed safely.",
+        "paused_suspicious": "Great! We'll be in touch shortly.",
         "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
     },
     "pt": {
@@ -79,7 +79,7 @@ I18N_PHRASES = {
         "proactive_email_saved": "Obrigado. Já verifiquei seu email e ele ficou registrado. Se depois você quiser falar com um consultor, já está pronto.",
         "proactive_email_check_failed": "Obrigado. Recebi seu email, mas não consegui validá-lo agora. Mesmo assim ele ficou registrado caso você precise de transferência para um consultor.",
         "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
-        "paused_suspicious": "Obrigado pelo seu interesse. Detectamos uma preocupação de segurança com seu email. Um membro da equipe o contatará em breve para verificar suas informações.",
+        "paused_suspicious": "Excelente, vamos estar em contato em breve.",
         "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
     },
 }
