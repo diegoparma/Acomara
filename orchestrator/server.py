@@ -1209,7 +1209,14 @@ def webhook_openbsp() -> Any:
         if command == "/version":
             detected_lang = get_session_language(session_vars, msg["text"])
             version_text = build_version_text()
-            version_with_lang = f"{version_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
+            client_status_text = ""
+            if session_vars.get("crm_client_found"):
+                client_status = "✅ CONTACTED" if session_vars.get("crm_client_contacted") else "👤 NEW CLIENT"
+                client_status_text = f"\nCRM Client: {client_status} ({session_vars.get('crm_client_name', 'Unknown')})"
+            else:
+                client_status_text = "\nCRM Client: Not found in system"
+
+            version_with_lang = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
             return jsonify(
                 {
                     "ok": True,
@@ -1230,6 +1237,12 @@ def webhook_openbsp() -> Any:
                         "suspicious": False,
                         "alert_sent": False,
                         "conversation_paused": False,
+                    },
+                    "crm_client": {
+                        "found": session_vars.get("crm_client_found", False),
+                        "contacted": session_vars.get("crm_client_contacted", False),
+                        "name": session_vars.get("crm_client_name"),
+                        "search_method": session_vars.get("crm_search_method"),
                     },
                 }
             )
@@ -1252,6 +1265,19 @@ def webhook_openbsp() -> Any:
                 "contact_id": msg["contact_id"],
             },
         )
+
+        # Check CRM client status by phone (from contact_address) first, fallback to email
+        if not session_vars.get("crm_client_found"):
+            phone = msg.get("contact_address", "").strip()
+            extracted_email_temp = extract_email_from_text(msg["text"])
+            crm_status = check_client_status(phone=phone, email=extracted_email_temp)
+            session_vars["crm_client_found"] = crm_status.get("found", False)
+            session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
+            session_vars["crm_client_id"] = crm_status.get("client_id")
+            session_vars["crm_client_name"] = crm_status.get("client_name")
+            session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
+            session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
+            session_vars["crm_search_method"] = crm_status.get("search_by")
 
         # Email verification logic
         email_verification_enabled = runtime.get("email_verification_enabled", True)
@@ -1652,7 +1678,15 @@ def chat_completions_compatible() -> Any:
                 session_vars = snapshot["variables"]
             detected_lang = get_session_language(session_vars, msg["text"])
             version_text = build_version_text()
-            reply = f"{version_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
+
+            client_status_text = ""
+            if session_vars.get("crm_client_found"):
+                client_status = "✅ CONTACTED" if session_vars.get("crm_client_contacted") else "👤 NEW CLIENT"
+                client_status_text = f"\nCRM Client: {client_status} ({session_vars.get('crm_client_name', 'Unknown')})"
+            else:
+                client_status_text = "\nCRM Client: Not found in system"
+
+            reply = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
         except Exception:
             reply = build_version_text()
         completion = {
@@ -1703,6 +1737,19 @@ def chat_completions_compatible() -> Any:
                 "contact_id": msg["contact_id"],
             },
         )
+
+        # Check CRM client status by phone (from contact_address) first, fallback to email
+        if not session_vars.get("crm_client_found"):
+            phone = msg.get("contact_address", "").strip()
+            extracted_email_temp = extract_email_from_text(msg["text"])
+            crm_status = check_client_status(phone=phone, email=extracted_email_temp)
+            session_vars["crm_client_found"] = crm_status.get("found", False)
+            session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
+            session_vars["crm_client_id"] = crm_status.get("client_id")
+            session_vars["crm_client_name"] = crm_status.get("client_name")
+            session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
+            session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
+            session_vars["crm_search_method"] = crm_status.get("search_by")
 
         # Email verification logic
         email_verification_enabled = runtime.get("email_verification_enabled", True)

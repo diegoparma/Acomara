@@ -15,17 +15,23 @@ from orchestrator.crm_client_status import check_client_status
 def test_client_lookup():
     """Test looking up clients in the CRM."""
 
-    # Test with a few example emails
-    test_emails = [
-        "diego@example.com",  # Non-existent
-        "test@example.com",   # Non-existent
+    # Test with phone numbers and emails
+    test_cases = [
+        ("5491234567", None, "Phone lookup example"),
+        (None, "test@example.com", "Email fallback example"),
+        ("invalid_phone", "invalid@example.com", "Non-existent client"),
     ]
 
     print("Testing CRM client status checker...\n")
 
-    for email in test_emails:
-        print(f"📧 Looking up: {email}")
-        result = check_client_status(email)
+    for phone, email, description in test_cases:
+        print(f"📞 {description}")
+        if phone:
+            print(f"   Phone: {phone}")
+        if email:
+            print(f"   Email: {email}")
+
+        result = check_client_status(phone=phone, email=email)
 
         print(f"   Found: {result['found']}")
         if result['found']:
@@ -34,6 +40,7 @@ def test_client_lookup():
             print(f"   Consultations: {result['consultation_count']}")
             if result['last_consultation_date']:
                 print(f"   Last consultation: {result['last_consultation_date']}")
+            print(f"   Search method: {result.get('search_by', 'unknown')}")
         else:
             print(f"   Status: Not found in CRM")
 
