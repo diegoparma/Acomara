@@ -1125,6 +1125,7 @@ def build_version_text() -> str:
             f"HIBP key: {'configured' if features['has_hibp_api_key'] else 'missing'}",
             f"Session agent: {features['session_agent_base_url'] or 'missing'}",
             f"Handoff provider: {features['handoff_provider']}",
+            f"DB Host: {_env('DB_HOST', 'not configured')}",
         ]
     )
 
