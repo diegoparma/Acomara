@@ -36,6 +36,7 @@ from orchestrator.security import (
     pause_conversation,
     should_request_email,
 )
+from orchestrator.crm_client_status import check_client_status
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
@@ -529,6 +530,12 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "suspicious_email_alert_last_response": {},
         "email_check_failed": False,
         "email_check_failed_at_ts": None,
+        "crm_client_found": False,
+        "crm_client_contacted": False,
+        "crm_client_id": None,
+        "crm_client_name": None,
+        "crm_consultation_count": 0,
+        "crm_last_consultation_date": None,
     }
 
 
@@ -604,12 +611,32 @@ def generate_reply(
         "pt": "Responda em português.",
     }.get(user_lang, "Respond in the user's language.")
 
+    crm_client_context = ""
+    if session_vars.get("crm_client_found"):
+        client_name = session_vars.get("crm_client_name", "Cliente")
+        consultation_count = session_vars.get("crm_consultation_count", 0)
+        if session_vars.get("crm_client_contacted"):
+            crm_client_context = (
+                f"\n⭐ CLIENTE REGISTRADO: {client_name} ya fue contactado anteriormente "
+                f"({consultation_count} consulta(s) previa(s)). "
+                "Ofrece trato VIP/preferencial: sé más personal, recuerda detalles de sus consultas anteriores si es relevante, "
+                "y prioriza su comodidad."
+            )
+        else:
+            crm_client_context = (
+                f"\n👤 CLIENTE NUEVO: {client_name} es un cliente registrado pero sin consultas previas. "
+                "Es su primer contacto, sé bienvenido y explica bien los servicios."
+            )
+    else:
+        crm_client_context = "\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema."
+
     user_prompt = (
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
         "Cliente pregunta:\n{question}\n\n"
         "Variables de sesion actuales:\n{session_vars}\n\n"
-        "Evidencia interna recuperada:\n{context}\n\n"
+        "{crm_context}"
+        "\n\nEvidencia interna recuperada:\n{context}\n\n"
         "Instrucciones CRÍTICAS:\n"
         "- {lang_instruction}\n"
         "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada.\n"
@@ -623,6 +650,7 @@ def generate_reply(
         conversation_id=msg["conversation_id"],
         question=msg["text"],
         session_vars=json.dumps(session_vars, ensure_ascii=False),
+        crm_context=crm_client_context,
         context=context,
         lang_instruction=lang_instruction,
     )
@@ -1232,7 +1260,17 @@ def webhook_openbsp() -> Any:
         suspicious_email_value = ""
         extracted_email = extract_email_from_text(msg["text"])
         conversation_paused = bool(session_vars.get("conversation_paused"))
-        
+
+        # Check CRM client status if we have an email
+        if extracted_email and not session_vars.get("crm_client_found"):
+            crm_status = check_client_status(extracted_email)
+            session_vars["crm_client_found"] = crm_status.get("found", False)
+            session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
+            session_vars["crm_client_id"] = crm_status.get("client_id")
+            session_vars["crm_client_name"] = crm_status.get("client_name")
+            session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
+            session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
+
         if email_verification_enabled and not conversation_paused:
             if extracted_email and not session_vars.get("email_verified"):
                 # Check email reputation against Have I Been Pwned
@@ -1673,6 +1711,16 @@ def chat_completions_compatible() -> Any:
         suspicious_email_value = ""
         extracted_email = extract_email_from_text(msg["text"])
         conversation_paused = bool(session_vars.get("conversation_paused"))
+
+        # Check CRM client status if we have an email
+        if extracted_email and not session_vars.get("crm_client_found"):
+            crm_status = check_client_status(extracted_email)
+            session_vars["crm_client_found"] = crm_status.get("found", False)
+            session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
+            session_vars["crm_client_id"] = crm_status.get("client_id")
+            session_vars["crm_client_name"] = crm_status.get("client_name")
+            session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
+            session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
 
         if email_verification_enabled and not conversation_paused:
             if extracted_email and not session_vars.get("email_verified"):
