@@ -577,13 +577,13 @@ def generate_reply(
         "Variables de sesion actuales:\n{session_vars}\n\n"
         "Evidencia interna recuperada:\n{context}\n\n"
         "Instrucciones CRÍTICAS:\n"
-        "- Devuelve la respuesta del FAQ exactamente como aparece en la evidencia recuperada.\n"
-        "- NO parafrasees, resumas, mejores ni agregues información.\n"
-        "- NO traduzces ni adaptes la respuesta si el FAQ está en otro idioma.\n"
-        "- Si la evidencia está en otro idioma, devuélvela tal como está.\n"
-        "- Si no hay evidencia suficiente, di claramente que no está en la documentación.\n"
-        "- Responde en el idioma del usuario SOLO para instrucciones o disculpas, no para la respuesta del FAQ.\n"
-        "- NO agregues preguntas finales ni acciones siguientes más allá de lo que está en el FAQ."
+        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada.\n"
+        "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
+        "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
+        "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
+        "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
+        "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación.\n"
+        "- Responde TODO en el idioma del usuario (incluyendo la respuesta del FAQ traducida si aplica)."
     ).format(
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
