@@ -1268,10 +1268,13 @@ def webhook_openbsp() -> Any:
         )
 
         # Check CRM client status by phone (from contact_address) first, fallback to email
-        if not session_vars.get("crm_client_found"):
-            phone = msg.get("contact_address", "").strip()
+        phone = msg.get("contact_address", "").strip()
+        print(f"[SERVER_DEBUG] Checking CRM for phone={phone}")
+        if phone:  # Only check if we have a phone number
             extracted_email_temp = extract_email_from_text(msg["text"])
+            print(f"[SERVER_DEBUG] Calling check_client_status with phone={phone}, email={extracted_email_temp}")
             crm_status = check_client_status(phone=phone, email=extracted_email_temp)
+            print(f"[SERVER_DEBUG] CRM Status result: {crm_status}")
             session_vars["crm_client_found"] = crm_status.get("found", False)
             session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
             session_vars["crm_client_id"] = crm_status.get("client_id")
@@ -1279,6 +1282,8 @@ def webhook_openbsp() -> Any:
             session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
             session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
             session_vars["crm_search_method"] = crm_status.get("search_by")
+        else:
+            print(f"[SERVER_DEBUG] No phone number in contact_address, skipping CRM check")
 
         # Email verification logic
         email_verification_enabled = runtime.get("email_verification_enabled", True)
@@ -1740,10 +1745,13 @@ def chat_completions_compatible() -> Any:
         )
 
         # Check CRM client status by phone (from contact_address) first, fallback to email
-        if not session_vars.get("crm_client_found"):
-            phone = msg.get("contact_address", "").strip()
+        phone = msg.get("contact_address", "").strip()
+        print(f"[SERVER_DEBUG] Checking CRM for phone={phone}")
+        if phone:  # Only check if we have a phone number
             extracted_email_temp = extract_email_from_text(msg["text"])
+            print(f"[SERVER_DEBUG] Calling check_client_status with phone={phone}, email={extracted_email_temp}")
             crm_status = check_client_status(phone=phone, email=extracted_email_temp)
+            print(f"[SERVER_DEBUG] CRM Status result: {crm_status}")
             session_vars["crm_client_found"] = crm_status.get("found", False)
             session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
             session_vars["crm_client_id"] = crm_status.get("client_id")
@@ -1751,6 +1759,8 @@ def chat_completions_compatible() -> Any:
             session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
             session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
             session_vars["crm_search_method"] = crm_status.get("search_by")
+        else:
+            print(f"[SERVER_DEBUG] No phone number in contact_address, skipping CRM check")
 
         # Email verification logic
         email_verification_enabled = runtime.get("email_verification_enabled", True)
