@@ -78,6 +78,7 @@ def build_context(top_hits: list[dict]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Answer one sales query from FAQ cloud index")
     parser.add_argument("query", help="Customer question")
+    parser.add_argument("--lang", default="es", choices=["es", "en", "pt"], help="Response language (default: es)")
     args = parser.parse_args()
 
     load_dotenv(ROOT / ".env")
@@ -111,7 +112,7 @@ def main() -> None:
         "- Responde SOLO con datos respaldados por la evidencia.\n"
         "- Si falta informacion, dilo explicitamente y ofrece pasar a asesor humano.\n"
         "- Cierra con un siguiente paso comercial concreto (una sola accion).\n"
-        "- Escribe en espanol."
+        "- " + {"es": "Responde en español.", "en": "Respond in English.", "pt": "Responda em português."}.get(args.lang, "Responde en español.")
     )
 
     resp = client.responses.create(
