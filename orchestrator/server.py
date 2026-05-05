@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import smtplib
 import sys
 import time
@@ -93,6 +94,16 @@ def detect_language_from_text(text: str) -> str:
     Returns detected language code (es/pt/en) or 'es' as conservative default.
     """
     text_lower = text.lower()
+    normalized_text = unicodedata.normalize("NFKD", text_lower)
+    normalized_text = normalized_text.encode("ascii", "ignore").decode("ascii")
+
+    def keyword_count(keywords: tuple[str, ...]) -> int:
+        count = 0
+        for keyword in keywords:
+            pattern = r"(?<!\w)" + re.escape(keyword) + r"(?!\w)"
+            if re.search(pattern, normalized_text):
+                count += 1
+        return count
 
     es_keywords = (
         "hola",
@@ -150,9 +161,9 @@ def detect_language_from_text(text: str) -> str:
         "route",
     )
 
-    es_count = sum(1 for kw in es_keywords if kw in text_lower)
-    pt_count = sum(1 for kw in pt_keywords if kw in text_lower)
-    en_count = sum(1 for kw in en_keywords if kw in text_lower)
+    es_count = keyword_count(es_keywords)
+    pt_count = keyword_count(pt_keywords)
+    en_count = keyword_count(en_keywords)
 
     if en_count > es_count and en_count > pt_count and en_count > 0:
         return "en"
@@ -562,6 +573,7 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
     """
     return {
         "conversation_language": "es",
+        "conversation_language_source": "reset",
         "conversation_turn_count": 0,
         "conversation_paused": False,
         "pause_reason": "",
@@ -618,6 +630,15 @@ def reset_session_state(
         "session_reset",
         {"source": "command", "command": "/reset", "at_ts": now_ts},
     )
+
+
+def get_language_source(session_vars: dict[str, Any] | None) -> str:
+    if not session_vars or not isinstance(session_vars, dict):
+        return "message content"
+    source = str(session_vars.get("conversation_language_source") or "").strip().lower()
+    if not source:
+        return "message content"
+    return source
 
 
 def retrieve_top_k(
@@ -1213,7 +1234,6 @@ def build_version_text() -> str:
             f"Environment: {payload['environment']}",
             f"Version: {payload['version']}",
             f"Commit: {payload['commit_short']}",
-            f"Deployment: {payload['deployment']}",
             f"Python: {payload['python']}",
             f"Email verification: {'on' if features['email_verification_enabled'] else 'off'}",
             f"HIBP key: {'configured' if features['has_hibp_api_key'] else 'missing'}",
@@ -1287,7 +1307,7 @@ def webhook_openbsp() -> Any:
                 "ok": True,
                 "conversation_id": msg["conversation_id"],
                 "contact_id": msg["contact_id"],
-                "reply": "Conversación reiniciada. ¿En qué te puedo ayudar?",
+                "reply": "Conversación reiniciada. Idioma reiniciado a español. ¿En qué te puedo ayudar?",
                 "sources": [],
                 "openbsp_send": {"attempted": False, "status": 0, "response": {"info": "command"}},
                 "human_handoff_email": {
@@ -1361,7 +1381,7 @@ def webhook_openbsp() -> Any:
             else:
                 client_status_text = "\nCRM Client: Not found in system"
 
-            version_with_lang = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
+            version_with_lang = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {get_language_source(session_vars)}"
             return jsonify(
                 {
                     "ok": True,
@@ -1612,6 +1632,7 @@ def webhook_openbsp() -> Any:
         # Update conversation_language based on detected language from current message
         detected_lang = get_session_language(session_vars, msg["text"])
         session_vars["conversation_language"] = detected_lang
+        session_vars["conversation_language_source"] = "message_detected"
 
         updated_vars = {
             **session_vars,
@@ -1789,7 +1810,7 @@ def chat_completions_compatible() -> Any:
         reset_session_state(session_base_url, command_msg, session_agent_id)
         
         # Return success response with reset message
-        reply = "Conversación reiniciada. ¿En qué te puedo ayudar?"
+        reply = "Conversación reiniciada. Idioma reiniciado a español. ¿En qué te puedo ayudar?"
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",
             "object": "chat.completion",
@@ -1838,7 +1859,7 @@ def chat_completions_compatible() -> Any:
             else:
                 client_status_text = "\nCRM Client: Not found in system"
 
-            reply = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {session_vars.get('conversation_language', 'message content')}"
+            reply = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {get_language_source(session_vars)}"
         except Exception:
             reply = build_version_text()
         completion = {
@@ -2104,6 +2125,7 @@ def chat_completions_compatible() -> Any:
         # Update conversation_language based on detected language from current message
         detected_lang = get_session_language(session_vars, msg["text"])
         session_vars["conversation_language"] = detected_lang
+        session_vars["conversation_language_source"] = "message_detected"
 
         updated_vars = {
             **session_vars,

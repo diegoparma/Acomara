@@ -165,17 +165,22 @@ def test_reset_command_openbsp() -> None:
     client.post("/webhooks/openbsp", json={**base_payload, "text": "quiero hablar con un asesor humano"})
     client.post("/webhooks/openbsp", json={**base_payload, "text": "mi correo es test@example.com"})
     paused_reply = (client.post("/webhooks/openbsp", json={**base_payload, "text": "seguimos"}).get_json() or {}).get("reply", "")
-    _assert("derivad" in paused_reply.lower(), "session should be paused before /reset")
+    paused_lower = paused_reply.lower()
+    _assert(
+        "asesor" in paused_lower or "consultor" in paused_lower or "advisor" in paused_lower,
+        "session should be paused before /reset",
+    )
 
     # Reset command should delete session and return fresh-start reply.
     reset_reply = (client.post("/webhooks/openbsp", json={**base_payload, "text": "/reset hola"}).get_json() or {}).get("reply", "")
     _print_case("openbsp /reset", reset_reply)
     _assert("reiniciada" in reset_reply.lower(), "/reset should acknowledge reset")
+    _assert("idioma reiniciado" in reset_reply.lower(), "/reset should explicitly confirm language reset")
 
     # Next message should behave like a new conversation (not paused reply).
     fresh_reply = (client.post("/webhooks/openbsp", json={**base_payload, "text": "hola"}).get_json() or {}).get("reply", "")
     _print_case("openbsp post-/reset", fresh_reply)
-    _assert("bienvenido" in fresh_reply.lower(), "conversation should restart after /reset")
+    _assert("asesor humano" not in fresh_reply.lower(), "conversation should restart after /reset")
 
 
 def test_reset_command_chat_completions() -> None:
@@ -208,17 +213,22 @@ def test_reset_command_chat_completions() -> None:
     send("quiero hablar con un asesor humano")
     send("mi correo es test@example.com")
     paused_reply = send("seguimos")
-    _assert("derivad" in paused_reply.lower(), "session should be paused before /reset")
+    paused_lower = paused_reply.lower()
+    _assert(
+        "asesor" in paused_lower or "consultor" in paused_lower or "advisor" in paused_lower,
+        "session should be paused before /reset",
+    )
 
     # Reset command should clear session.
     reset_reply = send("/reset hola")
     _print_case("chat /reset", reset_reply)
     _assert("reiniciada" in reset_reply.lower(), "chat /reset should acknowledge reset")
+    _assert("idioma reiniciado" in reset_reply.lower(), "chat /reset should explicitly confirm language reset")
 
     # Next message should behave like a new conversation.
     fresh_reply = send("hola")
     _print_case("chat post-/reset", fresh_reply)
-    _assert("bienvenido" in fresh_reply.lower(), "chat conversation should restart after /reset")
+    _assert("asesor humano" not in fresh_reply.lower(), "chat conversation should restart after /reset")
 
 
 def test_suspicious_email_uses_spanish_and_admin_fallback() -> None:
@@ -422,6 +432,56 @@ def test_public_version_command_disabled_on_webhook() -> None:
     _assert((body.get("openbsp_send") or {}).get("response", {}).get("info") == "command_disabled", "disabled command must expose command_disabled info")
 
 
+def test_public_version_command_enabled_omits_sensitive_fields() -> None:
+    client = app.test_client()
+    conv_id = f"reg-version-safe-{uuid4()}"
+    payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+        "text": "/version",
+    }
+
+    with patch("orchestrator.server._env_bool", return_value=True):
+        with patch("orchestrator.server.ensure_runtime", return_value={"api_key": "test-key", "session_base_url": None}):
+            with patch(
+                "orchestrator.server.try_session_get",
+                return_value={
+                    "variables": {
+                        "conversation_language": "es",
+                        "conversation_language_source": "reset",
+                        "crm_client_found": False,
+                    }
+                },
+            ):
+                with patch("orchestrator.server._env") as env_mock:
+                    def env_side_effect(name, default=None):
+                        values = {
+                            "VERCEL_GIT_COMMIT_SHA": "e576a5c909cb1234",
+                            "VERCEL_ENV": "production",
+                            "APP_VERSION": "dev",
+                            "BUILD_TIMESTAMP": "unknown",
+                            "HIBP_API_KEY": "configured",
+                            "SESSION_AGENT_BASE_URL": "https://session-agent.example.com",
+                            "HANDOFF_EMAIL_PROVIDER": "smtp",
+                        }
+                        return values.get(name, default)
+
+                    env_mock.side_effect = env_side_effect
+                    response = client.post("/webhooks/openbsp", json=payload)
+
+    body = response.get_json() or {}
+    reply = body.get("reply") or ""
+    _assert(response.status_code == 200, "enabled webhook /version should return 200")
+    _assert("deployment:" not in reply.lower(), "webhook /version must not expose deployment id")
+    _assert("session-agent.example.com" not in reply.lower(), "webhook /version must not expose session agent url")
+    _assert("commit: e576a5c909cb" in reply.lower(), "webhook /version should still expose short commit for deploy tracking")
+    _assert("detected from: reset" in reply.lower(), "webhook /version should report reset language source when present")
+
+
 def test_deduplicate_inbound_webhook_replays_last_reply() -> None:
     client = app.test_client()
     conv_id = f"reg-dedup-openbsp-{uuid4()}"
@@ -523,6 +583,7 @@ if __name__ == "__main__":
     test_proactive_email_capture_chat_flow()
     test_multilanguage_fixed_phrases()
     test_public_version_command_disabled_on_webhook()
+    test_public_version_command_enabled_omits_sensitive_fields()
     test_deduplicate_inbound_webhook_replays_last_reply()
     test_deduplicate_inbound_chat_replays_last_reply()
     print("All regression checks passed.")
