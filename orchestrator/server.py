@@ -90,40 +90,97 @@ def detect_language_from_text(text: str) -> str:
     """Simple language detection from message content.
 
     Looks for common keywords in Spanish, Portuguese, and English.
-    Returns detected language code (es/pt/en) or 'en' as default.
+    Returns detected language code (es/pt/en) or 'es' as conservative default.
     """
     text_lower = text.lower()
 
-    es_keywords = ("hola", "qué", "cómo", "dónde", "cuándo", "gracias", "por favor", "sí", "no", "ayuda", "pregunta", "información", "quisiera", "quiero", "necesito", "tengo")
-    pt_keywords = ("oi", "olá", "como", "onde", "obrigado", "por favor", "sim", "não", "ajuda", "pergunta", "informação", "gostaria", "preciso", "tenho", "está")
+    es_keywords = (
+        "hola",
+        "buen dia",
+        "buenos",
+        "buenas",
+        "que",
+        "como",
+        "donde",
+        "cuando",
+        "gracias",
+        "por favor",
+        "si",
+        "ayuda",
+        "pregunta",
+        "informacion",
+        "quisiera",
+        "quiero",
+        "necesito",
+        "tengo",
+        "me interesa",
+        "ascenso",
+        "aconcagua",
+    )
+    pt_keywords = (
+        "oi",
+        "ola",
+        "como",
+        "onde",
+        "obrigado",
+        "por favor",
+        "sim",
+        "nao",
+        "ajuda",
+        "pergunta",
+        "informacao",
+        "gostaria",
+        "preciso",
+        "tenho",
+        "estou",
+    )
+    en_keywords = (
+        "hello",
+        "hi",
+        "thanks",
+        "thank you",
+        "please",
+        "help",
+        "question",
+        "information",
+        "i want",
+        "i need",
+        "interested",
+        "expedition",
+        "route",
+    )
 
     es_count = sum(1 for kw in es_keywords if kw in text_lower)
     pt_count = sum(1 for kw in pt_keywords if kw in text_lower)
+    en_count = sum(1 for kw in en_keywords if kw in text_lower)
+
+    if en_count > es_count and en_count > pt_count and en_count > 0:
+        return "en"
 
     if es_count > pt_count and es_count > 0:
         return "es"
     if pt_count > 0:
         return "pt"
-    return "en"
+    return "es"
 
 
 def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str = "") -> str:
-    """Get conversation language from session variables. Default: English.
+    """Get conversation language from session variables. Default: Spanish.
 
     Reads conversation_language field set by session agent.
     Falls back to language detection from message text if not set.
-    Falls back to 'en' if detection fails.
+    Falls back to 'es' if detection fails.
     """
     if not session_vars or not isinstance(session_vars, dict):
         if fallback_text:
             return detect_language_from_text(fallback_text)
-        return "en"
+        return "es"
     lang = session_vars.get("conversation_language", "").strip().lower()
     if lang in I18N_PHRASES:
         return lang
     if fallback_text:
         return detect_language_from_text(fallback_text)
-    return "en"
+    return "es"
 
 
 def get_phrase(key: str, language: str | None = None) -> str:
@@ -501,10 +558,10 @@ def try_session_delete(
 def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
     """Build a canonical clean session state for /reset.
 
-    Defaults conversation_language to English.
+    Defaults conversation_language to Spanish.
     """
     return {
-        "conversation_language": "en",
+        "conversation_language": "es",
         "conversation_turn_count": 0,
         "conversation_paused": False,
         "pause_reason": "",
@@ -536,6 +593,8 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "crm_client_name": None,
         "crm_consultation_count": 0,
         "crm_last_consultation_date": None,
+        "last_inbound_signature": "",
+        "last_inbound_signature_ts": None,
     }
 
 
@@ -697,6 +756,41 @@ def normalize_for_intent(text: str) -> str:
     folded = unicodedata.normalize("NFKD", text)
     ascii_text = folded.encode("ascii", "ignore").decode("ascii")
     return " ".join(ascii_text.lower().split())
+
+
+def build_inbound_signature(msg: dict[str, str]) -> str:
+    """Build a deterministic signature for inbound de-duplication."""
+    normalized_text = normalize_for_intent(msg.get("text", ""))
+    return "|".join(
+        [
+            msg.get("conversation_id", ""),
+            msg.get("contact_id", ""),
+            msg.get("contact_address", ""),
+            msg.get("channel", ""),
+            normalized_text,
+        ]
+    )
+
+
+def is_duplicate_inbound(
+    session_vars: dict[str, Any],
+    inbound_signature: str,
+    now_ts: int,
+    window_seconds: int = 120,
+) -> bool:
+    """Return True when the inbound payload appears to be a recent retry."""
+    last_sig = str(session_vars.get("last_inbound_signature") or "")
+    raw_last_ts = session_vars.get("last_inbound_signature_ts")
+    try:
+        last_ts = int(raw_last_ts) if raw_last_ts is not None else 0
+    except (TypeError, ValueError):
+        last_ts = 0
+
+    if not last_sig or not last_ts:
+        return False
+    if (now_ts - last_ts) > window_seconds:
+        return False
+    return inbound_signature == last_sig
 
 
 def extract_command(text: str) -> str | None:
@@ -1103,7 +1197,7 @@ def build_version_payload() -> dict[str, Any]:
         "features": {
             "email_verification_enabled": _env_bool("EMAIL_VERIFICATION_ENABLED", "true"),
             "has_hibp_api_key": bool(_env("HIBP_API_KEY")),
-            "session_agent_base_url": _env("SESSION_AGENT_BASE_URL"),
+            "has_session_agent": bool(_env("SESSION_AGENT_BASE_URL")),
             "handoff_provider": _env("HANDOFF_EMAIL_PROVIDER", "resend"),
             "openbsp_send_configured": bool(_env("OPENBSP_SEND_URL")),
         },
@@ -1123,9 +1217,8 @@ def build_version_text() -> str:
             f"Python: {payload['python']}",
             f"Email verification: {'on' if features['email_verification_enabled'] else 'off'}",
             f"HIBP key: {'configured' if features['has_hibp_api_key'] else 'missing'}",
-            f"Session agent: {features['session_agent_base_url'] or 'missing'}",
+            f"Session agent: {'configured' if features['has_session_agent'] else 'missing'}",
             f"Handoff provider: {features['handoff_provider']}",
-            f"DB Host: {_env('DB_HOST', 'not configured')}",
         ]
     )
 
@@ -1156,7 +1249,22 @@ def health() -> Any:
 
 @app.get("/version")
 def version() -> Any:
-    return jsonify(build_version_payload())
+    payload = build_version_payload()
+    safe_payload = {
+        "service": payload["service"],
+        "environment": payload["environment"],
+        "runtime_mode": payload["runtime_mode"],
+        "version": payload["version"],
+        "commit": payload["commit_short"],
+        "features": {
+            "email_verification_enabled": payload["features"]["email_verification_enabled"],
+            "has_hibp_api_key": payload["features"]["has_hibp_api_key"],
+            "has_session_agent": payload["features"]["has_session_agent"],
+            "handoff_provider": payload["features"]["handoff_provider"],
+            "openbsp_send_configured": payload["features"]["openbsp_send_configured"],
+        },
+    }
+    return jsonify(safe_payload)
 
 
 @app.post("/webhooks/openbsp")
@@ -1207,7 +1315,43 @@ def webhook_openbsp() -> Any:
         if snapshot and isinstance(snapshot.get("variables"), dict):
             session_vars = snapshot["variables"]
 
+        now_ts = int(time.time())
+        inbound_signature = build_inbound_signature(msg)
+        if is_duplicate_inbound(session_vars, inbound_signature, now_ts):
+            replay_reply = str(session_vars.get("last_assistant_reply") or "").strip()
+            if replay_reply:
+                return jsonify(
+                    {
+                        "ok": True,
+                        "conversation_id": msg["conversation_id"],
+                        "contact_id": msg["contact_id"],
+                        "reply": replay_reply,
+                        "sources": [],
+                        "deduplicated": True,
+                        "openbsp_send": {
+                            "attempted": False,
+                            "status": 0,
+                            "response": {"info": "duplicate_inbound"},
+                        },
+                    }
+                )
+
         if command == "/version":
+            if not _env_bool("ENABLE_PUBLIC_VERSION_COMMAND", "false"):
+                return jsonify(
+                    {
+                        "ok": True,
+                        "conversation_id": msg["conversation_id"],
+                        "contact_id": msg["contact_id"],
+                        "reply": "Comando no disponible en este canal.",
+                        "sources": [],
+                        "openbsp_send": {
+                            "attempted": False,
+                            "status": 0,
+                            "response": {"info": "command_disabled"},
+                        },
+                    }
+                )
             detected_lang = get_session_language(session_vars, msg["text"])
             version_text = build_version_text()
             client_status_text = ""
@@ -1295,7 +1439,7 @@ def webhook_openbsp() -> Any:
 
         # Check CRM client status if we have an email
         if extracted_email and not session_vars.get("crm_client_found"):
-            crm_status = check_client_status(extracted_email)
+            crm_status = check_client_status(email=extracted_email)
             session_vars["crm_client_found"] = crm_status.get("found", False)
             session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
             session_vars["crm_client_id"] = crm_status.get("client_id")
@@ -1476,6 +1620,8 @@ def webhook_openbsp() -> Any:
             "channel": msg["channel"],
             "contact_address": msg["contact_address"],
             "handoff_requested": handoff_requested,
+            "last_inbound_signature": inbound_signature,
+            "last_inbound_signature_ts": now_ts,
         }
         if handoff_sent:
             updated_vars["handoff_email_last_sent_ts"] = now_ts
@@ -1726,6 +1872,33 @@ def chat_completions_compatible() -> Any:
         if snapshot and isinstance(snapshot.get("variables"), dict):
             session_vars = snapshot["variables"]
 
+        now_ts = int(time.time())
+        inbound_signature = build_inbound_signature(msg)
+        if is_duplicate_inbound(session_vars, inbound_signature, now_ts):
+            replay_reply = str(session_vars.get("last_assistant_reply") or "").strip()
+            if replay_reply:
+                completion = {
+                    "id": f"chatcmpl-{uuid4().hex[:24]}",
+                    "object": "chat.completion",
+                    "created": int(time.time()),
+                    "model": model,
+                    "choices": [
+                        {
+                            "index": 0,
+                            "message": {"role": "assistant", "content": replay_reply},
+                            "finish_reason": "stop",
+                            "logprobs": None,
+                        }
+                    ],
+                    "usage": {
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "total_tokens": 0,
+                    },
+                    "deduplicated": True,
+                }
+                return jsonify(completion)
+
         # Increment conversation turn counter
         current_turn = session_vars.get("conversation_turn_count", 0)
         session_vars["conversation_turn_count"] = current_turn + 1
@@ -1772,7 +1945,7 @@ def chat_completions_compatible() -> Any:
 
         # Check CRM client status if we have an email
         if extracted_email and not session_vars.get("crm_client_found"):
-            crm_status = check_client_status(extracted_email)
+            crm_status = check_client_status(email=extracted_email)
             session_vars["crm_client_found"] = crm_status.get("found", False)
             session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
             session_vars["crm_client_id"] = crm_status.get("client_id")
@@ -1939,6 +2112,8 @@ def chat_completions_compatible() -> Any:
             "channel": msg["channel"],
             "contact_address": msg["contact_address"],
             "handoff_requested": handoff_requested,
+            "last_inbound_signature": inbound_signature,
+            "last_inbound_signature_ts": now_ts,
         }
         if handoff_sent:
             updated_vars["handoff_email_last_sent_ts"] = now_ts

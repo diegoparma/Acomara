@@ -23,6 +23,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from orchestrator.server import app
+import orchestrator.server as server
 
 
 def _assert(condition: bool, message: str) -> None:
@@ -398,6 +399,117 @@ def test_multilanguage_fixed_phrases() -> None:
     _assert("Para conectarte" in reply2 or "correo" in reply2.lower(), "handoff message should be in Spanish after reset")
 
 
+def test_public_version_command_disabled_on_webhook() -> None:
+    client = app.test_client()
+    conv_id = f"reg-version-disabled-{uuid4()}"
+    payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+        "text": "/version",
+    }
+
+    with patch("orchestrator.server._env_bool", return_value=False):
+        with patch("orchestrator.server.ensure_runtime", return_value={"api_key": "test-key", "session_base_url": None}):
+            response = client.post("/webhooks/openbsp", json=payload)
+
+    body = response.get_json() or {}
+    _assert(response.status_code == 200, "webhook /version should return 200")
+    _assert("no disponible" in (body.get("reply") or "").lower(), "public /version should be disabled")
+    _assert((body.get("openbsp_send") or {}).get("response", {}).get("info") == "command_disabled", "disabled command must expose command_disabled info")
+
+
+def test_deduplicate_inbound_webhook_replays_last_reply() -> None:
+    client = app.test_client()
+    conv_id = f"reg-dedup-openbsp-{uuid4()}"
+    msg = {
+        "text": "hola equipo",
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+    now_ts = 2_000_000_000
+    sig = server.build_inbound_signature(msg)
+
+    with patch("orchestrator.server.time.time", return_value=now_ts):
+        with patch("orchestrator.server.ensure_runtime", return_value={"api_key": "test-key", "session_base_url": "http://session"}):
+            with patch(
+                "orchestrator.server.try_session_get",
+                return_value={
+                    "variables": {
+                        "last_assistant_reply": "respuesta previa",
+                        "last_inbound_signature": sig,
+                        "last_inbound_signature_ts": now_ts,
+                    }
+                },
+            ):
+                response = client.post("/webhooks/openbsp", json=msg)
+
+    body = response.get_json() or {}
+    _assert(response.status_code == 200, "dedup webhook should return 200")
+    _assert(body.get("deduplicated") is True, "webhook should flag deduplicated=true")
+    _assert(body.get("reply") == "respuesta previa", "webhook dedup should replay last assistant reply")
+
+
+def test_deduplicate_inbound_chat_replays_last_reply() -> None:
+    client = app.test_client()
+    conv_id = f"reg-dedup-chat-{uuid4()}"
+    headers = {
+        "Authorization": "Bearer test-orchestrator-key",
+        "conversation-id": conv_id,
+        "organization-id": "test-org",
+        "organization-address": "test-org-address",
+        "contact-id": "test-contact",
+        "contact-address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+    user_text = "hola equipo"
+    msg = {
+        "text": user_text,
+        "conversation_id": conv_id,
+        "organization_id": headers["organization-id"],
+        "organization_address": headers["organization-address"],
+        "contact_id": headers["contact-id"],
+        "contact_address": headers["contact-address"],
+        "channel": headers["channel"],
+    }
+    now_ts = 2_000_000_000
+    sig = server.build_inbound_signature(msg)
+
+    payload = {
+        "model": "gpt-5.4",
+        "messages": [{"role": "user", "content": user_text}],
+        "stream": False,
+    }
+
+    with patch("orchestrator.server.time.time", return_value=now_ts):
+        with patch("orchestrator.server.is_authorized_for_chat", return_value=True):
+            with patch("orchestrator.server.ensure_runtime", return_value={"api_key": "test-key", "session_base_url": "http://session"}):
+                with patch(
+                    "orchestrator.server.try_session_get",
+                    return_value={
+                        "variables": {
+                            "last_assistant_reply": "chat previa",
+                            "last_inbound_signature": sig,
+                            "last_inbound_signature_ts": now_ts,
+                        }
+                    },
+                ):
+                    response = client.post("/v1/chat/completions", headers=headers, json=payload)
+
+    body = response.get_json() or {}
+    choice_content = (((body.get("choices") or [{}])[0].get("message") or {}).get("content") or "")
+    _assert(response.status_code == 200, "dedup chat should return 200")
+    _assert(body.get("deduplicated") is True, "chat should flag deduplicated=true")
+    _assert(choice_content == "chat previa", "chat dedup should replay last assistant reply")
+
+
 if __name__ == "__main__":
     load_dotenv(Path(".env"))
 
@@ -410,4 +522,7 @@ if __name__ == "__main__":
     test_proactive_email_capture_enables_direct_handoff()
     test_proactive_email_capture_chat_flow()
     test_multilanguage_fixed_phrases()
+    test_public_version_command_disabled_on_webhook()
+    test_deduplicate_inbound_webhook_replays_last_reply()
+    test_deduplicate_inbound_chat_replays_last_reply()
     print("All regression checks passed.")
