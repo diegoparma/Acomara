@@ -238,7 +238,22 @@ def is_authorized_for_chat() -> bool:
             or request.headers.get("x-api-key")
             or ""
         ).strip()
-        return bool(direct_token) and direct_token == expected
+        if direct_token:
+            return direct_token == expected
+
+        # Some gateways place the key in query params or request body fields.
+        query_token = (request.args.get("api_key") or request.args.get("key") or "").strip()
+        if query_token:
+            return query_token == expected
+
+        body = request.get_json(silent=True) or {}
+        body_token = (
+            str(body.get("api_key") or body.get("apiKey") or body.get("key") or "").strip()
+        )
+        if body_token:
+            return body_token == expected
+
+        return False
     token = auth.removeprefix("Bearer ").strip()
     return token == expected
 
@@ -1773,18 +1788,9 @@ def chat_completions_compatible() -> Any:
             ),
             400,
         )
-    if stream is True:
-        return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "Streaming is not supported in this endpoint.",
-                        "type": "invalid_request_error",
-                    }
-                }
-            ),
-            400,
-        )
+    # Compatibility: some providers always send stream=true.
+    # We currently return a non-streaming completion payload.
+    _ = bool(stream)
 
     user_text = extract_last_user_text(messages)
     if not user_text:
