@@ -231,7 +231,14 @@ def is_authorized_for_chat() -> bool:
 
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
-        return False
+        # Compatibility fallback for providers that send API keys as raw headers.
+        # This keeps strict auth while supporting non-Bearer integrations.
+        direct_token = (
+            request.headers.get("api-key")
+            or request.headers.get("x-api-key")
+            or ""
+        ).strip()
+        return bool(direct_token) and direct_token == expected
     token = auth.removeprefix("Bearer ").strip()
     return token == expected
 
