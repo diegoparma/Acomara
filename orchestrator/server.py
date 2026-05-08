@@ -1765,6 +1765,10 @@ def webhook_openbsp() -> Any:
         return jsonify({"ok": False, "error": str(exc)}), 500
 
 
+# Compatibility aliases for providers that normalize or append the path
+# differently under Chat Completions mode.
+@app.post("/v1")
+@app.post("/chat/completions")
 @app.post("/v1/chat/completions")
 def chat_completions_compatible() -> Any:
     """OpenAI Chat Completions compatible endpoint for OpenBSP custom model."""
