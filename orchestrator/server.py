@@ -38,6 +38,7 @@ from orchestrator.security import (
     should_request_email,
 )
 from orchestrator.crm_client_status import check_client_status
+from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
@@ -59,6 +60,7 @@ I18N_PHRASES = {
         "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
         "paused_suspicious": "Excelente, te vamos a estar contactando en breve.",
         "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
+        "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
@@ -71,6 +73,7 @@ I18N_PHRASES = {
         "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
         "paused_suspicious": "Great! We'll be in touch shortly.",
         "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
+        "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
     },
     "pt": {
         "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
@@ -83,6 +86,7 @@ I18N_PHRASES = {
         "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
         "paused_suspicious": "Excelente, vamos estar em contato em breve.",
         "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
+        "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
     },
 }
 
@@ -186,6 +190,13 @@ def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str
         if fallback_text:
             return detect_language_from_text(fallback_text)
         return "es"
+
+    if fallback_text and not fallback_text.strip().startswith("/"):
+        source = str(session_vars.get("conversation_language_source") or "").strip().lower()
+        # After /reset, allow the first real user message to re-detect language.
+        if source == "reset":
+            return detect_language_from_text(fallback_text)
+
     lang = session_vars.get("conversation_language", "").strip().lower()
     if lang in I18N_PHRASES:
         return lang
@@ -599,6 +610,10 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "conversation_turn_count": 0,
         "conversation_paused": False,
         "pause_reason": "",
+        "paused_reply_count": 0,
+        "paused_loop_frozen": False,
+        "paused_loop_finalized_at_ts": None,
+        "paused_loop_final_handoff_attempted": False,
         "paused_email": "",
         "paused_at_ts": now_ts,
         "last_user_message": "",
@@ -1194,6 +1209,7 @@ def ensure_runtime() -> dict[str, Any]:
         "handoff_email_cooldown_seconds": int(
             _env("HANDOFF_EMAIL_COOLDOWN_SECONDS", "1800") or "1800"
         ),
+        "paused_reply_threshold": int(_env("PAUSED_REPLY_THRESHOLD", "2") or "2"),
         "email_verification_enabled": str(_env("EMAIL_VERIFICATION_ENABLED", "true") or "true")
         .strip()
         .lower()
@@ -1276,6 +1292,87 @@ def build_paused_reply(session_vars: dict[str, Any]) -> str:
     return get_phrase("paused_suspicious", lang)
 
 
+def apply_paused_anti_loop_guard(
+    session_vars: dict[str, Any],
+    msg: dict[str, str],
+    runtime: dict[str, Any],
+    now_ts: int,
+) -> tuple[str, bool, int, dict[str, Any], bool]:
+    """Limit repetitive paused replies and finalize automated thread replies."""
+    raw_threshold = runtime.get("paused_reply_threshold", 2)
+    try:
+        threshold = max(1, int(raw_threshold))
+    except (TypeError, ValueError):
+        threshold = 2
+
+    try:
+        paused_reply_count = int(session_vars.get("paused_reply_count") or 0)
+    except (TypeError, ValueError):
+        paused_reply_count = 0
+
+    paused_reply_count += 1
+    session_vars["paused_reply_count"] = paused_reply_count
+
+    if paused_reply_count <= threshold:
+        return build_paused_reply(session_vars), False, 0, {}, False
+
+    lang = get_session_language(session_vars, msg.get("text", ""))
+    session_vars["paused_loop_frozen"] = True
+    if not session_vars.get("paused_loop_finalized_at_ts"):
+        session_vars["paused_loop_finalized_at_ts"] = now_ts
+
+    handoff_attempted = False
+    handoff_status = 0
+    handoff_data: dict[str, Any] = {"info": "paused loop frozen"}
+    handoff_sent = False
+
+    reason = str(session_vars.get("pause_reason") or "").strip().lower()
+    if reason == "human_handoff_in_progress" and not session_vars.get("paused_loop_final_handoff_attempted"):
+        cooldown_ok = should_send_handoff_email(
+            session_vars,
+            runtime["handoff_email_cooldown_seconds"],
+            now_ts,
+        )
+        if cooldown_ok:
+            handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
+                runtime,
+                msg,
+                session_vars,
+            )
+            handoff_sent = handoff_attempted and handoff_status in (200, 201, 202)
+        else:
+            handoff_data = {"info": "paused loop final handoff skipped by cooldown"}
+        session_vars["paused_loop_final_handoff_attempted"] = True
+
+    return get_phrase("paused_loop_final", lang), handoff_attempted, handoff_status, handoff_data, handoff_sent
+
+
+def _parse_bool_query(value: str | None, default: bool = False) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _is_authorized_for_audit() -> bool:
+    load_local_env()
+    expected = _env("ORCHESTRATOR_API_KEY")
+    if not expected:
+        return True
+
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        return auth.removeprefix("Bearer ").strip() == expected
+
+    direct_token = (
+        request.headers.get("api-key")
+        or request.headers.get("x-api-key")
+        or request.args.get("api_key")
+        or request.args.get("key")
+        or ""
+    ).strip()
+    return bool(direct_token) and direct_token == expected
+
+
 @app.get("/health")
 def health() -> Any:
     payload = build_version_payload()
@@ -1287,6 +1384,153 @@ def health() -> Any:
             "commit": payload["commit_short"],
         }
     )
+
+
+@app.get("/audit/conversations")
+def audit_conversations() -> Any:
+        if not _is_authorized_for_audit():
+                return auth_error("Invalid or missing API key for audit endpoint.")
+
+        org_id = (request.args.get("organization_id") or DEFAULT_ORG_ID).strip()
+        days_back_raw = (request.args.get("days_back") or "").strip()
+        max_conversations_raw = (request.args.get("max_conversations") or "").strip()
+        include_test = _parse_bool_query(request.args.get("include_test"), default=False)
+
+        try:
+                days_back = int(days_back_raw) if days_back_raw else None
+                max_conversations = int(max_conversations_raw) if max_conversations_raw else None
+        except ValueError:
+                return jsonify({"ok": False, "error": "days_back and max_conversations must be integers"}), 400
+
+        try:
+                report = run_conversation_audit(
+                        organization_id=org_id,
+                        days_back=days_back,
+                        include_test_conversations=include_test,
+                        max_conversations=max_conversations,
+                )
+                return jsonify({"ok": True, "report": report})
+        except Exception as exc:  # pragma: no cover
+                return jsonify({"ok": False, "error": str(exc)}), 500
+
+
+@app.get("/audit/dashboard")
+def audit_dashboard() -> Any:
+        if not _is_authorized_for_audit():
+                return auth_error("Invalid or missing API key for audit dashboard.")
+
+        org_id = (request.args.get("organization_id") or DEFAULT_ORG_ID).strip()
+        days_back_raw = (request.args.get("days_back") or "").strip()
+        include_test = _parse_bool_query(request.args.get("include_test"), default=False)
+
+        try:
+                days_back = int(days_back_raw) if days_back_raw else None
+        except ValueError:
+                return "days_back must be an integer", 400
+
+        try:
+                report = run_conversation_audit(
+                        organization_id=org_id,
+                        days_back=days_back,
+                        include_test_conversations=include_test,
+                )
+        except Exception as exc:  # pragma: no cover
+                return f"Audit error: {exc}", 500
+
+        totals = report.get("totals", {})
+        issue_counts = report.get("issue_counts", {})
+        status_counts = report.get("status_counts", {})
+        message_stats = report.get("message_stats", {})
+        problematic = report.get("problematic_conversations", [])
+
+        issue_rows = "".join(
+                f"<tr><td>{issue}</td><td>{count}</td></tr>"
+                for issue, count in sorted(issue_counts.items(), key=lambda item: item[1], reverse=True)
+        )
+        if not issue_rows:
+                issue_rows = "<tr><td colspan='2'>No issues detected</td></tr>"
+
+        problem_rows = "".join(
+                "<tr>"
+                f"<td>{row.get('conversation_id', '-')}</td>"
+                f"<td>{row.get('message_count', 0)}</td>"
+                f"<td>{', '.join(row.get('issues', []))}</td>"
+                "</tr>"
+                for row in problematic[:20]
+        )
+        if not problem_rows:
+                problem_rows = "<tr><td colspan='3'>No problematic conversations in current window</td></tr>"
+
+        html = f"""
+<!doctype html>
+<html lang='es'>
+<head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <title>Acomara Audit Dashboard</title>
+    <style>
+        :root {{
+            --bg: #f6f7f9;
+            --panel: #ffffff;
+            --ink: #1a2433;
+            --muted: #6a7485;
+            --accent: #0b6db7;
+            --warn: #d9480f;
+            --ok: #1b7f3b;
+        }}
+        * {{ box-sizing: border-box; }}
+        body {{ margin: 0; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; background: radial-gradient(circle at top right, #e6f2fb 0%, var(--bg) 45%); color: var(--ink); }}
+        .wrap {{ max-width: 1160px; margin: 0 auto; padding: 28px 20px 40px; }}
+        h1 {{ margin: 0; font-size: 1.7rem; letter-spacing: 0.2px; }}
+        .meta {{ margin-top: 6px; color: var(--muted); font-size: 0.95rem; }}
+        .grid {{ margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }}
+        .card {{ background: var(--panel); border: 1px solid #dde3ea; border-radius: 12px; padding: 14px; box-shadow: 0 4px 14px rgba(14, 33, 53, 0.05); }}
+        .label {{ color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }}
+        .value {{ margin-top: 6px; font-size: 1.45rem; font-weight: 700; }}
+        .value.ok {{ color: var(--ok); }}
+        .value.warn {{ color: var(--warn); }}
+        h2 {{ margin: 22px 0 10px; font-size: 1.05rem; }}
+        table {{ width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid #dde3ea; }}
+        th, td {{ padding: 10px 12px; border-bottom: 1px solid #edf1f5; text-align: left; font-size: 0.92rem; vertical-align: top; }}
+        th {{ background: #f2f7fc; color: #314257; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }}
+        tr:last-child td {{ border-bottom: 0; }}
+        .foot {{ margin-top: 14px; color: var(--muted); font-size: 0.85rem; }}
+    </style>
+</head>
+<body>
+    <div class='wrap'>
+        <h1>Acomara Conversation Audit</h1>
+        <div class='meta'>Generado: {report.get('generated_at', '-')} | Organization: {report.get('organization_id', '-')}</div>
+
+        <div class='grid'>
+            <div class='card'><div class='label'>Conversaciones auditadas</div><div class='value'>{totals.get('audited_conversations', 0)}</div></div>
+            <div class='card'><div class='label'>Con problemas</div><div class='value warn'>{totals.get('conversations_with_issues', 0)}</div></div>
+            <div class='card'><div class='label'>Quality rate</div><div class='value ok'>{totals.get('quality_rate_percent', 0)}%</div></div>
+            <div class='card'><div class='label'>Mensajes totales</div><div class='value'>{message_stats.get('total_messages', 0)}</div></div>
+            <div class='card'><div class='label'>Promedio mensajes</div><div class='value'>{message_stats.get('avg', 0)}</div></div>
+            <div class='card'><div class='label'>Estado OK</div><div class='value'>{status_counts.get('OK', 0)}</div></div>
+        </div>
+
+        <h2>Problemas por tipo</h2>
+        <table>
+            <thead><tr><th>Tipo</th><th>Cantidad</th></tr></thead>
+            <tbody>{issue_rows}</tbody>
+        </table>
+
+        <h2>Conversaciones problemáticas (top 20 por tamaño)</h2>
+        <table>
+            <thead><tr><th>Conversation ID</th><th>Mensajes</th><th>Issues</th></tr></thead>
+            <tbody>{problem_rows}</tbody>
+        </table>
+
+        <div class='foot'>
+            Query options: days_back, include_test, organization_id, api_key
+        </div>
+    </div>
+</body>
+</html>
+"""
+        return html
 
 
 @app.get("/version")
@@ -1572,7 +1816,24 @@ def webhook_openbsp() -> Any:
 
         if session_vars.get("conversation_paused"):
             # Conversation already paused – deterministic reply, skip LLM.
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
             # Need email before executing handoff.
@@ -1602,6 +1863,10 @@ def webhook_openbsp() -> Any:
             reply = get_phrase("handoff_executed", lang)
             session_vars["conversation_paused"] = True
             session_vars["pause_reason"] = "human_handoff_in_progress"
+            session_vars["paused_reply_count"] = 0
+            session_vars["paused_loop_frozen"] = False
+            session_vars["paused_loop_finalized_at_ts"] = None
+            session_vars["paused_loop_final_handoff_attempted"] = False
             session_vars["handoff_pending_confirmation"] = False
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
@@ -1626,7 +1891,24 @@ def webhook_openbsp() -> Any:
             hits = []
         elif session_vars.get("conversation_paused"):
             # Conversation paused for other reasons (e.g., suspicious email)
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         else:
             # Normal LLM path.
@@ -2065,7 +2347,24 @@ def chat_completions_compatible() -> Any:
         handoff_sent = False
 
         if session_vars.get("conversation_paused"):
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
             lang = get_session_language(session_vars, msg.get("text", ""))
@@ -2092,6 +2391,10 @@ def chat_completions_compatible() -> Any:
             reply = get_phrase("handoff_executed", lang)
             session_vars["conversation_paused"] = True
             session_vars["pause_reason"] = "human_handoff_in_progress"
+            session_vars["paused_reply_count"] = 0
+            session_vars["paused_loop_frozen"] = False
+            session_vars["paused_loop_finalized_at_ts"] = None
+            session_vars["paused_loop_final_handoff_attempted"] = False
             session_vars["handoff_pending_confirmation"] = False
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
@@ -2115,7 +2418,24 @@ def chat_completions_compatible() -> Any:
             hits = []
         elif session_vars.get("conversation_paused"):
             # Conversation paused for other reasons (e.g., suspicious email)
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         else:
             hits = retrieve_top_k(
