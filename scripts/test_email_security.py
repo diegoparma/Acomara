@@ -570,6 +570,124 @@ def test_deduplicate_inbound_chat_replays_last_reply() -> None:
     _assert(choice_content == "chat previa", "chat dedup should replay last assistant reply")
 
 
+def test_paused_anti_loop_webhook_finalizes_after_threshold() -> None:
+    client = app.test_client()
+    conv_id = f"reg-paused-loop-openbsp-{uuid4()}"
+    payload = {
+        "conversation_id": conv_id,
+        "organization_id": "test-org",
+        "organization_address": "test-org-address",
+        "contact_id": "test-contact",
+        "contact_address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    session_store = {
+        "conversation_paused": True,
+        "pause_reason": "human_handoff_in_progress",
+        "email_verified_real": True,
+        "handoff_email_last_sent_ts": 1_700_000_000,
+        "paused_reply_count": 0,
+    }
+    runtime = {
+        "api_key": "test-key",
+        "session_base_url": "http://session",
+        "session_agent_id": "sales-agent-v1",
+        "handoff_email_cooldown_seconds": 1,
+        "paused_reply_threshold": 2,
+        "email_verification_enabled": True,
+        "openbsp_send_url": None,
+        "openbsp_api_key": None,
+        "handoff_email_to": "ops@acomara.test",
+    }
+
+    with patch("orchestrator.server.ensure_runtime", return_value=runtime):
+        with patch("orchestrator.server.try_session_get", return_value={"variables": session_store}):
+            with patch("orchestrator.server.try_session_upsert"):
+                with patch("orchestrator.server.try_session_append_event"):
+                    with patch("orchestrator.server.check_client_status", return_value={}):
+                        with patch("orchestrator.server.try_send_handoff_email", return_value=(True, 200, {"ok": True})) as handoff_mock:
+                            r1 = client.post("/webhooks/openbsp", json={**payload, "text": "sigo esperando 1"})
+                            r2 = client.post("/webhooks/openbsp", json={**payload, "text": "sigo esperando 2"})
+                            r3 = client.post("/webhooks/openbsp", json={**payload, "text": "sigo esperando 3"})
+                            r4 = client.post("/webhooks/openbsp", json={**payload, "text": "sigo esperando 4"})
+
+    t1 = ((r1.get_json() or {}).get("reply") or "").lower()
+    t2 = ((r2.get_json() or {}).get("reply") or "").lower()
+    t3 = ((r3.get_json() or {}).get("reply") or "").lower()
+    t4 = ((r4.get_json() or {}).get("reply") or "").lower()
+
+    _assert("asesor" in t1 or "advisor" in t1, "paused turn 1 should still use normal paused reply")
+    _assert("asesor" in t2 or "advisor" in t2, "paused turn 2 should still use normal paused reply")
+    _assert("cierro este hilo" in t3, "paused turn 3 should switch to final anti-loop closure")
+    _assert("cierro este hilo" in t4, "paused turn 4 should stay frozen in final anti-loop closure")
+    _assert(handoff_mock.call_count == 1, "final anti-loop handoff must run once and not repeat")
+    _assert(session_store.get("paused_reply_count") == 4, "paused reply counter should increment per inbound turn")
+    _assert(session_store.get("paused_loop_frozen") is True, "session should remain frozen after final anti-loop closure")
+
+
+def test_paused_anti_loop_chat_finalizes_after_threshold() -> None:
+    client = app.test_client()
+    conv_id = f"reg-paused-loop-chat-{uuid4()}"
+    headers = {
+        "Authorization": "Bearer test-orchestrator-key",
+        "conversation-id": conv_id,
+        "organization-id": "test-org",
+        "organization-address": "test-org-address",
+        "contact-id": "test-contact",
+        "contact-address": "+5491111111111",
+        "channel": "whatsapp",
+    }
+
+    session_store = {
+        "conversation_paused": True,
+        "pause_reason": "human_handoff_in_progress",
+        "email_verified_real": True,
+        "handoff_email_last_sent_ts": 1_700_000_000,
+        "paused_reply_count": 0,
+    }
+    runtime = {
+        "api_key": "test-key",
+        "session_base_url": "http://session",
+        "session_agent_id": "sales-agent-v1",
+        "handoff_email_cooldown_seconds": 1,
+        "paused_reply_threshold": 2,
+        "email_verification_enabled": True,
+        "handoff_email_to": "ops@acomara.test",
+    }
+
+    def send(text: str) -> str:
+        payload = {
+            "model": "gpt-5.4",
+            "messages": [{"role": "user", "content": text}],
+            "stream": False,
+        }
+        response = client.post("/v1/chat/completions", headers=headers, json=payload)
+        body = response.get_json() or {}
+        _assert(response.status_code == 200, "chat paused anti-loop request should return 200")
+        return ((((body.get("choices") or [{}])[0].get("message") or {}).get("content")) or "")
+
+    with patch("orchestrator.server.is_authorized_for_chat", return_value=True):
+        with patch("orchestrator.server.ensure_runtime", return_value=runtime):
+            with patch("orchestrator.server.try_session_get", return_value={"variables": session_store}):
+                with patch("orchestrator.server.try_session_upsert"):
+                    with patch("orchestrator.server.try_session_append_event"):
+                        with patch("orchestrator.server.check_client_status", return_value={}):
+                            with patch("orchestrator.server.try_send_handoff_email", return_value=(True, 200, {"ok": True})) as handoff_mock:
+                                t1 = send("sigo esperando 1").lower()
+                                t2 = send("sigo esperando 2").lower()
+                                t3 = send("sigo esperando 3").lower()
+                                t4 = send("sigo esperando 4").lower()
+
+    _assert("asesor" in t1 or "advisor" in t1, "chat paused turn 1 should still use normal paused reply")
+    _assert("asesor" in t2 or "advisor" in t2, "chat paused turn 2 should still use normal paused reply")
+    _assert("cierro este hilo" in t3, "chat paused turn 3 should switch to final anti-loop closure")
+    _assert("cierro este hilo" in t4, "chat paused turn 4 should stay frozen in final anti-loop closure")
+    _assert(handoff_mock.call_count == 1, "chat final anti-loop handoff must run once and not repeat")
+    _assert(session_store.get("paused_reply_count") == 4, "chat paused reply counter should increment per inbound turn")
+    _assert(session_store.get("paused_loop_frozen") is True, "chat session should remain frozen after final anti-loop closure")
+
+
 if __name__ == "__main__":
     load_dotenv(Path(".env"))
 
@@ -586,4 +704,6 @@ if __name__ == "__main__":
     test_public_version_command_enabled_omits_sensitive_fields()
     test_deduplicate_inbound_webhook_replays_last_reply()
     test_deduplicate_inbound_chat_replays_last_reply()
+    test_paused_anti_loop_webhook_finalizes_after_threshold()
+    test_paused_anti_loop_chat_finalizes_after_threshold()
     print("All regression checks passed.")

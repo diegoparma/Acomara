@@ -59,6 +59,7 @@ I18N_PHRASES = {
         "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
         "paused_suspicious": "Excelente, te vamos a estar contactando en breve.",
         "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
+        "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
@@ -71,6 +72,7 @@ I18N_PHRASES = {
         "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
         "paused_suspicious": "Great! We'll be in touch shortly.",
         "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
+        "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
     },
     "pt": {
         "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
@@ -83,6 +85,7 @@ I18N_PHRASES = {
         "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
         "paused_suspicious": "Excelente, vamos estar em contato em breve.",
         "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
+        "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
     },
 }
 
@@ -599,6 +602,10 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "conversation_turn_count": 0,
         "conversation_paused": False,
         "pause_reason": "",
+        "paused_reply_count": 0,
+        "paused_loop_frozen": False,
+        "paused_loop_finalized_at_ts": None,
+        "paused_loop_final_handoff_attempted": False,
         "paused_email": "",
         "paused_at_ts": now_ts,
         "last_user_message": "",
@@ -1194,6 +1201,7 @@ def ensure_runtime() -> dict[str, Any]:
         "handoff_email_cooldown_seconds": int(
             _env("HANDOFF_EMAIL_COOLDOWN_SECONDS", "1800") or "1800"
         ),
+        "paused_reply_threshold": int(_env("PAUSED_REPLY_THRESHOLD", "2") or "2"),
         "email_verification_enabled": str(_env("EMAIL_VERIFICATION_ENABLED", "true") or "true")
         .strip()
         .lower()
@@ -1274,6 +1282,61 @@ def build_paused_reply(session_vars: dict[str, Any]) -> str:
     if reason == "proactive_email_request":
         return get_phrase("paused_proactive_email", lang)
     return get_phrase("paused_suspicious", lang)
+
+
+def apply_paused_anti_loop_guard(
+    session_vars: dict[str, Any],
+    msg: dict[str, str],
+    runtime: dict[str, Any],
+    now_ts: int,
+) -> tuple[str, bool, int, dict[str, Any], bool]:
+    """Limit repetitive paused replies and finalize automated thread replies."""
+    raw_threshold = runtime.get("paused_reply_threshold", 2)
+    try:
+        threshold = max(1, int(raw_threshold))
+    except (TypeError, ValueError):
+        threshold = 2
+
+    try:
+        paused_reply_count = int(session_vars.get("paused_reply_count") or 0)
+    except (TypeError, ValueError):
+        paused_reply_count = 0
+
+    paused_reply_count += 1
+    session_vars["paused_reply_count"] = paused_reply_count
+
+    if paused_reply_count <= threshold:
+        return build_paused_reply(session_vars), False, 0, {}, False
+
+    lang = get_session_language(session_vars, msg.get("text", ""))
+    session_vars["paused_loop_frozen"] = True
+    if not session_vars.get("paused_loop_finalized_at_ts"):
+        session_vars["paused_loop_finalized_at_ts"] = now_ts
+
+    handoff_attempted = False
+    handoff_status = 0
+    handoff_data: dict[str, Any] = {"info": "paused loop frozen"}
+    handoff_sent = False
+
+    reason = str(session_vars.get("pause_reason") or "").strip().lower()
+    if reason == "human_handoff_in_progress" and not session_vars.get("paused_loop_final_handoff_attempted"):
+        cooldown_ok = should_send_handoff_email(
+            session_vars,
+            runtime["handoff_email_cooldown_seconds"],
+            now_ts,
+        )
+        if cooldown_ok:
+            handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
+                runtime,
+                msg,
+                session_vars,
+            )
+            handoff_sent = handoff_attempted and handoff_status in (200, 201, 202)
+        else:
+            handoff_data = {"info": "paused loop final handoff skipped by cooldown"}
+        session_vars["paused_loop_final_handoff_attempted"] = True
+
+    return get_phrase("paused_loop_final", lang), handoff_attempted, handoff_status, handoff_data, handoff_sent
 
 
 @app.get("/health")
@@ -1572,7 +1635,24 @@ def webhook_openbsp() -> Any:
 
         if session_vars.get("conversation_paused"):
             # Conversation already paused – deterministic reply, skip LLM.
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
             # Need email before executing handoff.
@@ -1602,6 +1682,10 @@ def webhook_openbsp() -> Any:
             reply = get_phrase("handoff_executed", lang)
             session_vars["conversation_paused"] = True
             session_vars["pause_reason"] = "human_handoff_in_progress"
+            session_vars["paused_reply_count"] = 0
+            session_vars["paused_loop_frozen"] = False
+            session_vars["paused_loop_finalized_at_ts"] = None
+            session_vars["paused_loop_final_handoff_attempted"] = False
             session_vars["handoff_pending_confirmation"] = False
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
@@ -1626,7 +1710,24 @@ def webhook_openbsp() -> Any:
             hits = []
         elif session_vars.get("conversation_paused"):
             # Conversation paused for other reasons (e.g., suspicious email)
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         else:
             # Normal LLM path.
@@ -2065,7 +2166,24 @@ def chat_completions_compatible() -> Any:
         handoff_sent = False
 
         if session_vars.get("conversation_paused"):
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         elif handoff_requested and not session_vars.get("email_verified_real"):
             lang = get_session_language(session_vars, msg.get("text", ""))
@@ -2092,6 +2210,10 @@ def chat_completions_compatible() -> Any:
             reply = get_phrase("handoff_executed", lang)
             session_vars["conversation_paused"] = True
             session_vars["pause_reason"] = "human_handoff_in_progress"
+            session_vars["paused_reply_count"] = 0
+            session_vars["paused_loop_frozen"] = False
+            session_vars["paused_loop_finalized_at_ts"] = None
+            session_vars["paused_loop_final_handoff_attempted"] = False
             session_vars["handoff_pending_confirmation"] = False
             session_vars["paused_at_ts"] = now_ts
             handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
@@ -2115,7 +2237,24 @@ def chat_completions_compatible() -> Any:
             hits = []
         elif session_vars.get("conversation_paused"):
             # Conversation paused for other reasons (e.g., suspicious email)
-            reply = build_paused_reply(session_vars)
+            (
+                reply,
+                paused_handoff_attempted,
+                paused_handoff_status,
+                paused_handoff_data,
+                paused_handoff_sent,
+            ) = apply_paused_anti_loop_guard(
+                session_vars,
+                msg,
+                runtime,
+                now_ts,
+            )
+            if paused_handoff_attempted:
+                handoff_attempted = True
+                handoff_status = paused_handoff_status
+                handoff_data = paused_handoff_data
+            if paused_handoff_sent:
+                handoff_sent = True
             hits = []
         else:
             hits = retrieve_top_k(
