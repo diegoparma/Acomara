@@ -2,3 +2,4 @@ openai>=1.51.0
 python-dotenv>=1.0.1
 flask>=3.0.3
 mysql-connector-python>=8.0.33
+requests>=2.32.0
