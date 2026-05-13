@@ -760,6 +760,7 @@ def generate_reply(
         "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
+        "- Si compartes fechas de salida y el canal es WhatsApp, muéstralas en formato de lista, con una fecha por línea (no en un solo bloque).\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
         "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
     ).format(
@@ -808,6 +809,49 @@ def maybe_send_openbsp(
         },
     )
     return True, status, data
+
+
+def format_whatsapp_departure_dates(reply_text: str, channel: str) -> str:
+    """Render departure-date blocks as line-by-line lists for WhatsApp readability."""
+    if not reply_text or channel.strip().lower() != "whatsapp":
+        return reply_text
+
+    text = reply_text
+    looks_like_dates_response = (
+        "|" in text
+        and any(
+            token in text.lower()
+            for token in (
+                "fechas",
+                "salidas",
+                "departure",
+                "departures",
+            )
+        )
+    )
+    if not looks_like_dates_response:
+        return reply_text
+
+    month_pattern = re.compile(
+        r"\b("
+        r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|"
+        r"january|february|march|april|may|june|july|august|september|october|november|december"
+        r")\s*:\s*([0-9]{1,2}(?:\s*\|\s*[0-9]{1,2})+)",
+        flags=re.IGNORECASE,
+    )
+
+    def _expand_month_block(match: re.Match[str]) -> str:
+        month_label = match.group(1)
+        raw_days = match.group(2)
+        days = [d.strip() for d in raw_days.split("|") if d.strip()]
+        if len(days) < 2:
+            return match.group(0)
+        return "\n" + "\n".join(f"- {month_label} {day}" for day in days)
+
+    formatted = month_pattern.sub(_expand_month_block, text)
+    formatted = re.sub(r"[ \t]+\n", "\n", formatted)
+    formatted = re.sub(r"\n{3,}", "\n\n", formatted)
+    return formatted.strip()
 
 
 def normalize_for_intent(text: str) -> str:
@@ -1933,6 +1977,8 @@ def webhook_openbsp() -> Any:
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
 
+        reply = format_whatsapp_departure_dates(reply, msg.get("channel", ""))
+
         # Update conversation_language based on detected language from current message
         detected_lang = get_session_language(session_vars, msg["text"])
         session_vars["conversation_language"] = detected_lang
@@ -2458,6 +2504,8 @@ def chat_completions_compatible() -> Any:
                 reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
+
+        reply = format_whatsapp_departure_dates(reply, msg.get("channel", ""))
 
         # Update conversation_language based on detected language from current message
         detected_lang = get_session_language(session_vars, msg["text"])
