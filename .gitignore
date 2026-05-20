@@ -6,3 +6,7 @@ __pycache__/
 .DS_Store
 tmp/
 .env*.local
+
+# Test fixtures captured from Supabase contain real customer PII.
+# Regenerate locally with: python3 scripts/capture_fixtures.py
+tests/fixtures/conversations/
