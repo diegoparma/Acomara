@@ -61,6 +61,8 @@ I18N_PHRASES = {
         "paused_suspicious": "Excelente, te vamos a estar contactando en breve.",
         "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
         "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
+        "email_received_ack": "¡Gracias! Ya tengo tu correo ({email}) registrado. Un asesor humano va a revisar tu consulta y te contacta en breve por este medio. Mientras tanto, si querés agregar más detalles (fechas, número de personas, experiencia previa), escribilos y los sumamos a la derivación.",
+        "out_of_season": "Importante: las expediciones al Aconcagua se realizan únicamente entre noviembre y marzo (temporada del hemisferio sur). Para la fecha que mencionás no tenemos salidas. Si querés, te paso el calendario disponible de la próxima temporada.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
@@ -74,6 +76,8 @@ I18N_PHRASES = {
         "paused_suspicious": "Great! We'll be in touch shortly.",
         "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
         "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
+        "email_received_ack": "Thanks! I've saved your email ({email}). A human advisor will review your request and contact you shortly through this channel. In the meantime, feel free to add any extra details (dates, number of people, previous experience) and I'll include them in the handoff.",
+        "out_of_season": "Heads up: Aconcagua expeditions run only between November and March (Southern Hemisphere season). We don't have departures on the date you mentioned. If you'd like, I can share the available calendar for the next season.",
     },
     "pt": {
         "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
@@ -87,6 +91,8 @@ I18N_PHRASES = {
         "paused_suspicious": "Excelente, vamos estar em contato em breve.",
         "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
         "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
+        "email_received_ack": "Obrigado! Já registrei seu email ({email}). Um consultor humano vai revisar sua consulta e entrar em contato em breve por este canal. Enquanto isso, se quiser adicionar mais detalhes (datas, número de pessoas, experiência prévia), me envie e os incluo na transferência.",
+        "out_of_season": "Atenção: as expedições ao Aconcágua acontecem somente entre novembro e março (temporada do hemisfério sul). Para a data que você mencionou não temos saídas. Se quiser, posso te passar o calendário disponível da próxima temporada.",
     },
 }
 
@@ -94,12 +100,68 @@ I18N_PHRASES = {
 def detect_language_from_text(text: str) -> str:
     """Simple language detection from message content.
 
-    Looks for common keywords in Spanish, Portuguese, and English.
     Returns detected language code (es/pt/en) or 'es' as conservative default.
+    Treats short ambiguous greetings ("hola"/"olá"/"hi") as unknown -> caller
+    keeps the previous session language instead of locking in on the first
+    greeting (which historically caused language drift).
     """
+    if not text:
+        return "es"
+
     text_lower = text.lower()
     normalized_text = unicodedata.normalize("NFKD", text_lower)
     normalized_text = normalized_text.encode("ascii", "ignore").decode("ascii")
+
+    # Strong-signal tokens (each language) that should immediately win.
+    strong_en_tokens = (
+        "i would",
+        "i'd like",
+        "i want",
+        "i need",
+        "i'm interested",
+        "interested in",
+        "could you",
+        "please send",
+        "regards",
+        "thanks",
+        "thank you",
+        "summit",
+        "expedition",
+        "ascent",
+    )
+    strong_pt_tokens = (
+        "gostaria",
+        "obrigado",
+        "obrigada",
+        "voce",
+        "quero fazer",
+        "quero saber",
+        "este passeio",
+        "qual e",
+        "tem alguma",
+        "ola",
+    )
+    strong_es_tokens = (
+        "quiero",
+        "quisiera",
+        "necesito",
+        "me interesa",
+        "buen dia",
+        "buenas",
+        "podrias",
+        "podria",
+        "gracias",
+    )
+
+    for tok in strong_en_tokens:
+        if tok in normalized_text:
+            return "en"
+    for tok in strong_pt_tokens:
+        if tok in normalized_text:
+            return "pt"
+    for tok in strong_es_tokens:
+        if tok in normalized_text:
+            return "es"
 
     def keyword_count(keywords: tuple[str, ...]) -> int:
         count = 0
@@ -179,27 +241,136 @@ def detect_language_from_text(text: str) -> str:
     return "es"
 
 
+def detect_language_confident(text: str) -> str | None:
+    """Detect language only when there is enough evidence; else return None.
+
+    Used to avoid locking the conversation language on a short ambiguous
+    greeting (e.g. "Hola"/"Olá"/"Hi"). The caller should keep the previous
+    session language when this returns None.
+    """
+    if not text:
+        return None
+
+    stripped = text.strip()
+    if len(stripped) < 6:
+        return None
+
+    text_lower = stripped.lower()
+    normalized_text = unicodedata.normalize("NFKD", text_lower)
+    normalized_text = normalized_text.encode("ascii", "ignore").decode("ascii")
+
+    strong_en_tokens = (
+        "i would", "i'd like", "i want", "i need", "i'm interested",
+        "interested in", "could you", "please send", "regards",
+        "thank you", "summit", "expedition", "ascent",
+    )
+    strong_pt_tokens = (
+        "gostaria", "obrigado", "obrigada", "quero fazer", "quero saber",
+        "este passeio", "qual e", "tem alguma", "voce", "para mim",
+    )
+    strong_es_tokens = (
+        "quiero", "quisiera", "necesito", "me interesa", "buenos dias",
+        "buenas tardes", "podrias", "podria", "gracias", "por favor",
+    )
+
+    for tok in strong_en_tokens:
+        if tok in normalized_text:
+            return "en"
+    for tok in strong_pt_tokens:
+        if tok in normalized_text:
+            return "pt"
+    for tok in strong_es_tokens:
+        if tok in normalized_text:
+            return "es"
+
+    # Fallback: only commit if the heuristic returns something other than the
+    # blind "es" default. A non-trivial message with mostly english/portuguese
+    # keywords is reasonable evidence; a single "hola" is not.
+    detected = detect_language_from_text(text)
+    if detected == "es" and len(stripped) < 20:
+        return None
+    return detected
+
+
+# Months treated as out-of-Aconcagua-season (April-October).
+OUT_OF_SEASON_MONTH_TOKENS = (
+    # English
+    "april", "may", "june", "july", "august", "september", "october",
+    # Spanish (normalized: no accents)
+    "abril", "mayo", "junio", "julio", "agosto", "septiembre", "setiembre", "octubre",
+    # Portuguese
+    "maio", "junho", "julho", "agosto", "setembro", "outubro",
+)
+# Numeric date patterns indicating month 04-10 in DD/MM or MM/DD form.
+_OUT_OF_SEASON_DATE_PATTERNS = (
+    re.compile(r"\b\d{1,2}[/-](0?[4-9]|10)\b"),  # 27/05, 03-09
+    re.compile(r"\b(0?[4-9]|10)[/-]\d{1,2}\b"),  # 05/27, 09-03
+)
+_TRIP_INTENT_TOKENS = (
+    "tour", "expedicion", "expedición", "expedition", "trek", "trekking",
+    "ascen", "subir", "climb", "summit", "viaje", "viagem", "paseo",
+    "passeio", "passei", "passe", "salida", "departure", "saida", "saída",
+    "aconcagua", "montaña", "montanha", "mountain", "alta montaña",
+    "alta montanha", "fecha", "data", "date",
+)
+
+
+def mentions_out_of_season(text: str) -> bool:
+    """Return True if the user message references an out-of-season month
+    together with an expedition/trip intent. Conservative on purpose."""
+    if not text:
+        return False
+    lowered = text.lower()
+    normalized = unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
+
+    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS)
+    if not has_intent:
+        return False
+
+    for tok in OUT_OF_SEASON_MONTH_TOKENS:
+        if re.search(r"\b" + re.escape(tok) + r"\b", normalized):
+            return True
+    for pattern in _OUT_OF_SEASON_DATE_PATTERNS:
+        if pattern.search(normalized):
+            return True
+    return False
+
+
 def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str = "") -> str:
     """Get conversation language from session variables. Default: Spanish.
 
     Reads conversation_language field set by session agent.
     Falls back to language detection from message text if not set.
     Falls back to 'es' if detection fails.
+
+    If the latest user message has a *confident* language detection that
+    differs from the stored session language, we rotate to follow the user
+    (fixes language-drift bug where the bot stayed in the first-greeting
+    language even after the user switched).
     """
     if not session_vars or not isinstance(session_vars, dict):
         if fallback_text:
             return detect_language_from_text(fallback_text)
         return "es"
 
-    if fallback_text and not fallback_text.strip().startswith("/"):
-        source = str(session_vars.get("conversation_language_source") or "").strip().lower()
-        # After /reset, allow the first real user message to re-detect language.
-        if source == "reset":
-            return detect_language_from_text(fallback_text)
+    stored_lang = str(session_vars.get("conversation_language") or "").strip().lower()
+    source = str(session_vars.get("conversation_language_source") or "").strip().lower()
 
-    lang = session_vars.get("conversation_language", "").strip().lower()
-    if lang in I18N_PHRASES:
-        return lang
+    # 1) On /reset, prefer fresh detection from the next real message.
+    if source == "reset" and fallback_text and not fallback_text.strip().startswith("/"):
+        return detect_language_from_text(fallback_text)
+
+    # 2) If the new user message has a confident language signal, follow it.
+    if fallback_text and not fallback_text.strip().startswith("/"):
+        confident = detect_language_confident(fallback_text)
+        if confident and confident in I18N_PHRASES:
+            return confident
+
+    # 3) Otherwise keep the stored language.
+    if stored_lang in I18N_PHRASES:
+        return stored_lang
+
+    # 4) Last resort: heuristic on text or 'es'.
     if fallback_text:
         return detect_language_from_text(fallback_text)
     return "es"
@@ -1597,500 +1768,12 @@ def version() -> Any:
     return jsonify(safe_payload)
 
 
-@app.post("/webhooks/openbsp")
-def webhook_openbsp() -> Any:
-    payload = request.get_json(silent=True) or {}
-    msg = normalize_inbound(payload)
-
-    if not msg["text"]:
-        return jsonify({"error": "Could not extract inbound message text"}), 400
-
-    command = extract_command(msg["text"])
-
-    # /reset is the canonical reset command. /new remains as backward-compatible alias.
-    if command in ("/reset", "/new"):
-        session_base_url = _env("SESSION_AGENT_BASE_URL")
-        session_agent_id = _env("SESSION_AGENT_ID", "sales-agent-v1") or "sales-agent-v1"
-        reset_session_state(session_base_url, msg, session_agent_id)
-        return jsonify(
-            {
-                "ok": True,
-                "conversation_id": msg["conversation_id"],
-                "contact_id": msg["contact_id"],
-                "reply": "Conversación reiniciada. Idioma reiniciado a español. ¿En qué te puedo ayudar?",
-                "sources": [],
-                "openbsp_send": {"attempted": False, "status": 0, "response": {"info": "command"}},
-                "human_handoff_email": {
-                    "requested": False,
-                    "attempted": False,
-                    "sent": False,
-                    "status": 0,
-                    "response": {"info": "command"},
-                },
-                "email_verification": {
-                    "enabled": True,
-                    "suspicious": False,
-                    "alert_sent": False,
-                    "conversation_paused": False,
-                },
-            }
-        )
-    try:
-        runtime = ensure_runtime()
-        client = OpenAI(api_key=runtime["api_key"])
-
-        session_vars: dict[str, Any] = {}
-        session_base_url = runtime["session_base_url"]
-        snapshot = try_session_get(session_base_url, msg["conversation_id"])
-        if snapshot and isinstance(snapshot.get("variables"), dict):
-            session_vars = snapshot["variables"]
-
-        now_ts = int(time.time())
-        inbound_signature = build_inbound_signature(msg)
-        if is_duplicate_inbound(session_vars, inbound_signature, now_ts):
-            replay_reply = str(session_vars.get("last_assistant_reply") or "").strip()
-            if replay_reply:
-                return jsonify(
-                    {
-                        "ok": True,
-                        "conversation_id": msg["conversation_id"],
-                        "contact_id": msg["contact_id"],
-                        "reply": replay_reply,
-                        "sources": [],
-                        "deduplicated": True,
-                        "openbsp_send": {
-                            "attempted": False,
-                            "status": 0,
-                            "response": {"info": "duplicate_inbound"},
-                        },
-                    }
-                )
-
-        if command == "/version":
-            if not _env_bool("ENABLE_PUBLIC_VERSION_COMMAND", "false"):
-                return jsonify(
-                    {
-                        "ok": True,
-                        "conversation_id": msg["conversation_id"],
-                        "contact_id": msg["contact_id"],
-                        "reply": "Comando no disponible en este canal.",
-                        "sources": [],
-                        "openbsp_send": {
-                            "attempted": False,
-                            "status": 0,
-                            "response": {"info": "command_disabled"},
-                        },
-                    }
-                )
-            detected_lang = get_session_language(session_vars, msg["text"])
-            version_text = build_version_text()
-            client_status_text = ""
-            if session_vars.get("crm_client_found"):
-                client_status = "✅ CONTACTED" if session_vars.get("crm_client_contacted") else "👤 NEW CLIENT"
-                client_status_text = f"\nCRM Client: {client_status} ({session_vars.get('crm_client_name', 'Unknown')})"
-            else:
-                client_status_text = "\nCRM Client: Not found in system"
-
-            version_with_lang = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {get_language_source(session_vars)}"
-            return jsonify(
-                {
-                    "ok": True,
-                    "conversation_id": msg["conversation_id"],
-                    "contact_id": msg["contact_id"],
-                    "reply": version_with_lang,
-                    "sources": [],
-                    "openbsp_send": {"attempted": False, "status": 0, "response": {"info": "command"}},
-                    "human_handoff_email": {
-                        "requested": False,
-                        "attempted": False,
-                        "sent": False,
-                        "status": 0,
-                        "response": {"info": "command"},
-                    },
-                    "email_verification": {
-                        "enabled": True,
-                        "suspicious": False,
-                        "alert_sent": False,
-                        "conversation_paused": False,
-                    },
-                    "crm_client": {
-                        "found": session_vars.get("crm_client_found", False),
-                        "contacted": session_vars.get("crm_client_contacted", False),
-                        "name": session_vars.get("crm_client_name"),
-                        "search_method": session_vars.get("crm_search_method"),
-                    },
-                }
-            )
-
-        # Increment conversation turn counter
-        current_turn = session_vars.get("conversation_turn_count", 0)
-        session_vars["conversation_turn_count"] = current_turn + 1
-
-        # Ensure the session exists in the store before appending events.
-        # For new conversations (404 on GET) this creates the session record.
-        try_session_upsert(session_base_url, msg, runtime["session_agent_id"], session_vars)
-
-        try_session_append_event(
-            session_base_url,
-            msg["conversation_id"],
-            "inbound_message",
-            {
-                "text": msg["text"],
-                "channel": msg["channel"],
-                "contact_id": msg["contact_id"],
-            },
-        )
-
-        # Check CRM client status by phone (from contact_address) first, fallback to email
-        phone = msg.get("contact_address", "").strip()
-        print(f"[SERVER_DEBUG] Checking CRM for phone={phone}")
-        if phone:  # Only check if we have a phone number
-            extracted_email_temp = extract_email_from_text(msg["text"])
-            print(f"[SERVER_DEBUG] Calling check_client_status with phone={phone}, email={extracted_email_temp}")
-            crm_status = check_client_status(phone=phone, email=extracted_email_temp)
-            print(f"[SERVER_DEBUG] CRM Status result: {crm_status}")
-            session_vars["crm_client_found"] = crm_status.get("found", False)
-            session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
-            session_vars["crm_client_id"] = crm_status.get("client_id")
-            session_vars["crm_client_name"] = crm_status.get("client_name")
-            session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
-            session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
-            session_vars["crm_search_method"] = crm_status.get("search_by")
-        else:
-            print(f"[SERVER_DEBUG] No phone number in contact_address, skipping CRM check")
-
-        # Email verification logic
-        email_verification_enabled = runtime.get("email_verification_enabled", True)
-        email_suspicious = False
-        email_suspicious_alert_sent = False
-        suspicious_email_value = ""
-        extracted_email = extract_email_from_text(msg["text"])
-        conversation_paused = bool(session_vars.get("conversation_paused"))
-
-        # Check CRM client status if we have an email
-        if extracted_email and not session_vars.get("crm_client_found"):
-            crm_status = check_client_status(email=extracted_email)
-            session_vars["crm_client_found"] = crm_status.get("found", False)
-            session_vars["crm_client_contacted"] = crm_status.get("contacted", False)
-            session_vars["crm_client_id"] = crm_status.get("client_id")
-            session_vars["crm_client_name"] = crm_status.get("client_name")
-            session_vars["crm_consultation_count"] = crm_status.get("consultation_count", 0)
-            session_vars["crm_last_consultation_date"] = crm_status.get("last_consultation_date")
-
-        if email_verification_enabled and not conversation_paused:
-            if extracted_email and not session_vars.get("email_verified"):
-                # Check email reputation against Have I Been Pwned
-                is_suspicious, check_succeeded = check_email_reputation(
-                    extracted_email,
-                    runtime.get("hibp_api_key") or "",
-                    timeout=runtime.get("hibp_timeout_seconds", 10),
-                )
-                
-                if check_succeeded:
-                    session_vars["email_verified"] = True
-                    session_vars["verified_email"] = extracted_email
-                    session_vars["email_checked_at_ts"] = int(time.time())
-                    
-                    if is_suspicious:
-                        # Email is suspicious (new/unverified) - pause conversation
-                        email_suspicious = True
-                        suspicious_email_value = extracted_email
-                        session_vars = pause_conversation(
-                            session_vars,
-                            extracted_email,
-                            "Email appears to be unverified or new, requires manual validation",
-                        )
-                        
-                        # Send alert to admin once when suspicious email is detected.
-                        if not session_vars.get("suspicious_email_alert_sent"):
-                            alert_attempted, alert_status, alert_data, alert_sent, alert_method = try_send_suspicious_admin_alert(
-                                runtime,
-                                msg,
-                                extracted_email,
-                                session_vars,
-                            )
-                            email_suspicious_alert_sent = alert_sent
-                            if alert_attempted:
-                                session_vars["suspicious_email_alert_last_status"] = alert_status
-                                session_vars["suspicious_email_alert_method"] = alert_method
-                                session_vars["suspicious_email_alert_last_response"] = alert_data
-                        
-                        if email_suspicious_alert_sent:
-                            session_vars["suspicious_email_alert_sent_ts"] = int(time.time())
-                    else:
-                        # Email is verified (has real history)
-                        session_vars["email_verified_real"] = True
-                else:
-                    # Check failed (likely API error or rate limit)
-                    session_vars["email_check_failed"] = True
-                    session_vars["email_check_failed_at_ts"] = int(time.time())
-
-        now_ts = int(time.time())
-        proactive_email_capture_pending = bool(session_vars.get("proactive_email_capture_pending"))
-        proactive_email_verified = (
-            bool(extracted_email)
-            and proactive_email_capture_pending
-            and not bool(session_vars.get("handoff_pending_confirmation"))
-            and bool(session_vars.get("email_verified_real"))
-        )
-        proactive_email_check_failed = (
-            bool(extracted_email)
-            and proactive_email_capture_pending
-            and not bool(session_vars.get("handoff_pending_confirmation"))
-            and bool(session_vars.get("email_check_failed"))
-            and not email_suspicious
-        )
-
-        # --- HANDOFF DETECTION (before LLM) ---
-        # Detect explicit handoff requests. Affirmative detection was removed to
-        # avoid false positives when the LLM casually mentions "asesor".
-        handoff_requested = wants_human_handoff(msg["text"], session_vars)
-        # If user already triggered handoff and email was just verified, proceed.
-        if (
-            not handoff_requested
-            and session_vars.get("handoff_pending_confirmation")
-            and session_vars.get("email_verified_real")
-        ):
-            handoff_requested = True
-
-        handoff_attempted = False
-        handoff_status = 0
-        handoff_data: dict[str, Any] = {}
-        handoff_sent = False
-
-        if session_vars.get("conversation_paused"):
-            # Conversation already paused – deterministic reply, skip LLM.
-            (
-                reply,
-                paused_handoff_attempted,
-                paused_handoff_status,
-                paused_handoff_data,
-                paused_handoff_sent,
-            ) = apply_paused_anti_loop_guard(
-                session_vars,
-                msg,
-                runtime,
-                now_ts,
-            )
-            if paused_handoff_attempted:
-                handoff_attempted = True
-                handoff_status = paused_handoff_status
-                handoff_data = paused_handoff_data
-            if paused_handoff_sent:
-                handoff_sent = True
-            hits = []
-        elif handoff_requested and not session_vars.get("email_verified_real"):
-            # Need email before executing handoff.
-            lang = get_session_language(session_vars, msg.get("text", ""))
-            reply = get_phrase("handoff_ask_email", lang)
-            session_vars["handoff_pending_confirmation"] = True
-            session_vars["email_requested"] = True
-            handoff_data = {"info": "handoff pending email verification"}
-            hits = []
-        elif handoff_requested:
-            # Email already verified – execute handoff immediately, skip LLM.
-            lang = get_session_language(session_vars, msg.get("text", ""))
-            cooldown_ok = should_send_handoff_email(
-                session_vars,
-                runtime["handoff_email_cooldown_seconds"],
-                now_ts,
-            )
-            if cooldown_ok:
-                handoff_attempted, handoff_status, handoff_data = try_send_handoff_email(
-                    runtime,
-                    msg,
-                    session_vars,
-                )
-            else:
-                handoff_data = {"info": "handoff email skipped by cooldown"}
-            # Deterministic reply regardless of whether the email succeeded.
-            reply = get_phrase("handoff_executed", lang)
-            session_vars["conversation_paused"] = True
-            session_vars["pause_reason"] = "human_handoff_in_progress"
-            session_vars["paused_reply_count"] = 0
-            session_vars["paused_loop_frozen"] = False
-            session_vars["paused_loop_finalized_at_ts"] = None
-            session_vars["paused_loop_final_handoff_attempted"] = False
-            session_vars["handoff_pending_confirmation"] = False
-            session_vars["paused_at_ts"] = now_ts
-            handoff_sent = cooldown_ok and handoff_attempted and handoff_status in (200, 201, 202)
-            hits = []
-        elif proactive_email_verified:
-            lang = get_session_language(session_vars, msg.get("text", ""))
-            reply = get_phrase("proactive_email_saved", lang)
-            session_vars["proactive_email_capture_pending"] = False
-            session_vars["email_requested"] = False
-            session_vars["conversation_paused"] = False
-            hits = []
-        elif proactive_email_check_failed:
-            lang = get_session_language(session_vars, msg.get("text", ""))
-            reply = get_phrase("proactive_email_check_failed", lang)
-            session_vars["proactive_email_capture_pending"] = False
-            session_vars["email_requested"] = False
-            hits = []
-        elif session_vars.get("handoff_pending_confirmation"):
-            # Handoff was requested earlier but user didn't provide email yet.
-            lang = get_session_language(session_vars, msg.get("text", ""))
-            reply = get_phrase("handoff_pending", lang)
-            hits = []
-        elif session_vars.get("conversation_paused"):
-            # Conversation paused for other reasons (e.g., suspicious email)
-            (
-                reply,
-                paused_handoff_attempted,
-                paused_handoff_status,
-                paused_handoff_data,
-                paused_handoff_sent,
-            ) = apply_paused_anti_loop_guard(
-                session_vars,
-                msg,
-                runtime,
-                now_ts,
-            )
-            if paused_handoff_attempted:
-                handoff_attempted = True
-                handoff_status = paused_handoff_status
-                handoff_data = paused_handoff_data
-            if paused_handoff_sent:
-                handoff_sent = True
-            hits = []
-        else:
-            # Normal LLM path.
-            hits = retrieve_top_k(
-                client,
-                runtime["embed_model"],
-                runtime["rows"],
-                msg["text"],
-                runtime["top_k"],
-            )
-            reply = generate_reply(
-                client,
-                runtime["chat_model"],
-                runtime["system_prompt"],
-                msg,
-                hits,
-                session_vars,
-            )
-            if should_request_email(session_vars):
-                lang = get_session_language(session_vars, msg.get("text", ""))
-                reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
-                session_vars["email_requested"] = True
-                session_vars["proactive_email_capture_pending"] = True
-
-        reply = format_whatsapp_departure_dates(reply, msg.get("channel", ""))
-
-        # Update conversation_language based on detected language from current message
-        detected_lang = get_session_language(session_vars, msg["text"])
-        session_vars["conversation_language"] = detected_lang
-        session_vars["conversation_language_source"] = "message_detected"
-
-        updated_vars = {
-            **session_vars,
-            "last_user_message": msg["text"],
-            "last_assistant_reply": reply,
-            "channel": msg["channel"],
-            "contact_address": msg["contact_address"],
-            "handoff_requested": handoff_requested,
-            "last_inbound_signature": inbound_signature,
-            "last_inbound_signature_ts": now_ts,
-        }
-        if handoff_sent:
-            updated_vars["handoff_email_last_sent_ts"] = now_ts
-            updated_vars["handoff_email_last_to"] = runtime.get("handoff_email_to")
-            updated_vars["handoff_pending_confirmation"] = False
-        
-        if email_suspicious:
-            updated_vars["email_suspicious"] = True
-            updated_vars["suspicious_email"] = suspicious_email_value
-        
-        if email_suspicious_alert_sent:
-            updated_vars["suspicious_email_alert_sent"] = True
-            updated_vars["suspicious_email_alert_sent_ts"] = now_ts
-
-        try_session_upsert(
-            session_base_url,
-            msg,
-            runtime["session_agent_id"],
-            updated_vars,
-        )
-        if handoff_sent:
-            try_session_append_event(
-                session_base_url,
-                msg["conversation_id"],
-                "handoff_email",
-                {
-                    "to": runtime.get("handoff_email_to"),
-                    "status": handoff_status,
-                    "provider": runtime.get("handoff_email_provider"),
-                },
-            )
-        
-        if email_suspicious_alert_sent:
-            try_session_append_event(
-                session_base_url,
-                msg["conversation_id"],
-                "suspicious_email_alert",
-                {
-                    "email": suspicious_email_value,
-                    "status": "sent_to_admin",
-                    "reason": "Email appears unverified or new, requires manual validation",
-                    "method": updated_vars.get("suspicious_email_alert_method", "security_alert"),
-                },
-            )
-        
-        try_session_append_event(
-            session_base_url,
-            msg["conversation_id"],
-            "outbound_message",
-            {
-                "text": reply,
-                "source": "acomara-orchestrator",
-            },
-        )
-
-        sent, send_status, send_data = maybe_send_openbsp(
-            runtime["openbsp_send_url"],
-            runtime["openbsp_api_key"],
-            msg,
-            reply,
-        )
-
-        return jsonify(
-            {
-                "ok": True,
-                "conversation_id": msg["conversation_id"],
-                "contact_id": msg["contact_id"],
-                "reply": reply,
-                "sources": [
-                    {
-                        "id": h["id"],
-                        "topic": h.get("topic", "general"),
-                        "score": round(float(h["score"]), 4),
-                    }
-                    for h in hits
-                ],
-                "openbsp_send": {
-                    "attempted": sent,
-                    "status": send_status,
-                    "response": send_data,
-                },
-                "human_handoff_email": {
-                    "requested": handoff_requested,
-                    "attempted": handoff_attempted,
-                    "sent": handoff_sent,
-                    "status": handoff_status,
-                    "response": handoff_data,
-                },
-                "email_verification": {
-                    "enabled": email_verification_enabled,
-                    "suspicious": email_suspicious,
-                    "alert_sent": email_suspicious_alert_sent,
-                    "conversation_paused": bool(session_vars.get("conversation_paused", False)),
-                },
-            }
-        )
-    except Exception as exc:  # pragma: no cover
-        return jsonify({"ok": False, "error": str(exc)}), 500
+# NOTE: legacy `/webhooks/openbsp` handler removed (2026-05-20).
+# In production OpenBSP integrates via Chat Completions custom-model mode and
+# only `/v1/chat/completions` receives traffic. The webhook required
+# `OPENBSP_SEND_URL` (not configured) to deliver replies, so it could not work
+# even if hit. Keeping a single entry point eliminates the duplicated logic
+# that caused recurring email/language regressions.
 
 
 # Compatibility aliases for providers that normalize or append the path
@@ -2309,6 +1992,16 @@ def chat_completions_compatible() -> Any:
         extracted_email = extract_email_from_text(msg["text"])
         conversation_paused = bool(session_vars.get("conversation_paused"))
 
+        # Fix #1: persist email capture as soon as the user shares any email,
+        # regardless of HIBP outcome. This blocks the proactive-email loop.
+        if extracted_email:
+            session_vars["email_captured"] = True
+            if not session_vars.get("captured_email"):
+                session_vars["captured_email"] = extracted_email
+            if not session_vars.get("email_captured_at_ts"):
+                session_vars["email_captured_at_ts"] = int(time.time())
+            session_vars["email_requested"] = True
+
         # Check CRM client status if we have an email
         if extracted_email and not session_vars.get("crm_client_found"):
             crm_status = check_client_status(email=extracted_email)
@@ -2499,18 +2192,36 @@ def chat_completions_compatible() -> Any:
                 hits,
                 session_vars,
             )
-            if should_request_email(session_vars):
-                lang = get_session_language(session_vars, msg.get("text", ""))
+            lang = get_session_language(session_vars, msg.get("text", ""))
+            # Fix #6: when the user just shared their email, replace the LLM
+            # reply with a deterministic acknowledgement so we never re-ask.
+            if extracted_email and not session_vars.get("email_received_acked"):
+                reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
+                session_vars["email_received_acked"] = True
+                session_vars["email_captured"] = True
+                session_vars["captured_email"] = extracted_email
+                session_vars["email_requested"] = True
+                session_vars["proactive_email_capture_pending"] = False
+            elif should_request_email(session_vars):
                 reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
                 session_vars["email_requested"] = True
                 session_vars["proactive_email_capture_pending"] = True
+            # Fix #7: out-of-season heads-up (only once per conversation).
+            if mentions_out_of_season(msg["text"]) and not session_vars.get("out_of_season_warned"):
+                reply = f"{get_phrase('out_of_season', lang)}\n\n{reply}"
+                session_vars["out_of_season_warned"] = True
 
         reply = format_whatsapp_departure_dates(reply, msg.get("channel", ""))
 
-        # Update conversation_language based on detected language from current message
-        detected_lang = get_session_language(session_vars, msg["text"])
-        session_vars["conversation_language"] = detected_lang
-        session_vars["conversation_language_source"] = "message_detected"
+        # Fix #2: only commit conversation_language when the new message
+        # has a confident language signal; otherwise keep the previous one.
+        confident_lang = detect_language_confident(msg["text"])
+        if confident_lang and confident_lang in I18N_PHRASES:
+            session_vars["conversation_language"] = confident_lang
+            session_vars["conversation_language_source"] = "message_detected"
+        elif not session_vars.get("conversation_language"):
+            session_vars["conversation_language"] = get_session_language(session_vars, msg["text"])
+            session_vars["conversation_language_source"] = "message_detected_low_confidence"
 
         updated_vars = {
             **session_vars,
