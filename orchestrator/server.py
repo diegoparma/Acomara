@@ -1776,6 +1776,69 @@ def version() -> Any:
 # that caused recurring email/language regressions.
 
 
+# ---------------------------------------------------------------------------
+# Post-processing policies (Step 1 of refactor: mechanical extraction).
+#
+# These are pure helpers — same semantics as the inline blocks they replaced
+# inside chat_completions_compatible. They mutate session_vars in place
+# (matching the prior behavior) and return the possibly-modified reply.
+# Tested in tests/test_helpers.py.
+# ---------------------------------------------------------------------------
+
+
+def apply_email_ack_or_request_policy(
+    reply: str,
+    session_vars: dict[str, Any],
+    extracted_email: str | None,
+    lang: str,
+) -> str:
+    """Fix #6 + proactive email request.
+
+    If the user just shared an email, replace the LLM reply with a
+    deterministic ack and mark email captured (single-ask rule). Otherwise,
+    when the conversation is in the email-request window and no email has
+    been seen yet, append the proactive ask.
+    """
+    if extracted_email and not session_vars.get("email_received_acked"):
+        reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
+        session_vars["email_received_acked"] = True
+        session_vars["email_captured"] = True
+        session_vars["captured_email"] = extracted_email
+        session_vars["email_requested"] = True
+        session_vars["proactive_email_capture_pending"] = False
+    elif should_request_email(session_vars):
+        reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
+        session_vars["email_requested"] = True
+        session_vars["proactive_email_capture_pending"] = True
+    return reply
+
+
+def apply_out_of_season_policy(
+    reply: str,
+    user_text: str,
+    session_vars: dict[str, Any],
+    lang: str,
+) -> str:
+    """Fix #7: prepend an out-of-season heads-up once per conversation."""
+    if mentions_out_of_season(user_text) and not session_vars.get("out_of_season_warned"):
+        reply = f"{get_phrase('out_of_season', lang)}\n\n{reply}"
+        session_vars["out_of_season_warned"] = True
+    return reply
+
+
+def apply_language_commit_policy(user_text: str, session_vars: dict[str, Any]) -> None:
+    """Fix #2: only commit conversation_language when the new user message
+    has a confident language signal; otherwise keep the previous value.
+    """
+    confident_lang = detect_language_confident(user_text)
+    if confident_lang and confident_lang in I18N_PHRASES:
+        session_vars["conversation_language"] = confident_lang
+        session_vars["conversation_language_source"] = "message_detected"
+    elif not session_vars.get("conversation_language"):
+        session_vars["conversation_language"] = get_session_language(session_vars, user_text)
+        session_vars["conversation_language_source"] = "message_detected_low_confidence"
+
+
 # Compatibility aliases for providers that normalize or append the path
 # differently under Chat Completions mode.
 @app.post("/v1")
@@ -2193,35 +2256,14 @@ def chat_completions_compatible() -> Any:
                 session_vars,
             )
             lang = get_session_language(session_vars, msg.get("text", ""))
-            # Fix #6: when the user just shared their email, replace the LLM
-            # reply with a deterministic acknowledgement so we never re-ask.
-            if extracted_email and not session_vars.get("email_received_acked"):
-                reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
-                session_vars["email_received_acked"] = True
-                session_vars["email_captured"] = True
-                session_vars["captured_email"] = extracted_email
-                session_vars["email_requested"] = True
-                session_vars["proactive_email_capture_pending"] = False
-            elif should_request_email(session_vars):
-                reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
-                session_vars["email_requested"] = True
-                session_vars["proactive_email_capture_pending"] = True
-            # Fix #7: out-of-season heads-up (only once per conversation).
-            if mentions_out_of_season(msg["text"]) and not session_vars.get("out_of_season_warned"):
-                reply = f"{get_phrase('out_of_season', lang)}\n\n{reply}"
-                session_vars["out_of_season_warned"] = True
+            reply = apply_email_ack_or_request_policy(
+                reply, session_vars, extracted_email, lang
+            )
+            reply = apply_out_of_season_policy(reply, msg["text"], session_vars, lang)
 
         reply = format_whatsapp_departure_dates(reply, msg.get("channel", ""))
 
-        # Fix #2: only commit conversation_language when the new message
-        # has a confident language signal; otherwise keep the previous one.
-        confident_lang = detect_language_confident(msg["text"])
-        if confident_lang and confident_lang in I18N_PHRASES:
-            session_vars["conversation_language"] = confident_lang
-            session_vars["conversation_language_source"] = "message_detected"
-        elif not session_vars.get("conversation_language"):
-            session_vars["conversation_language"] = get_session_language(session_vars, msg["text"])
-            session_vars["conversation_language_source"] = "message_detected_low_confidence"
+        apply_language_commit_policy(msg["text"], session_vars)
 
         updated_vars = {
             **session_vars,

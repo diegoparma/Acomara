@@ -22,6 +22,9 @@ from orchestrator.security import (  # noqa: E402
     should_request_email,
 )
 from orchestrator.server import (  # noqa: E402
+    apply_email_ack_or_request_policy,
+    apply_language_commit_policy,
+    apply_out_of_season_policy,
     build_inbound_signature,
     detect_language_confident,
     format_whatsapp_departure_dates,
@@ -172,6 +175,94 @@ class NormalizeAndSignatureTests(unittest.TestCase):
         a = {"conversation_id": "abc", "text": "hola", "channel": "whatsapp"}
         b = {"conversation_id": "abc", "text": "chau", "channel": "whatsapp"}
         self.assertNotEqual(build_inbound_signature(a), build_inbound_signature(b))
+
+
+class EmailAckOrRequestPolicyTests(unittest.TestCase):
+    def test_email_present_replaces_reply_and_marks_captured(self):
+        sv: dict = {}
+        out = apply_email_ack_or_request_policy(
+            "LLM original reply", sv, "jacques@orange.fr", "es"
+        )
+        self.assertIn("jacques@orange.fr", out)
+        self.assertNotIn("LLM original reply", out)
+        self.assertTrue(sv["email_received_acked"])
+        self.assertTrue(sv["email_captured"])
+        self.assertEqual(sv["captured_email"], "jacques@orange.fr")
+        self.assertTrue(sv["email_requested"])
+        self.assertFalse(sv["proactive_email_capture_pending"])
+
+    def test_email_already_acked_keeps_llm_reply(self):
+        sv: dict = {"email_received_acked": True, "email_captured": True}
+        out = apply_email_ack_or_request_policy("LLM reply", sv, "x@y.com", "es")
+        self.assertEqual(out, "LLM reply")
+
+    def test_no_email_in_window_appends_proactive_ask(self):
+        sv: dict = {"conversation_turn_count": 3}
+        out = apply_email_ack_or_request_policy("Info útil", sv, None, "es")
+        self.assertIn("Info útil", out)
+        self.assertIn("correo", out.lower())
+        self.assertTrue(sv["email_requested"])
+        self.assertTrue(sv["proactive_email_capture_pending"])
+
+    def test_no_email_outside_window_is_passthrough(self):
+        sv: dict = {"conversation_turn_count": 1}
+        out = apply_email_ack_or_request_policy("Hola!", sv, None, "es")
+        self.assertEqual(out, "Hola!")
+        self.assertNotIn("email_requested", sv)
+
+    def test_email_already_captured_blocks_proactive_request(self):
+        sv: dict = {
+            "conversation_turn_count": 3,
+            "email_captured": True,
+            "email_received_acked": True,
+        }
+        out = apply_email_ack_or_request_policy("Reply", sv, None, "es")
+        self.assertEqual(out, "Reply")
+
+
+class OutOfSeasonPolicyTests(unittest.TestCase):
+    def test_prepends_warning_when_out_of_season_intent(self):
+        sv: dict = {}
+        out = apply_out_of_season_policy(
+            "Detalle de la expedición",
+            "Quiero hacer la expedición en mayo",
+            sv,
+            "es",
+        )
+        self.assertTrue(out.startswith("Importante"))
+        self.assertIn("Detalle de la expedición", out)
+        self.assertTrue(sv["out_of_season_warned"])
+
+    def test_only_once_per_conversation(self):
+        sv: dict = {"out_of_season_warned": True}
+        out = apply_out_of_season_policy("Reply", "passeio em julho", sv, "pt")
+        self.assertEqual(out, "Reply")
+
+    def test_in_season_does_not_warn(self):
+        sv: dict = {}
+        out = apply_out_of_season_policy("Reply", "expedición en diciembre", sv, "es")
+        self.assertEqual(out, "Reply")
+        self.assertNotIn("out_of_season_warned", sv)
+
+
+class LanguageCommitPolicyTests(unittest.TestCase):
+    def test_confident_signal_commits(self):
+        sv: dict = {"conversation_language": "es"}
+        apply_language_commit_policy("I would like info about Aconcagua expedition", sv)
+        self.assertEqual(sv["conversation_language"], "en")
+        self.assertEqual(sv["conversation_language_source"], "message_detected")
+
+    def test_short_ambiguous_keeps_existing_without_overwriting_source(self):
+        sv: dict = {"conversation_language": "en"}
+        apply_language_commit_policy("Hola", sv)
+        self.assertEqual(sv["conversation_language"], "en")
+        self.assertNotIn("conversation_language_source", sv)
+
+    def test_no_existing_lang_uses_low_confidence_fallback(self):
+        sv: dict = {}
+        apply_language_commit_policy("Hola", sv)
+        self.assertIn(sv["conversation_language"], {"es", "en", "pt"})
+        self.assertEqual(sv["conversation_language_source"], "message_detected_low_confidence")
 
 
 if __name__ == "__main__":
