@@ -96,6 +96,14 @@ class LanguageDetectionTests(unittest.TestCase):
             "pt",
         )
 
+    def test_hola_does_not_substring_match_portuguese(self):
+        # Regression: "ola" used to be a strong_pt substring token, so any
+        # message containing "hola" or "español" got mis-detected as PT.
+        from orchestrator.server import detect_language_from_text
+        self.assertEqual(detect_language_from_text("hola que tal"), "es")
+        self.assertEqual(detect_language_from_text("perdón? sabes hablar español?"), "es")
+        self.assertEqual(detect_language_from_text("si español por favor"), "es")
+
 
 class SessionLanguageTests(unittest.TestCase):
     def test_default_when_empty(self):

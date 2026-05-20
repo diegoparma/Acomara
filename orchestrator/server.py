@@ -139,7 +139,10 @@ def detect_language_from_text(text: str) -> str:
         "este passeio",
         "qual e",
         "tem alguma",
-        "ola",
+        # NOTE: do not add "ola" here — it would substring-match "hola" (es)
+        # and "español". The standalone "olá" greeting is too short to lock
+        # the language on its own; it is handled via word-boundary keyword_count
+        # below and the < 20-char fallback in detect_language_confident.
     )
     strong_es_tokens = (
         "quiero",
@@ -918,6 +921,10 @@ def generate_reply(
     else:
         crm_client_context = "\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema."
 
+    # Override conversation_language in the dumped state so the LLM does not
+    # see a stale/contradictory signal vs the explicit lang_instruction.
+    session_vars_for_llm = {**session_vars, "conversation_language": user_lang}
+
     user_prompt = (
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
@@ -938,7 +945,7 @@ def generate_reply(
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],
-        session_vars=json.dumps(session_vars, ensure_ascii=False),
+        session_vars=json.dumps(session_vars_for_llm, ensure_ascii=False),
         crm_context=crm_client_context,
         context=context,
         lang_instruction=lang_instruction,
