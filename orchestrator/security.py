@@ -65,29 +65,20 @@ def check_email_reputation(
 def should_request_email(session_vars: dict[str, Any]) -> bool:
     """
     Determine if agent should request email in this turn.
-
-    Request email after ~3-4 turns of conversation when prospect
+    
+    Request email after ~3-4 turns of conversation when prospect 
     is engaged but before attempting to convert.
-
-    Hard block: if the user has already shared any email at any point in
-    the conversation, NEVER request it again (single-ask rule).
     """
     turn_count = session_vars.get("conversation_turn_count", 0)
-
-    # Hard block: the email was already captured / requested / verified at any point.
-    if session_vars.get("email_captured"):
-        return False
-    if session_vars.get("captured_email"):
-        return False
-    if session_vars.get("verified_email"):
-        return False
+    
+    # Already requested or already verified
     if session_vars.get("email_requested"):
         return False
     if session_vars.get("email_verified"):
         return False
     if session_vars.get("email_compromised"):
         return False
-
+    
     # Request specifically around turns 3-4 in normal flow.
     return 3 <= turn_count <= 4
 
