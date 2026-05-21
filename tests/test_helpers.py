@@ -152,22 +152,39 @@ class FormatWhatsappDatesTests(unittest.TestCase):
         text = "Hola, ¿en qué puedo ayudarte?"
         self.assertEqual(format_whatsapp_departure_dates(text, "whatsapp"), text)
 
-    def test_expands_pipe_dates_into_list(self):
+    def test_compacts_pipe_dates_into_single_line(self):
         original = "Fechas confirmadas: diciembre: 1 | 4 | 20 | 27"
         out = format_whatsapp_departure_dates(original, "whatsapp")
-        for expected in ("- diciembre 1", "- diciembre 4", "- diciembre 20", "- diciembre 27"):
-            self.assertIn(expected, out)
+        self.assertIn("Dic 1, 4, 20, 27", out)
+        self.assertNotIn("|", out)
 
     def test_handles_english_month_in_dates_block(self):
         original = "Departures: december: 1 | 4 | 20"
         out = format_whatsapp_departure_dates(original, "whatsapp")
-        self.assertIn("- december 1", out)
-        self.assertIn("- december 20", out)
+        self.assertIn("Dec 1, 4, 20", out)
 
     def test_no_change_when_single_day(self):
         original = "Salidas confirmadas: enero: 5"
         out = format_whatsapp_departure_dates(original, "whatsapp")
         self.assertEqual(out, original)
+
+    def test_collapses_multiline_program_block(self):
+        original = (
+            "Fechas confirmadas:\n"
+            "18+2 DÍAS | NORMAL EXTENDIDO (recomendado)\n"
+            "- Noviembre: 14 | 22\n"
+            "-\n"
+            "- Diciembre: 1 | 4 | 20 | 27\n"
+            "- Enero: 2 | 10 | 31\n"
+            "- Febrero: 7\n"
+        )
+        out = format_whatsapp_departure_dates(original, "whatsapp")
+        self.assertIn("*18+2 días - Normal Extendido* _(recomendado)_", out)
+        self.assertIn(
+            "Nov 14, 22 · Dic 1, 4, 20, 27 · Ene 2, 10, 31 · Feb 7",
+            out,
+        )
+        self.assertNotIn("\n-\n", out)
 
 
 class NormalizeAndSignatureTests(unittest.TestCase):

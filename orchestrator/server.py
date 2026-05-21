@@ -1006,7 +1006,7 @@ def generate_reply(
         "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
-        "- Si compartes fechas de salida y el canal es WhatsApp, muéstralas en formato de lista, con una fecha por línea (no en un solo bloque).\n"
+        "- Si compartes fechas de salida y el canal es WhatsApp, usa un formato compacto: una línea por programa y meses abreviados con días agrupados.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
         "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
     ).format(
@@ -1057,8 +1057,36 @@ def maybe_send_openbsp(
     return True, status, data
 
 
+_MONTH_ABBR: dict[str, str] = {
+    "enero": "Ene", "febrero": "Feb", "marzo": "Mar", "abril": "Abr",
+    "mayo": "May", "junio": "Jun", "julio": "Jul", "agosto": "Ago",
+    "septiembre": "Sep", "setiembre": "Sep", "octubre": "Oct",
+    "noviembre": "Nov", "diciembre": "Dic",
+    "january": "Jan", "february": "Feb", "march": "Mar", "april": "Apr",
+    "may": "May", "june": "Jun", "july": "Jul", "august": "Aug",
+    "september": "Sep", "october": "Oct", "november": "Nov", "december": "Dec",
+}
+
+_TITLE_PATTERN = re.compile(
+    r"^([ \t]*)(\d+\s*\+\s*\d+)\s+(?:D[ÍI]AS|d[íi]as)\s*\|\s*(.+?)\s*$",
+    flags=re.MULTILINE,
+)
+
+
+def _format_program_title(match: "re.Match[str]") -> str:
+    indent = match.group(1)
+    days = re.sub(r"\s+", "", match.group(2))
+    rest = match.group(3).strip()
+    paren = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", rest)
+    if paren:
+        name = paren.group(1).strip().title()
+        note = paren.group(2).strip().lower()
+        return f"{indent}*{days} días - {name}* _({note})_"
+    return f"{indent}*{days} días - {rest.title()}*"
+
+
 def format_whatsapp_departure_dates(reply_text: str, channel: str) -> str:
-    """Render departure-date blocks as line-by-line lists for WhatsApp readability."""
+    """Render departure-date blocks compactly for WhatsApp readability."""
     if not reply_text or channel.strip().lower() != "whatsapp":
         return reply_text
 
@@ -1082,19 +1110,51 @@ def format_whatsapp_departure_dates(reply_text: str, channel: str) -> str:
         r"\b("
         r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|"
         r"january|february|march|april|may|june|july|august|september|october|november|december"
-        r")\s*:\s*([0-9]{1,2}(?:\s*\|\s*[0-9]{1,2})+)",
+        r")\s*:\s*([0-9]{1,2}(?:\s*(?:\||,)\s*[0-9]{1,2})+)",
         flags=re.IGNORECASE,
     )
 
-    def _expand_month_block(match: re.Match[str]) -> str:
+    def _compact_month(match: "re.Match[str]") -> str:
         month_label = match.group(1)
-        raw_days = match.group(2)
-        days = [d.strip() for d in raw_days.split("|") if d.strip()]
+        days = [d.strip() for d in re.split(r"\||,", match.group(2)) if d.strip()]
         if len(days) < 2:
             return match.group(0)
-        return "\n" + "\n".join(f"- {month_label} {day}" for day in days)
+        abbr = _MONTH_ABBR.get(month_label.lower(), month_label)
+        return f"{abbr} {', '.join(days)}"
 
-    formatted = month_pattern.sub(_expand_month_block, text)
+    formatted = month_pattern.sub(_compact_month, text)
+
+    # Collapse consecutive month lines into one compact line per program.
+    abbr_set = set(_MONTH_ABBR.values())
+    month_keys = "|".join(sorted(_MONTH_ABBR.keys(), key=len, reverse=True))
+    abbr_keys = "|".join(sorted(abbr_set, key=len, reverse=True))
+    month_line_re = re.compile(
+        rf"^[ \t]*[-*]?[ \t]*(?P<month>{month_keys}|{abbr_keys})[ \t]*:?[ \t]+"
+        rf"(?P<days>\d{{1,2}}(?:[ \t]*[,|][ \t]*\d{{1,2}})*)\s*$",
+        re.IGNORECASE,
+    )
+
+    out_lines: list[str] = []
+    buffer: list[str] = []
+    for line in formatted.split("\n"):
+        if re.fullmatch(r"[ \t]*[-*][ \t]*", line):
+            continue
+        m = month_line_re.match(line)
+        if m:
+            month_raw = m.group("month").lower()
+            abbr = _MONTH_ABBR.get(month_raw, m.group("month").capitalize())
+            days = [d.strip() for d in re.split(r"[,|]", m.group("days")) if d.strip()]
+            buffer.append(f"{abbr} {', '.join(days)}")
+            continue
+        if buffer:
+            out_lines.append(" · ".join(buffer))
+            buffer = []
+        out_lines.append(line)
+    if buffer:
+        out_lines.append(" · ".join(buffer))
+
+    formatted = "\n".join(out_lines)
+    formatted = _TITLE_PATTERN.sub(_format_program_title, formatted)
     formatted = re.sub(r"[ \t]+\n", "\n", formatted)
     formatted = re.sub(r"\n{3,}", "\n\n", formatted)
     return formatted.strip()
