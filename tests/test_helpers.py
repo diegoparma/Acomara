@@ -104,6 +104,17 @@ class LanguageDetectionTests(unittest.TestCase):
         self.assertEqual(detect_language_from_text("perdón? sabes hablar español?"), "es")
         self.assertEqual(detect_language_from_text("si español por favor"), "es")
 
+    def test_colloquial_english_not_defaulted_to_spanish(self):
+        from orchestrator.server import detect_language_from_text
+        self.assertEqual(detect_language_from_text("Do u have 12 days sir?"), "en")
+
+    def test_mixed_spanish_with_single_pt_token_stays_spanish(self):
+        from orchestrator.server import detect_language_from_text
+        self.assertEqual(
+            detect_language_from_text("Aun no te había hecho ninguna pergunta aun"),
+            "es",
+        )
+
 
 class SessionLanguageTests(unittest.TestCase):
     def test_default_when_empty(self):

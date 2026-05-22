@@ -297,13 +297,44 @@ def detect_language_from_text(text: str) -> str:
     pt_count = keyword_count(pt_keywords)
     en_count = keyword_count(en_keywords)
 
+    # Secondary signal: common function words improve robustness on colloquial
+    # user messages (e.g., "Do u have 12 days sir?") where domain keywords are
+    # sparse and the old heuristic defaulted to Spanish.
+    words = re.findall(r"\b[a-z]+\b", normalized_text)
+    word_set = set(words)
+    es_stopwords = {
+        "de", "la", "el", "que", "en", "y", "por", "para", "con", "una", "un",
+        "hola", "buenas", "aun", "ninguna", "te", "me", "quiero", "necesito",
+    }
+    pt_stopwords = {
+        "de", "do", "da", "que", "em", "e", "por", "para", "com", "uma", "um",
+        "oi", "ola", "voce", "nao", "sim", "quero", "gostaria", "pergunta",
+    }
+    en_stopwords = {
+        "the", "and", "for", "with", "to", "from", "please", "hello", "hi", "thanks",
+        "i", "you", "we", "can", "do", "have", "sir", "week", "next", "my",
+    }
+    es_word_score = len(word_set & es_stopwords)
+    pt_word_score = len(word_set & pt_stopwords)
+    en_word_score = len(word_set & en_stopwords)
+
     if en_count > es_count and en_count > pt_count and en_count > 0:
         return "en"
 
     if es_count > pt_count and es_count > 0:
         return "es"
-    if pt_count > 0:
+    # Avoid over-triggering PT on a single weak token inside mostly-Spanish text
+    # (e.g. "Aun no te había hecho ninguna pergunta aun").
+    if pt_count > es_count and pt_count >= 2:
         return "pt"
+
+    if en_word_score > es_word_score and en_word_score > pt_word_score and en_word_score >= 2:
+        return "en"
+    if pt_word_score > es_word_score and pt_word_score > en_word_score and pt_word_score >= 2:
+        return "pt"
+    if es_word_score > pt_word_score and es_word_score > en_word_score and es_word_score >= 2:
+        return "es"
+
     return "es"
 
 
