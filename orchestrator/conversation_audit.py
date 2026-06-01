@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import re
+import unicodedata
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -36,7 +37,12 @@ ES_KEYWORDS = (
     "cual",
     "quiero",
     "informacion",
-    "aconcagua",
+    "quisiera",
+    "precio",
+    "fechas",
+    "salida",
+    "disponibles",
+    "asesor",
 )
 EN_KEYWORDS = (
     "hello",
@@ -50,8 +56,93 @@ EN_KEYWORDS = (
     "which",
     "i want",
     "information",
-    "aconcagua",
+    "would like",
+    "departure",
+    "available",
+    "price",
+    "how",
+    "are",
+    "can",
+    "could",
+    "please",
+    "plan",
+    "together",
+    "human",
+    "email",
+    "english",
+    "contact",
+    "help",
+    "thanks",
+    "yes",
+    "have",
+    "need",
+    "want",
+    "call",
 )
+PT_KEYWORDS = (
+    "ola",
+    "obrigado",
+    "por favor",
+    "quero",
+    "gostaria",
+    "informacao",
+    "datas",
+    "preco",
+    "assessor",
+    "expedicao",
+    "disponiveis",
+)
+IT_KEYWORDS = (
+    "ciao",
+    "grazie",
+    "per favore",
+    "vorrei",
+    "informazioni",
+    "data",
+    "date",
+    "prezzo",
+    "consulente",
+    "spedizione",
+    "disponibili",
+    "posso",
+)
+FR_KEYWORDS = (
+    "bonjour",
+    "merci",
+    "s il vous plait",
+    "je voudrais",
+    "informations",
+    "dates",
+    "prix",
+    "conseiller",
+    "expedition",
+    "disponibles",
+)
+
+LANGUAGE_PREFERENCE_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
+    "en": (
+        re.compile(r"\benglish\s+please\b", re.IGNORECASE),
+        re.compile(r"\bi\s+don(?:'|’)?t\s+speak\s+spanish\b", re.IGNORECASE),
+        re.compile(r"\bspeak\s+english\b", re.IGNORECASE),
+    ),
+    "es": (
+        re.compile(r"\bespanol\s+por\s+favor\b", re.IGNORECASE),
+        re.compile(r"\bhabla\s+en\s+espanol\b", re.IGNORECASE),
+        re.compile(r"\bno\s+hablo\s+ingles\b", re.IGNORECASE),
+    ),
+    "pt": (
+        re.compile(r"\bportugues\s+por\s+favor\b", re.IGNORECASE),
+        re.compile(r"\bfale\s+em\s+portugues\b", re.IGNORECASE),
+    ),
+    "it": (
+        re.compile(r"\bin\s+italiano\b", re.IGNORECASE),
+        re.compile(r"\bparla\s+italiano\b", re.IGNORECASE),
+    ),
+    "fr": (
+        re.compile(r"\ben\s+francais\b", re.IGNORECASE),
+        re.compile(r"\bparlez\s+francais\b", re.IGNORECASE),
+    ),
+}
 
 CRM_ERROR_PATTERNS = (
     "crm",
@@ -87,15 +178,60 @@ def _load_env_if_available() -> None:
         load_dotenv(env_path)
 
 
-def _detect_language(text: str) -> str:
-    lowered = (text or "").lower()
-    es_count = sum(1 for key in ES_KEYWORDS if re.search(r"\b" + re.escape(key) + r"\b", lowered))
-    en_count = sum(1 for key in EN_KEYWORDS if re.search(r"\b" + re.escape(key) + r"\b", lowered))
-    if es_count > en_count:
-        return "es"
-    if en_count > es_count:
-        return "en"
+def _normalize_for_language_detection(text: str) -> str:
+    normalized = unicodedata.normalize("NFKD", text or "")
+    normalized = normalized.encode("ascii", "ignore").decode("ascii")
+    normalized = normalized.lower()
+    normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _score_language(text: str, keywords: tuple[str, ...]) -> int:
+    normalized = _normalize_for_language_detection(text)
+    score = 0
+    for keyword in keywords:
+        normalized_keyword = _normalize_for_language_detection(keyword)
+        if not normalized_keyword:
+            continue
+        if " " in normalized_keyword:
+            if normalized_keyword in normalized:
+                score += 2
+        else:
+            score += len(re.findall(r"\b" + re.escape(normalized_keyword) + r"\b", normalized))
+    return score
+
+
+def _dominant_language(labels: list[str]) -> str:
+    non_unknown = [label for label in labels if label != "unknown"]
+    if non_unknown:
+        return Counter(non_unknown).most_common(1)[0][0]
+    if labels:
+        return Counter(labels).most_common(1)[0][0]
     return "unknown"
+
+
+def _detect_language(text: str) -> str:
+    scores = {
+        "es": _score_language(text, ES_KEYWORDS),
+        "en": _score_language(text, EN_KEYWORDS),
+        "pt": _score_language(text, PT_KEYWORDS),
+        "it": _score_language(text, IT_KEYWORDS),
+        "fr": _score_language(text, FR_KEYWORDS),
+    }
+    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+    top_lang, top_score = ranked[0]
+    runner_up = ranked[1][1] if len(ranked) > 1 else 0
+
+    # Keep the detector conservative: require at least two hits, or a clear
+    # margin over the runner-up. Short greetings and mixed sentences remain
+    # unknown so the audit does not over-attribute drift.
+    if top_score < 2:
+        return "unknown"
+    if top_score == runner_up:
+        return "unknown"
+    if top_score == 2 and runner_up > 0:
+        return "unknown"
+    return top_lang
 
 
 def _supabase_get(base_url: str, api_key: str, table: str, params: dict[str, Any]) -> list[dict[str, Any]]:
@@ -120,19 +256,20 @@ def _fetch_conversations(
     organization_id: str,
     days_back: int | None = None,
     max_conversations: int | None = None,
+    apply_days_back_filter: bool = True,
 ) -> list[dict[str, Any]]:
     conversations: list[dict[str, Any]] = []
     offset = 0
     page_size = 500
     updated_since = None
-    if days_back is not None:
+    if apply_days_back_filter and days_back is not None:
         updated_since = (datetime.now(timezone.utc) - timedelta(days=days_back)).isoformat()
 
     while True:
         params: dict[str, Any] = {
             "organization_id": f"eq.{organization_id}",
             "select": "id,created_at,updated_at,contact_address",
-            "order": "created_at.asc",
+            "order": "updated_at.asc",
             "limit": page_size,
             "offset": offset,
         }
@@ -176,9 +313,88 @@ def _fetch_text_messages(base_url: str, api_key: str, conversation_id: str) -> l
             {
                 "role": "assistant" if message.get("direction") == "outgoing" else "user",
                 "text": str(content.get("text") or ""),
+                "timestamp": str(message.get("timestamp") or ""),
             }
         )
     return text_messages
+
+
+def _latest_message_timestamp(messages: list[dict[str, str]]) -> datetime | None:
+    latest: datetime | None = None
+    for message in messages:
+        raw_timestamp = str(message.get("timestamp") or "").strip()
+        if not raw_timestamp:
+            continue
+        try:
+            parsed = datetime.fromisoformat(raw_timestamp.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if latest is None or parsed > latest:
+            latest = parsed
+    return latest
+
+
+def _is_control_command(text: str) -> bool:
+    stripped = (text or "").strip().lower()
+    return stripped.startswith("/reset") or stripped.startswith("/new")
+
+
+def _detect_language_preference(text: str) -> str | None:
+    normalized = _normalize_for_language_detection(text)
+    for lang, patterns in LANGUAGE_PREFERENCE_PATTERNS.items():
+        if any(pattern.search(normalized) for pattern in patterns):
+            return lang
+    return None
+
+
+def _count_language_drift(messages: list[dict[str, str]]) -> tuple[int, dict[str, Any]]:
+    """Count drift by comparing each assistant turn to user expectation.
+
+    Expectations are derived per segment (split by /reset and /new):
+    - explicit language preference from user text (highest priority),
+    - otherwise last detectable user language in the segment.
+    """
+    mismatches = 0
+    assistant_turns = 0
+    segment_id = 0
+    locked_lang_by_segment: dict[int, str] = {}
+    last_user_lang_by_segment: dict[int, str] = {}
+
+    for msg in messages:
+        role = msg.get("role")
+        text = str(msg.get("text") or "")
+
+        if role == "user":
+            if _is_control_command(text):
+                segment_id += 1
+                continue
+
+            preferred = _detect_language_preference(text)
+            if preferred:
+                locked_lang_by_segment[segment_id] = preferred
+
+            detected = _detect_language(text)
+            if detected != "unknown":
+                last_user_lang_by_segment[segment_id] = detected
+            continue
+
+        if role != "assistant":
+            continue
+
+        assistant_turns += 1
+        expected = locked_lang_by_segment.get(segment_id) or last_user_lang_by_segment.get(segment_id)
+        if not expected:
+            continue
+
+        assistant_lang = _detect_language(text)
+        if assistant_lang not in ("unknown", expected):
+            mismatches += 1
+
+    return mismatches, {
+        "assistant_turns": assistant_turns,
+        "segments": segment_id + 1,
+        "locked_lang_by_segment": locked_lang_by_segment,
+    }
 
 
 def run_conversation_audit(
@@ -200,7 +416,12 @@ def run_conversation_audit(
         organization_id=organization_id,
         days_back=days_back,
         max_conversations=max_conversations,
+        apply_days_back_filter=False,
     )
+
+    cutoff_ts: datetime | None = None
+    if days_back is not None:
+        cutoff_ts = datetime.now(timezone.utc) - timedelta(days=days_back)
 
     issue_counts: Counter[str] = Counter()
     language_counts: Counter[str] = Counter()
@@ -231,6 +452,10 @@ def run_conversation_audit(
             )
             continue
 
+        latest_activity_at = _latest_message_timestamp(messages)
+        if cutoff_ts is not None and latest_activity_at is not None and latest_activity_at < cutoff_ts:
+            continue
+
         message_counts.append(len(messages))
         user_texts = [m["text"] for m in messages if m["role"] == "user"]
         bot_texts = [m["text"] for m in messages if m["role"] == "assistant"]
@@ -238,24 +463,24 @@ def run_conversation_audit(
         issues: list[str] = []
 
         user_langs = [_detect_language(text) for text in user_texts]
-        bot_langs = [_detect_language(text) for text in bot_texts]
-        predominant_user_lang = "unknown"
-        if user_langs:
-            predominant_user_lang = Counter(user_langs).most_common(1)[0][0]
+        predominant_user_lang = _dominant_language(user_langs)
+        if predominant_user_lang != "unknown":
             language_counts[predominant_user_lang] += 1
 
-        mismatches = sum(
-            1
-            for lang in bot_langs
-            if predominant_user_lang != "unknown" and lang not in ("unknown", predominant_user_lang)
-        )
+        mismatches, drift_debug = _count_language_drift(messages)
         if mismatches > 0:
             issues.append("LANGUAGE_DRIFT")
 
+        # Count only truly consecutive assistant duplicates in the full turn
+        # timeline. This avoids false positives when the user writes between
+        # two equal bot replies (e.g. handoff confirmation + user "ok").
         duplicate_replies = sum(
             1
-            for i in range(len(bot_texts) - 1)
-            if bot_texts[i].strip() and bot_texts[i].strip() == bot_texts[i + 1].strip()
+            for i in range(len(messages) - 1)
+            if messages[i]["role"] == "assistant"
+            and messages[i + 1]["role"] == "assistant"
+            and messages[i]["text"].strip()
+            and messages[i]["text"].strip() == messages[i + 1]["text"].strip()
         )
         if duplicate_replies > 0:
             issues.append("DUPLICATE_REPLIES")
@@ -283,9 +508,12 @@ def run_conversation_audit(
                     "conversation_id": conv_id,
                     "created_at": conv.get("created_at"),
                     "updated_at": conv.get("updated_at"),
+                    "latest_activity_at": latest_activity_at.isoformat() if latest_activity_at else None,
                     "contact_address": conv.get("contact_address"),
                     "message_count": len(messages),
                     "issues": issues,
+                    "language_drift_mismatches": mismatches,
+                    "language_drift_debug": drift_debug,
                 }
             )
         else:

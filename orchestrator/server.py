@@ -108,6 +108,8 @@ class ReplyDecision:
     handoff_status: int = 0
     handoff_data: dict[str, Any] = field(default_factory=dict)
     handoff_sent: bool = False
+    outbound_suppressed: bool = False
+    outbound_safety_blocked: bool = False
 
 
 # i18n: Internationalization layer for fixed phrases
@@ -389,6 +391,38 @@ def detect_language_confident(text: str) -> str | None:
     return detected
 
 
+def detect_explicit_language_preference(text: str) -> str | None:
+    """Detect direct user requests for a specific conversation language."""
+    normalized = normalize_for_intent(text)
+
+    en_patterns = (
+        "english please",
+        "speak english",
+        "in english",
+        "i dont speak spanish",
+        "i do not speak spanish",
+    )
+    es_patterns = (
+        "espanol por favor",
+        "habla en espanol",
+        "en espanol",
+        "no hablo ingles",
+    )
+    pt_patterns = (
+        "portugues por favor",
+        "fale em portugues",
+        "em portugues",
+    )
+
+    if any(pattern in normalized for pattern in en_patterns):
+        return "en"
+    if any(pattern in normalized for pattern in es_patterns):
+        return "es"
+    if any(pattern in normalized for pattern in pt_patterns):
+        return "pt"
+    return None
+
+
 # Months treated as out-of-Aconcagua-season (April-October).
 OUT_OF_SEASON_MONTH_TOKENS = (
     # English
@@ -452,6 +486,18 @@ def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str
 
     stored_lang = str(session_vars.get("conversation_language") or "").strip().lower()
     source = str(session_vars.get("conversation_language_source") or "").strip().lower()
+    locked = bool(session_vars.get("conversation_language_locked"))
+
+    # 0) Explicit user preference always wins and can switch the lock.
+    if fallback_text and not fallback_text.strip().startswith("/"):
+        explicit_pref = detect_explicit_language_preference(fallback_text)
+        if explicit_pref and explicit_pref in I18N_PHRASES:
+            return explicit_pref
+
+    # If language was explicitly locked, preserve it unless user asks otherwise
+    # (handled by branch 0 above).
+    if locked and stored_lang in I18N_PHRASES:
+        return stored_lang
 
     # 1) On /reset, prefer fresh detection from the next real message.
     if source == "reset" and fallback_text and not fallback_text.strip().startswith("/"):
@@ -880,6 +926,7 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
     return {
         "conversation_language": "es",
         "conversation_language_source": "reset",
+        "conversation_language_locked": False,
         "conversation_turn_count": 0,
         "conversation_paused": False,
         "pause_reason": "",
@@ -891,6 +938,7 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "paused_at_ts": now_ts,
         "last_user_message": "",
         "last_assistant_reply": "",
+        "last_assistant_reply_ts": None,
         "handoff_requested": False,
         "handoff_pending_confirmation": False,
         "proactive_email_capture_pending": False,
@@ -1024,6 +1072,13 @@ def generate_reply(
     # see a stale/contradictory signal vs the explicit lang_instruction.
     session_vars_for_llm = {**session_vars, "conversation_language": user_lang}
 
+    is_whatsapp = str(msg.get("channel", "")).strip().lower() == "whatsapp"
+    response_length_instruction = (
+        "Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres."
+        if is_whatsapp
+        else "Mantén la respuesta corta: máximo 3 líneas y 450 caracteres."
+    )
+
     user_prompt = (
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
@@ -1037,6 +1092,7 @@ def generate_reply(
         "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
+        "- {response_length_instruction}\n"
         "- Si compartes fechas de salida y el canal es WhatsApp, usa un formato compacto: una línea por programa y meses abreviados con días agrupados.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
         "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
@@ -1048,10 +1104,12 @@ def generate_reply(
         crm_context=crm_client_context,
         context=context,
         lang_instruction=lang_instruction,
+        response_length_instruction=response_length_instruction,
     )
 
     resp = client.responses.create(
         model=chat_model,
+        max_output_tokens=220,
         input=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -1282,6 +1340,104 @@ def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -
         "connect me with",
     )
     return any(trigger in normalized for trigger in triggers)
+
+
+def _contains_known_program_duration(normalized_text: str) -> bool:
+    return bool(
+        re.search(
+            r"\b(18\s*\+\s*2|17\s*\+\s*2|14\s*\+\s*2|12\s*\+\s*2)\b",
+            normalized_text,
+        )
+    )
+
+
+def _is_program_options_first_intent(normalized_text: str) -> bool:
+    generic_keywords = (
+        "opciones",
+        "alternativas",
+        "programas",
+        "itinerarios",
+        "expediciones",
+        "que opciones",
+        "cuales son",
+        "what options",
+        "which options",
+        "alternatives",
+        "programs",
+        "itineraries",
+        "expeditions",
+    )
+    has_generic_keyword = any(k in normalized_text for k in generic_keywords)
+    return has_generic_keyword and not _contains_known_program_duration(normalized_text)
+
+
+def _is_program_options_followup_intent(normalized_text: str) -> bool:
+    followup_keywords = (
+        "otras",
+        "otras opciones",
+        "otras alternativas",
+        "las otras",
+        "restantes",
+        "demas",
+        "todas",
+        "lista",
+        "listame",
+        "all options",
+        "other options",
+        "other alternatives",
+        "the other",
+        "list the others",
+    )
+    return any(k in normalized_text for k in followup_keywords)
+
+
+def _first_program_options_reply(lang: str) -> str:
+    if lang == "en":
+        return (
+            "I recommend starting with two options:\n"
+            "1. 18+2 (highly recommended)\n"
+            "2. 12+2 (recommended)\n\n"
+            "There are other alternatives as well. If you'd like, I can list them in detail."
+        )
+    return (
+        "Para empezar, te recomiendo estas dos opciones:\n"
+        "1. 18+2 (muy recomendada)\n"
+        "2. 12+2 (recomendada)\n\n"
+        "También hay otras alternativas. Si quieres, te las listo en detalle."
+    )
+
+
+def _followup_program_options_reply(lang: str) -> str:
+    if lang == "en":
+        return (
+            "The other alternatives are:\n"
+            "1. 14+2\n"
+            "2. 17+2"
+        )
+    return (
+        "Las otras alternativas son:\n"
+        "1. 14+2\n"
+        "2. 17+2"
+    )
+
+
+def build_program_options_guidance_reply(
+    user_text: str,
+    session_vars: dict[str, Any],
+    lang: str,
+) -> str | None:
+    normalized = normalize_for_intent(user_text)
+    options_stage = int(session_vars.get("program_options_stage") or 0)
+
+    if options_stage <= 0 and _is_program_options_first_intent(normalized):
+        session_vars["program_options_stage"] = 1
+        return _first_program_options_reply(lang)
+
+    if options_stage >= 1 and _is_program_options_followup_intent(normalized):
+        session_vars["program_options_stage"] = 2
+        return _followup_program_options_reply(lang)
+
+    return None
 
 
 def should_send_handoff_email(
@@ -1673,6 +1829,29 @@ def build_paused_reply(session_vars: dict[str, Any]) -> str:
     return get_phrase("paused_suspicious", lang)
 
 
+def contains_sensitive_outbound_content(text: str) -> bool:
+    """Return True when outbound text appears to contain credentials/secrets."""
+    if not text:
+        return False
+    patterns = (
+        r"\bpass(?:word)?\s*[:=]\s*\S+",
+        r"\bapi[_-]?key\s*[:=]\s*\S+",
+        r"\btoken\s*[:=]\s*\S+",
+        r"\b(email|usuario|user)\s*[:=]\s*\S+@\S+\s+.*\bpass(?:word)?\b",
+        r"\blogin\b.{0,80}\bpass(?:word)?\b",
+    )
+    lowered = text.lower()
+    return any(re.search(pattern, lowered, re.IGNORECASE) for pattern in patterns)
+
+
+def build_sensitive_outbound_block_reply(lang: str) -> str:
+    if lang == "en":
+        return "I can't share credentials or access data through this channel. A human advisor will continue with secure onboarding steps."
+    if lang == "pt":
+        return "Nao posso compartilhar credenciais ou dados de acesso por este canal. Um consultor humano continuara com os passos seguros."
+    return "No puedo compartir credenciales ni datos de acceso por este canal. Un asesor humano continuara con los pasos seguros."
+
+
 def apply_paused_anti_loop_guard(
     session_vars: dict[str, Any],
     msg: dict[str, str],
@@ -1696,6 +1875,10 @@ def apply_paused_anti_loop_guard(
 
     if paused_reply_count <= threshold:
         return build_paused_reply(session_vars), False, 0, {}, False
+
+    # Emit the final paused-loop message only once; suppress subsequent repeats.
+    if session_vars.get("paused_loop_finalized_at_ts"):
+        return "", False, 0, {"info": "paused loop already finalized"}, False
 
     lang = get_session_language(session_vars, msg.get("text", ""))
     session_vars["paused_loop_frozen"] = True
@@ -1996,13 +2179,22 @@ def apply_language_commit_policy(user_text: str, session_vars: dict[str, Any]) -
     """Fix #2: only commit conversation_language when the new user message
     has a confident language signal; otherwise keep the previous value.
     """
+    explicit_pref = detect_explicit_language_preference(user_text)
+    if explicit_pref and explicit_pref in I18N_PHRASES:
+        session_vars["conversation_language"] = explicit_pref
+        session_vars["conversation_language_source"] = "user_preference_explicit"
+        session_vars["conversation_language_locked"] = True
+        return
+
     confident_lang = detect_language_confident(user_text)
     if confident_lang and confident_lang in I18N_PHRASES:
         session_vars["conversation_language"] = confident_lang
         session_vars["conversation_language_source"] = "message_detected"
+        session_vars["conversation_language_locked"] = False
     elif not session_vars.get("conversation_language"):
         session_vars["conversation_language"] = get_session_language(session_vars, user_text)
         session_vars["conversation_language_source"] = "message_detected_low_confidence"
+        session_vars["conversation_language_locked"] = False
 
 
 def process_inbound_message(
@@ -2200,40 +2392,70 @@ def process_inbound_message(
             context.now_ts,
         )
     else:
-        decision.hits = retrieve_top_k(
-            client,
-            runtime["embed_model"],
-            runtime["rows"],
-            msg.text,
-            runtime["top_k"],
-        )
-        decision.reply = generate_reply(
-            client,
-            runtime["chat_model"],
-            runtime["system_prompt"],
-            msg_dict,
-            decision.hits,
-            session_vars,
-        )
         lang = get_session_language(session_vars, msg.text)
-        decision.reply = apply_email_ack_or_request_policy(
-            decision.reply, session_vars, context.extracted_email, lang
-        )
-        decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
+        guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
+        if guided_reply is not None:
+            decision.reply = guided_reply
+        else:
+            decision.hits = retrieve_top_k(
+                client,
+                runtime["embed_model"],
+                runtime["rows"],
+                msg.text,
+                runtime["top_k"],
+            )
+            decision.reply = generate_reply(
+                client,
+                runtime["chat_model"],
+                runtime["system_prompt"],
+                msg_dict,
+                decision.hits,
+                session_vars,
+            )
+            decision.reply = apply_email_ack_or_request_policy(
+                decision.reply, session_vars, context.extracted_email, lang
+            )
+            decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
     decision.reply = format_whatsapp_departure_dates(decision.reply, msg.channel)
+
+    # Outbound safety filter: never send credential-like content.
+    effective_lang = get_session_language(session_vars, msg.text)
+    if contains_sensitive_outbound_content(decision.reply):
+        decision.reply = build_sensitive_outbound_block_reply(effective_lang)
+        decision.outbound_safety_blocked = True
+
+    # Short-window anti-duplicate guard for same assistant reply bursts.
+    last_reply = str(session_vars.get("last_assistant_reply") or "").strip()
+    raw_last_ts = session_vars.get("last_assistant_reply_ts")
+    try:
+        last_reply_ts = int(raw_last_ts) if raw_last_ts is not None else 0
+    except (TypeError, ValueError):
+        last_reply_ts = 0
+    if (
+        decision.reply.strip()
+        and last_reply
+        and normalize_for_intent(decision.reply) == normalize_for_intent(last_reply)
+        and last_reply_ts
+        and (context.now_ts - last_reply_ts) <= 45
+    ):
+        decision.reply = ""
+        decision.outbound_suppressed = True
+
     apply_language_commit_policy(msg.text, session_vars)
 
     updated_vars = {
         **session_vars,
         "last_user_message": msg.text,
-        "last_assistant_reply": decision.reply,
         "channel": msg.channel,
         "contact_address": msg.contact_address,
         "handoff_requested": context.handoff_requested,
         "last_inbound_signature": context.inbound_signature,
         "last_inbound_signature_ts": context.now_ts,
     }
+    if decision.reply.strip():
+        updated_vars["last_assistant_reply"] = decision.reply
+        updated_vars["last_assistant_reply_ts"] = context.now_ts
 
     if decision.handoff_sent:
         updated_vars["handoff_email_last_sent_ts"] = context.now_ts
@@ -2302,10 +2524,15 @@ def chat_completions_compatible() -> Any:
     if command in ("/reset", "/new"):
         session_base_url = _env("SESSION_AGENT_BASE_URL")
         session_agent_id = _env("SESSION_AGENT_ID", "sales-agent-v1") or "sales-agent-v1"
+        pre_reset_vars: dict[str, Any] = {}
+        snapshot = try_session_get(session_base_url, inbound_msg.conversation_id)
+        if snapshot and isinstance(snapshot.get("variables"), dict):
+            pre_reset_vars = snapshot["variables"]
         reset_session_state(session_base_url, inbound_msg.as_dict(), session_agent_id)
-        
-        # Return success response with reset message
-        reply = "Conversación reiniciada. Idioma reiniciado a español. ¿En qué te puedo ayudar?"
+
+        # Use best-known language from the pre-reset session and current text.
+        reply_lang = get_session_language(pre_reset_vars, user_text)
+        reply = get_phrase("reset_acknowledge", reply_lang)
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",
             "object": "chat.completion",
@@ -2466,16 +2693,17 @@ def chat_completions_compatible() -> Any:
                     "method": updated_vars.get("suspicious_email_alert_method", "security_alert"),
                 },
             )
-        try_session_append_event(
-            session_base_url,
-            msg["conversation_id"],
-            "outbound_message",
-            {
-                "text": decision.reply,
-                "source": "acomara-orchestrator-chat-completions",
-                "faq_sources": [h["id"] for h in decision.hits],
-            },
-        )
+        if decision.reply.strip():
+            try_session_append_event(
+                session_base_url,
+                msg["conversation_id"],
+                "outbound_message",
+                {
+                    "text": decision.reply,
+                    "source": "acomara-orchestrator-chat-completions",
+                    "faq_sources": [h["id"] for h in decision.hits],
+                },
+            )
 
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",

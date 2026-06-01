@@ -300,6 +300,13 @@ class LanguageCommitPolicyTests(unittest.TestCase):
         self.assertIn(sv["conversation_language"], {"es", "en", "pt"})
         self.assertEqual(sv["conversation_language_source"], "message_detected_low_confidence")
 
+    def test_explicit_english_preference_locks_language(self):
+        sv: dict = {"conversation_language": "es"}
+        apply_language_commit_policy("I don't speak Spanish, English please", sv)
+        self.assertEqual(sv["conversation_language"], "en")
+        self.assertEqual(sv["conversation_language_source"], "user_preference_explicit")
+        self.assertTrue(sv["conversation_language_locked"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
