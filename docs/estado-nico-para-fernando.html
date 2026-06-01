@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nico — Estado del Arte · Acomara</title>
+  <style>
+    :root {
+      --brand-dark:   #1a2634;
+      --brand-mid:    #2c4a6e;
+      --brand-light:  #4a7fb5;
+      --brand-sky:    #e8f2fb;
+      --accent:       #c8a84b;
+      --accent-light: #fdf6e3;
+      --green:        #2e7d5e;
+      --green-light:  #e8f5f0;
+      --red:          #c0392b;
+      --red-light:    #fdf0ee;
+      --text:         #1e2a35;
+      --muted:        #5a6e82;
+      --border:       #d4dde6;
+      --bg:           #f5f8fc;
+      --white:        #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-mid) 100%);
+      color: var(--white);
+      padding: 48px 40px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      right: 80px; top: 80px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(200,168,75,0.12);
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+    .badge {
+      display: inline-block;
+      background: rgba(200,168,75,0.25);
+      color: var(--accent);
+      border: 1px solid rgba(200,168,75,0.4);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    header h1 span { color: var(--accent); }
+    header p.subtitle {
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+    }
+
+    /* ── VERSION BADGE IN HEADER ── */
+    .version-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      margin-top: 20px;
+    }
+    .version-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: #5ee88a; }
+
+    /* ── LAYOUT ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── SECTION ── */
+    section { margin-bottom: 36px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--brand-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--brand-dark);
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .card p { color: var(--text); margin-bottom: 12px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card strong { color: var(--brand-dark); }
+
+    .highlight-box {
+      background: var(--brand-sky);
+      border-left: 4px solid var(--brand-light);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--brand-mid);
+    }
+
+    /* ── TABLE ── */
+    .kb-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .kb-table thead tr {
+      background: var(--brand-dark);
+      color: var(--white);
+    }
+    .kb-table thead th {
+      padding: 11px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .kb-table thead th:first-child { border-radius: 8px 0 0 0; }
+    .kb-table thead th:last-child  { border-radius: 0 8px 0 0; }
+    .kb-table tbody tr { border-bottom: 1px solid var(--border); }
+    .kb-table tbody tr:last-child { border-bottom: none; }
+    .kb-table tbody tr:hover { background: var(--brand-sky); }
+    .kb-table td { padding: 11px 16px; vertical-align: top; }
+    .kb-table td:first-child { font-weight: 600; color: var(--brand-mid); white-space: nowrap; }
+
+    /* ── LIMITS GRID ── */
+    .limits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .limits-grid { grid-template-columns: 1fr; } }
+    .limit-item {
+      background: var(--red-light);
+      border: 1px solid #f5c6c2;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .limit-item .x { color: var(--red); font-size: 16px; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+
+    /* ── PHRASES ── */
+    .phrase-grid { display: flex; flex-direction: column; gap: 12px; }
+    .phrase-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .phrase-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      white-space: nowrap;
+      margin-top: 2px;
+      min-width: 110px;
+    }
+    .phrase-text {
+      font-style: italic;
+      color: var(--text);
+      font-size: 14px;
+      background: var(--brand-sky);
+      border-left: 3px solid var(--brand-light);
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+      flex: 1;
+    }
+
+    /* ── BEHAVIOR PILLS ── */
+    .behavior-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .behavior-grid { grid-template-columns: 1fr; } }
+    .behavior-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .behavior-item h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--brand-mid);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .behavior-item ul { padding-left: 16px; }
+    .behavior-item ul li { font-size: 13.5px; color: var(--text); margin-bottom: 4px; }
+
+    /* ── DOES / DOESNT ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+    .green-card {
+      background: var(--green-light);
+      border: 1px solid #b8ddd0;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .green-card h3 { color: var(--green); font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .blue-card {
+      background: var(--brand-sky);
+      border: 1px solid #c0d8ef;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .blue-card h3 { color: var(--brand-mid); font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .check-list { list-style: none; padding: 0; }
+    .check-list li { font-size: 14px; margin-bottom: 7px; display: flex; align-items: flex-start; gap: 8px; }
+    .check-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .human-list { list-style: none; padding: 0; }
+    .human-list li { font-size: 14px; margin-bottom: 7px; display: flex; align-items: flex-start; gap: 8px; }
+    .human-list li::before { content: '→'; color: var(--brand-light); font-weight: 700; flex-shrink: 0; }
+
+    /* ── VERSION HISTORY ── */
+    .version-history {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .version-row {
+      display: grid;
+      grid-template-columns: 90px 120px 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13.5px;
+    }
+    .version-row:last-child { border-bottom: none; }
+    .version-row.header-row {
+      background: var(--brand-dark);
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .version-row > div { padding: 12px 16px; }
+    .version-row.header-row > div { padding: 10px 16px; }
+    .version-tag {
+      font-weight: 700;
+      color: var(--brand-mid);
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .version-date { color: var(--muted); font-size: 13px; }
+    .version-notes { color: var(--text); }
+    .version-row:nth-child(even):not(.header-row) { background: var(--bg); }
+    .current-tag {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid rgba(200,168,75,0.4);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* ── DIVIDER ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="badge">Documento Interno · Acomara</div>
+    <h1>Estado del Arte de <span>Nico</span></h1>
+    <p class="subtitle">Agente de ventas digital — Acomara Aconcagua Expeditions</p>
+    <div class="version-chip">
+      <span class="dot"></span>
+      Versión 1.0 · 27 de mayo de 2026 · Preparado para Fernando
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- QUÉ ES NICO -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">🤖</div>
+      <h2>Qué es Nico</h2>
+    </div>
+    <div class="card">
+      <p>Nico es el agente de ventas digital de Acomara. Funciona <strong>24/7 por WhatsApp</strong> (y otros canales) y tiene una sola misión: <strong>convertir consultas en leads calificados</strong> para que un asesor humano cierre la venta.</p>
+      <p>No reemplaza al asesor — <strong>lo libera para que aparezca en el momento justo</strong>.</p>
+      <div class="highlight-box">
+        Principio central: <em>No inventar &gt; vender · Seguridad &gt; conversión · Claridad &gt; cantidad · Avanzar siempre, pero dentro de reglas.</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- BASE DE CONOCIMIENTO -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">📚</div>
+      <h2>Qué sabe Nico — Base de Conocimiento</h2>
+    </div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table class="kb-table">
+        <thead>
+          <tr>
+            <th>Tema</th>
+            <th>Qué puede responder</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Programas</td>
+            <td>Opciones 18+2, 14+2, 12+2 y Ruta Polaca 17+2 — descripción, diferencias, a quién conviene cada uno</td>
+          </tr>
+          <tr>
+            <td>Rutas</td>
+            <td>Ruta Normal y Glaciar Polaco 360° — altitudes, campamentos, perfil de dificultad</td>
+          </tr>
+          <tr>
+            <td>Precios</td>
+            <td>USD 6.990 estándar / USD 5.990 promocional (siempre aclarando "sujeto a disponibilidad")</td>
+          </tr>
+          <tr>
+            <td>Temporada y fechas</td>
+            <td>Noviembre a marzo — fechas de salida publicadas</td>
+          </tr>
+          <tr>
+            <td>Qué incluye</td>
+            <td>Servicios incluidos vs. opcionales (porteadores, EAP, WiFi, traslados privados, etc.)</td>
+          </tr>
+          <tr>
+            <td>Permisos y seguros</td>
+            <td>Permiso de parque, cobertura de rescate y evacuación</td>
+          </tr>
+          <tr>
+            <td>Equipamiento</td>
+            <td>Qué llevar, qué alquilar, listas de gear</td>
+          </tr>
+          <tr>
+            <td>Logística</td>
+            <td>Campamentos, alimentación, menú de altura, grupos privados vs. abiertos</td>
+          </tr>
+          <tr>
+            <td>Seguridad</td>
+            <td>Protocolos de seguridad, guías, tamaño de grupos</td>
+          </tr>
+          <tr>
+            <td>Propinas</td>
+            <td>Política y montos habituales</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="highlight-box" style="margin-top: 12px;">
+      <strong>Regla de oro:</strong> Nico solo responde con información que existe en esta base. Si algo no está, no lo inventa — deriva al asesor.
+    </div>
+  </section>
+
+  <!-- LÍMITES DUROS -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">🚫</div>
+      <h2>Qué NO puede hacer Nico — Límites Duros</h2>
+    </div>
+    <div class="limits-grid">
+      <div class="limit-item">
+        <span class="x">✗</span>
+        <span><strong>Confirmar disponibilidad real de cupos</strong> por fecha específica</span>
+      </div>
+      <div class="limit-item">
+        <span class="x">✗</span>
+        <span><strong>Tomar reservas</strong> ni dar confirmaciones de pago</span>
+      </div>
+      <div class="limit-item">
+        <span class="x">✗</span>
+        <span><strong>Hacer cotizaciones personalizadas</strong> ni inventar descuentos</span>
+      </div>
+      <div class="limit-item">
+        <span class="x">✗</span>
+        <span><strong>Dar consejos médicos</strong> ni farmacológicos</span>
+      </div>
+      <div class="limit-item" style="grid-column: 1 / -1;">
+        <span class="x">✗</span>
+        <span><strong>Mezclar información propia</strong> con la del FAQ — cero alucinaciones</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRASES DETERMINÍSTICAS -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">💬</div>
+      <h2>Frases Determinísticas — Respuestas Fijas</h2>
+    </div>
+    <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">Estas respuestas las genera el sistema directamente — no el modelo de IA — para garantizar consistencia total en cada conversación.</p>
+    <div class="phrase-grid">
+      <div class="phrase-card">
+        <span class="phrase-label">Sin info</span>
+        <span class="phrase-text">"No dispongo de esa información, pero si lo deseas puedes escribir tu correo y le pediré a un asesor humano que te contacte para ayudarte con eso."</span>
+      </div>
+      <div class="phrase-card">
+        <span class="phrase-label">Derivación</span>
+        <span class="phrase-text">"Un asesor humano puede ayudarte con eso y guiarte a través de las mejores opciones."</span>
+      </div>
+      <div class="phrase-card">
+        <span class="phrase-label">Temas médicos</span>
+        <span class="phrase-text">"La evaluación médica la realizan los médicos de montaña. Por favor consultá el protocolo médico."</span>
+      </div>
+      <div class="phrase-card">
+        <span class="phrase-label">Pedir email</span>
+        <span class="phrase-text">"Si querés, puedo enviarte el detalle completo según tu caso. ¿A qué email te lo mando?"</span>
+      </div>
+      <div class="phrase-card">
+        <span class="phrase-label">Email recibido</span>
+        <span class="phrase-text">"¡Gracias! Ya tengo tu correo registrado y un asesor humano se va a comunicar con vos pronto."</span>
+      </div>
+      <div class="phrase-card">
+        <span class="phrase-label">Fuera de temp.</span>
+        <span class="phrase-text">"Importante: las expediciones al Aconcagua se realizan únicamente entre noviembre y marzo..."</span>
+      </div>
+      <div class="phrase-card">
+        <span class="phrase-label">Derivación ejec.</span>
+        <span class="phrase-text">"Perfecto, ya derivé tu solicitud a un asesor humano. Te va a contactar a la brevedad."</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPORTAMIENTO -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <h2>Cómo se Comporta Nico</h2>
+    </div>
+    <div class="behavior-grid">
+      <div class="behavior-item">
+        <h4>💬 Estilo de conversación</h4>
+        <ul>
+          <li>Consultivo, no agresivo. Guía sin presionar.</li>
+          <li>Máx. 2 líneas en WhatsApp (280 caracteres).</li>
+          <li>Cada respuesta genera un micro-avance natural.</li>
+          <li>Nunca repite la misma frase dos veces.</li>
+        </ul>
+      </div>
+      <div class="behavior-item">
+        <h4>🌐 Idioma automático</h4>
+        <ul>
+          <li>Detecta español, inglés o portugués.</li>
+          <li>Responde siempre en el mismo idioma del usuario.</li>
+          <li>Nunca mezcla idiomas en una misma respuesta.</li>
+        </ul>
+      </div>
+      <div class="behavior-item">
+        <h4>📧 Captura de email</h4>
+        <ul>
+          <li>Lo pide <strong>una sola vez</strong> entre el turno 2 y 4.</li>
+          <li>Lo presenta como beneficio, no como exigencia.</li>
+          <li>Si el usuario no lo da, la conversación continúa.</li>
+        </ul>
+      </div>
+      <div class="behavior-item">
+        <h4>🔒 Verificación de seguridad</h4>
+        <ul>
+          <li>Verifica el email contra base de brechas reales.</li>
+          <li>Email válido → continúa y notifica al asesor.</li>
+          <li>Email sospechoso → pausa sin continuar la venta.</li>
+          <li>Protege contra bots, spam y leads falsos.</li>
+        </ul>
+      </div>
+      <div class="behavior-item" style="grid-column: 1 / -1;">
+        <h4>🚨 Escalamiento automático a humano</h4>
+        <ul style="columns: 2; column-gap: 24px;">
+          <li>El usuario pide hablar con una persona</li>
+          <li>Confirmación de cupo o reserva</li>
+          <li>Preguntas médicas o legales</li>
+          <li>Info no disponible en la base de conocimiento</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- NICO VS ASESOR -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">🤝</div>
+      <h2>División de Trabajo: Nico vs. Asesor Humano</h2>
+    </div>
+    <div class="two-col">
+      <div class="green-card">
+        <h3>✅ Lo que Nico hace hoy</h3>
+        <ul class="check-list">
+          <li>Responde consultas frecuentes 24/7 sin intervención</li>
+          <li>Califica leads progresivamente (fecha, experiencia, grupo, país)</li>
+          <li>Captura emails y notifica al equipo con historial completo</li>
+          <li>Opera en 3 idiomas sin configuración manual</li>
+          <li>Nunca inventa ni promete lo que no puede cumplir</li>
+        </ul>
+      </div>
+      <div class="blue-card">
+        <h3>→ Lo que sigue haciendo el asesor</h3>
+        <ul class="human-list">
+          <li>Confirmar disponibilidad real de cupos</li>
+          <li>Cerrar ventas y tomar reservas</li>
+          <li>Negociar descuentos o condiciones especiales</li>
+          <li>Acompañar casos con preguntas médicas complejas</li>
+          <li>Atender clientes VIP o grupos grandes</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- VERSIONES -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <h2>Historial de Versiones de este Documento</h2>
+    </div>
+    <div class="version-history">
+      <div class="version-row header-row">
+        <div>Versión</div>
+        <div>Fecha</div>
+        <div>Cambios</div>
+      </div>
+      <div class="version-row">
+        <div class="version-tag">v1.0 <span class="current-tag">actual</span></div>
+        <div class="version-date">27 may 2026</div>
+        <div class="version-notes">Documento inicial. Cubre base de conocimiento, límites, frases determinísticas, comportamiento y división de trabajo. Preparado para Fernando.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Documento interno · Acomara Aconcagua Expeditions · No distribuir externamente<br/>
+  Para cambios técnicos recientes del agente, ver <code>docs/sales-agent/13-conversation-fix-log.md</code>
+</footer>
+
+</body>
+</html>
