@@ -17,11 +17,9 @@ import json
 import math
 import os
 import re
-import smtplib
 import sys
 import time
 import unicodedata
-from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -37,6 +35,39 @@ from orchestrator.security import (
     extract_email_from_text,
     pause_conversation,
     should_request_email,
+)
+from orchestrator.handoff_email import (
+    try_send_handoff_email,
+    try_send_suspicious_admin_alert,
+)
+from orchestrator.policies import (
+    apply_email_ack_or_request_policy as _apply_email_ack_or_request_policy,
+    apply_language_commit_policy as _apply_language_commit_policy,
+    apply_out_of_season_policy as _apply_out_of_season_policy,
+)
+from orchestrator.observability import (
+    build_health_response,
+    build_safe_version_response,
+    build_version_payload as _build_version_payload,
+    build_version_text as _build_version_text,
+    parse_bool_query,
+    render_audit_dashboard_html,
+)
+from orchestrator.session_client import (
+    session_headers as _session_headers,
+    session_get as _session_get,
+    session_delete as _session_delete,
+    session_append_event as _session_append_event,
+    session_upsert as _session_upsert,
+    try_session_get as _try_session_get,
+    try_session_append_event as _try_session_append_event,
+    try_session_upsert as _try_session_upsert,
+    try_session_delete as _try_session_delete,
+)
+from orchestrator.inbound import (
+    find_text_candidate as _find_text_candidate,
+    normalize_inbound as _normalize_inbound,
+    validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
@@ -640,117 +671,16 @@ def cosine(a: list[float], b: list[float]) -> float:
 
 
 def find_text_candidate(obj: Any, preferred_keys: list[str]) -> str:
-    if isinstance(obj, dict):
-        for key in preferred_keys:
-            value = obj.get(key)
-            if isinstance(value, str) and value.strip():
-                return value.strip()
-        for value in obj.values():
-            text = find_text_candidate(value, preferred_keys)
-            if text:
-                return text
-    elif isinstance(obj, list):
-        for item in obj:
-            text = find_text_candidate(item, preferred_keys)
-            if text:
-                return text
-    return ""
+    return _find_text_candidate(obj, preferred_keys)
 
 
 def validate_and_normalize_headers(headers: Any, max_length: int = 1000) -> dict[str, str]:
     """Validate and normalize HTTP headers with size limits."""
-    def safe_get(key: str, default: str = "") -> str:
-        value = headers.get(key, default)
-        if not isinstance(value, str):
-            value = str(value)
-        value = value.strip()
-        if len(value) > max_length:
-            raise ValueError(f"Header '{key}' exceeds max length of {max_length}")
-        return value
-
-    return {
-        "conversation_id": safe_get("conversation-id", "openbsp-conversation"),
-        "organization_id": safe_get("organization-id", "openbsp-org"),
-        "organization_address": safe_get("organization-address", "openbsp-org-address"),
-        "contact_id": safe_get("contact-id", headers.get("x-contact-id", "openbsp-contact")),
-        "contact_address": safe_get("contact-address", headers.get("x-contact-address", "openbsp-contact-address")),
-        "channel": safe_get("x-channel", "whatsapp"),
-    }
+    return _validate_and_normalize_headers(headers, max_length=max_length)
 
 
 def normalize_inbound(payload: dict[str, Any]) -> dict[str, str]:
-    text = find_text_candidate(payload, ["text", "body", "message", "content"])
-
-    conversation_id = (
-        str(
-            payload.get("conversation_id")
-            or payload.get("conversationId")
-            or payload.get("conversation", {}).get("id")
-            or payload.get("chat_id")
-            or payload.get("thread_id")
-            or ""
-        ).strip()
-        or "unknown-conversation"
-    )
-
-    organization_id = (
-        str(
-            payload.get("organization_id")
-            or payload.get("organizationId")
-            or payload.get("organization", {}).get("id")
-            or "default-org"
-        ).strip()
-        or "default-org"
-    )
-
-    organization_address = (
-        str(
-            payload.get("organization_address")
-            or payload.get("organizationAddress")
-            or payload.get("organization", {}).get("address")
-            or payload.get("account")
-            or "default-org-address"
-        ).strip()
-        or "default-org-address"
-    )
-
-    contact_id = (
-        str(
-            payload.get("contact_id")
-            or payload.get("contactId")
-            or payload.get("contact", {}).get("id")
-            or payload.get("from")
-            or "unknown-contact"
-        ).strip()
-        or "unknown-contact"
-    )
-
-    contact_address = (
-        str(
-            payload.get("contact_address")
-            or payload.get("contactAddress")
-            or payload.get("contact", {}).get("address")
-            or payload.get("phone")
-            or payload.get("from")
-            or "unknown-contact-address"
-        ).strip()
-        or "unknown-contact-address"
-    )
-
-    channel = (
-        str(payload.get("channel") or payload.get("service") or "whatsapp").strip()
-        or "whatsapp"
-    )
-
-    return {
-        "text": text,
-        "conversation_id": conversation_id,
-        "organization_id": organization_id,
-        "organization_address": organization_address,
-        "contact_id": contact_id,
-        "contact_address": contact_address,
-        "channel": channel,
-    }
+    return _normalize_inbound(payload)
 
 
 def normalize_inbound_message(payload: dict[str, Any]) -> InboundMessage:
@@ -792,39 +722,25 @@ def http_json(
 
 
 def session_headers(msg: dict[str, str], agent_id: str) -> dict[str, str]:
-    return {
-        "organization-id": msg["organization_id"],
-        "organization-address": msg["organization_address"],
-        "conversation-id": msg["conversation_id"],
-        "agent-id": agent_id,
-        "contact-id": msg["contact_id"],
-        "contact-address": msg["contact_address"],
-    }
+    return _session_headers(msg, agent_id)
 
 
 def session_get(session_base_url: str, conversation_id: str) -> dict[str, Any] | None:
-    status, data = http_json(
-        method="GET",
-        url=f"{session_base_url.rstrip('/')}/v1/sessions/{conversation_id}",
-        timeout=45,
+    return _session_get(
+        session_base_url,
+        conversation_id,
+        http_json=http_json,
+        logger=app.logger,
     )
-    if status == 200 and isinstance(data, dict):
-        return data
-    if status == 404:
-        # New conversation — no session yet, not an error
-        return None
-    app.logger.warning("session_get failed", extra={"status": status, "data": data})
-    return None
 
 
 def session_delete(session_base_url: str, conversation_id: str) -> None:
-    status, data = http_json(
-        method="DELETE",
-        url=f"{session_base_url.rstrip('/')}/v1/sessions/{conversation_id}",
-        timeout=45,
+    _session_delete(
+        session_base_url,
+        conversation_id,
+        http_json=http_json,
+        logger=app.logger,
     )
-    if status not in (0, 200, 204):
-        app.logger.warning("session_delete failed", extra={"status": status, "data": data})
 
 
 def session_append_event(
@@ -833,17 +749,14 @@ def session_append_event(
     event_type: str,
     event_data: dict[str, Any],
 ) -> None:
-    status, data = http_json(
-        method="POST",
-        url=f"{session_base_url.rstrip('/')}/v1/sessions/{conversation_id}/events",
-        body={"event_type": event_type, "event_data": event_data},
-        timeout=45,
+    _session_append_event(
+        session_base_url,
+        conversation_id,
+        event_type,
+        event_data,
+        http_json=http_json,
+        logger=app.logger,
     )
-    if status not in (0, 200):
-        app.logger.warning(
-            "session_append_event failed",
-            extra={"status": status, "data": data, "event_type": event_type},
-        )
 
 
 def session_upsert(
@@ -852,30 +765,23 @@ def session_upsert(
     agent_id: str,
     variables: dict[str, Any],
 ) -> None:
-    status, data = http_json(
-        method="POST",
-        url=f"{session_base_url.rstrip('/')}/v1/sessions/upsert",
-        body={
-            "conversation_id": msg["conversation_id"],
-            "organization_id": msg["organization_id"],
-            "agent_id": agent_id,
-            "contact_id": msg["contact_id"],
-            "variables": variables,
-        },
-        timeout=45,
+    _session_upsert(
+        session_base_url,
+        msg,
+        agent_id,
+        variables,
+        http_json=http_json,
+        logger=app.logger,
     )
-    if status not in (0, 200):
-        app.logger.warning("session_upsert failed", extra={"status": status, "data": data})
 
 
 def try_session_get(session_base_url: str | None, conversation_id: str) -> dict[str, Any] | None:
-    if not session_base_url:
-        return None
-    try:
-        return session_get(session_base_url, conversation_id)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("session_get exception: %s", exc)
-        return None
+    return _try_session_get(
+        session_base_url,
+        conversation_id,
+        http_json=http_json,
+        logger=app.logger,
+    )
 
 
 def try_session_append_event(
@@ -884,12 +790,14 @@ def try_session_append_event(
     event_type: str,
     event_data: dict[str, Any],
 ) -> None:
-    if not session_base_url:
-        return
-    try:
-        session_append_event(session_base_url, conversation_id, event_type, event_data)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("session_append_event exception: %s", exc)
+    _try_session_append_event(
+        session_base_url,
+        conversation_id,
+        event_type,
+        event_data,
+        http_json=http_json,
+        logger=app.logger,
+    )
 
 
 def try_session_upsert(
@@ -898,24 +806,26 @@ def try_session_upsert(
     agent_id: str,
     variables: dict[str, Any],
 ) -> None:
-    if not session_base_url:
-        return
-    try:
-        session_upsert(session_base_url, msg, agent_id, variables)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("session_upsert exception: %s", exc)
+    _try_session_upsert(
+        session_base_url,
+        msg,
+        agent_id,
+        variables,
+        http_json=http_json,
+        logger=app.logger,
+    )
 
 
 def try_session_delete(
     session_base_url: str | None,
     conversation_id: str,
 ) -> None:
-    if not session_base_url:
-        return
-    try:
-        session_delete(session_base_url, conversation_id)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("session_delete exception: %s", exc)
+    _try_session_delete(
+        session_base_url,
+        conversation_id,
+        http_json=http_json,
+        logger=app.logger,
+    )
 
 
 def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
@@ -1455,233 +1365,6 @@ def should_send_handoff_email(
     return (now_ts - last_ts) >= cooldown_seconds
 
 
-def send_handoff_email(
-    runtime: dict[str, Any],
-    msg: dict[str, str],
-    session_vars: dict[str, Any],
-) -> tuple[bool, int, dict[str, Any]]:
-    provider = str(runtime.get("handoff_email_provider") or "resend").strip().lower()
-    from_email = runtime.get("handoff_email_from")
-    to_email = runtime.get("handoff_email_to")
-    if not from_email or not to_email:
-        return False, 0, {"info": "handoff email not configured"}
-
-    def sanitize_for_email(text: str) -> str:
-        return text.replace("\r", "").replace("\n", " ")
-
-    subject = f"[Acomara] Solicitud de asesor humano - {msg['conversation_id']}"
-    text_body = "\n".join(
-        [
-            "Un cliente solicito contacto con asesor humano.",
-            "",
-            f"conversation_id: {sanitize_for_email(msg['conversation_id'])}",
-            f"organization_id: {sanitize_for_email(msg['organization_id'])}",
-            f"contact_id: {sanitize_for_email(msg['contact_id'])}",
-            f"contact_address: {sanitize_for_email(msg['contact_address'])}",
-            f"channel: {sanitize_for_email(msg['channel'])}",
-            f"conversation_turn_count: {sanitize_for_email(str(session_vars.get('conversation_turn_count', '')))}",
-            f"verified_email: {sanitize_for_email(str(session_vars.get('verified_email', '')))}",
-            f"email_verified_real: {sanitize_for_email(str(session_vars.get('email_verified_real', False)))}",
-            f"pause_reason: {sanitize_for_email(str(session_vars.get('pause_reason', 'human_handoff_in_progress')))}",
-            "",
-            f"ultimo_mensaje_cliente: {sanitize_for_email(msg['text'])}",
-            f"ultimo_reply_bot: {sanitize_for_email(session_vars.get('last_assistant_reply', ''))}",
-        ]
-    )
-
-    if provider == "smtp":
-        smtp_host = runtime.get("handoff_smtp_host")
-        smtp_port = int(runtime.get("handoff_smtp_port") or 587)
-        smtp_user = runtime.get("handoff_smtp_user")
-        smtp_password = runtime.get("handoff_smtp_password")
-        smtp_starttls = bool(runtime.get("handoff_smtp_starttls"))
-        if not smtp_host or not smtp_user or not smtp_password:
-            return False, 0, {"info": "smtp handoff email not configured"}
-
-        message = EmailMessage()
-        message["Subject"] = subject
-        message["From"] = from_email
-        message["To"] = to_email
-        message.set_content(text_body)
-
-        with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
-            if smtp_starttls:
-                smtp.starttls()
-            smtp.login(smtp_user, smtp_password)
-            smtp.send_message(message)
-        return True, 200, {"ok": True, "provider": "smtp"}
-
-    if provider != "resend":
-        return False, 0, {"info": f"unsupported handoff email provider: {provider}"}
-
-    api_key = runtime.get("handoff_email_api_key")
-    if not api_key:
-        return False, 0, {"info": "handoff email not configured"}
-
-    status, data = http_json(
-        method="POST",
-        url="https://api.resend.com/emails",
-        headers={"Authorization": f"Bearer {api_key}"},
-        body={
-            "from": from_email,
-            "to": [to_email],
-            "subject": subject,
-            "text": text_body,
-        },
-        timeout=20,
-    )
-    return True, status, data
-
-
-def try_send_handoff_email(
-    runtime: dict[str, Any],
-    msg: dict[str, str],
-    session_vars: dict[str, Any],
-) -> tuple[bool, int, dict[str, Any]]:
-    try:
-        return send_handoff_email(runtime, msg, session_vars)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("send_handoff_email exception: %s", exc)
-        return True, 0, {"error": str(exc)}
-
-
-def send_compromised_email_alert(
-    runtime: dict[str, Any],
-    msg: dict[str, str],
-    email: str,
-    session_vars: dict[str, Any],
-) -> tuple[bool, int, dict[str, Any]]:
-    """Send alert to admin when prospect's email is suspicious/unverified."""
-    provider = str(runtime.get("handoff_email_provider") or "resend").strip().lower()
-    from_email = runtime.get("handoff_email_from")
-    to_email = runtime.get("handoff_email_to")
-    if not from_email or not to_email:
-        return False, 0, {"info": "alert email not configured"}
-
-    subject = f"[ACOMARA SECURITY] Email sospechoso detectado - {msg['conversation_id']}"
-    text_body = "\n".join(
-        [
-            "⚠️ ALERTA DE SEGURIDAD",
-            "",
-            "Se detectó que el email proporcionado por un prospecto NO tiene historial en bases de datos de breaches.",
-            "",
-            f"Email sospechoso: {email}",
-            f"conversation_id: {msg['conversation_id']}",
-            f"organization_id: {msg['organization_id']}",
-            f"contact_id: {msg['contact_id']}",
-            f"contact_address: {msg['contact_address']}",
-            f"channel: {msg['channel']}",
-            "",
-            f"La conversación ha sido PAUSADA automáticamente.",
-            f"El prospecto deberá ser contactado por un asesor humano.",
-            "",
-            f"Último mensaje del cliente: {msg['text']}",
-        ]
-    )
-
-    if provider == "smtp":
-        smtp_host = runtime.get("handoff_smtp_host")
-        smtp_port = int(runtime.get("handoff_smtp_port") or 587)
-        smtp_user = runtime.get("handoff_smtp_user")
-        smtp_password = runtime.get("handoff_smtp_password")
-        smtp_starttls = bool(runtime.get("handoff_smtp_starttls"))
-        if not smtp_host or not smtp_user or not smtp_password:
-            return False, 0, {"info": "smtp alert email not configured"}
-
-        message = EmailMessage()
-        message["Subject"] = subject
-        message["From"] = from_email
-        message["To"] = to_email
-        message.set_content(text_body)
-
-        with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
-            if smtp_starttls:
-                smtp.starttls()
-            smtp.login(smtp_user, smtp_password)
-            smtp.send_message(message)
-        return True, 200, {"ok": True, "provider": "smtp"}
-
-    if provider != "resend":
-        return False, 0, {"info": f"unsupported alert email provider: {provider}"}
-
-    api_key = runtime.get("handoff_email_api_key")
-    if not api_key:
-        return False, 0, {"info": "alert email not configured"}
-
-    status, data = http_json(
-        method="POST",
-        url="https://api.resend.com/emails",
-        headers={"Authorization": f"Bearer {api_key}"},
-        body={
-            "from": from_email,
-            "to": [to_email],
-            "subject": subject,
-            "text": text_body,
-        },
-        timeout=20,
-    )
-    return True, status, data
-
-
-def try_send_compromised_email_alert(
-    runtime: dict[str, Any],
-    msg: dict[str, str],
-    email: str,
-    session_vars: dict[str, Any],
-) -> tuple[bool, int, dict[str, Any]]:
-    try:
-        return send_compromised_email_alert(runtime, msg, email, session_vars)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("send_compromised_email_alert exception: %s", exc)
-        return True, 0, {"error": str(exc)}
-
-
-def try_send_suspicious_admin_alert(
-    runtime: dict[str, Any],
-    msg: dict[str, str],
-    email: str,
-    session_vars: dict[str, Any],
-) -> tuple[bool, int, dict[str, Any], bool, str]:
-    """Send suspicious-email admin alert with a fallback notification path.
-
-    Returns: (attempted, status, response, sent, method)
-    """
-    attempted, status, data = try_send_compromised_email_alert(
-        runtime,
-        msg,
-        email,
-        session_vars,
-    )
-    if attempted and status in (200, 201, 202):
-        return attempted, status, data, True, "security_alert"
-
-    fallback_attempted, fallback_status, fallback_data = try_send_handoff_email(
-        runtime,
-        msg,
-        {
-            **session_vars,
-            "verified_email": email,
-            "email_verified_real": False,
-            "pause_reason": "suspicious_email_requires_manual_validation",
-        },
-    )
-    fallback_sent = fallback_attempted and fallback_status in (200, 201, 202)
-    return (
-        attempted or fallback_attempted,
-        fallback_status if fallback_attempted else status,
-        {
-            "primary": {"attempted": attempted, "status": status, "response": data},
-            "fallback": {
-                "attempted": fallback_attempted,
-                "status": fallback_status,
-                "response": fallback_data,
-            },
-        },
-        fallback_sent,
-        "handoff_fallback",
-    )
-
-
 def extract_last_user_text(messages: Any) -> str:
     if not isinstance(messages, list):
         return ""
@@ -1758,64 +1441,16 @@ def ensure_runtime() -> dict[str, Any]:
     }
 
 
-def _env_bool(name: str, default: str = "false") -> bool:
-    return str(_env(name, default) or default).strip().lower() in (
-        "1",
-        "true",
-        "yes",
-        "on",
-    )
-
-
 def build_version_payload() -> dict[str, Any]:
-    commit_sha = (
-        _env("VERCEL_GIT_COMMIT_SHA")
-        or _env("COMMIT_SHA")
-        or _env("GIT_COMMIT")
-        or "unknown"
+    return _build_version_payload(
+        env=_env,
+        is_cloud_runtime=is_cloud_runtime,
+        python_version=sys.version.split(" ")[0],
     )
-    deployment = (
-        _env("VERCEL_DEPLOYMENT_ID")
-        or _env("VERCEL_URL")
-        or _env("RENDER_SERVICE_ID")
-        or "unknown"
-    )
-    return {
-        "service": "acomara-orchestrator",
-        "environment": _env("VERCEL_ENV", _env("ENV", "unknown")),
-        "runtime_mode": "cloud" if is_cloud_runtime() else "local",
-        "version": _env("APP_VERSION", "dev"),
-        "commit": commit_sha,
-        "commit_short": commit_sha[:12] if commit_sha != "unknown" else "unknown",
-        "deployed_at": _env("BUILD_TIMESTAMP", "unknown"),
-        "deployment": deployment,
-        "python": sys.version.split(" ")[0],
-        "features": {
-            "email_verification_enabled": _env_bool("EMAIL_VERIFICATION_ENABLED", "true"),
-            "has_hibp_api_key": bool(_env("HIBP_API_KEY")),
-            "has_session_agent": bool(_env("SESSION_AGENT_BASE_URL")),
-            "handoff_provider": _env("HANDOFF_EMAIL_PROVIDER", "resend"),
-            "openbsp_send_configured": bool(_env("OPENBSP_SEND_URL")),
-        },
-    }
 
 
 def build_version_text() -> str:
-    payload = build_version_payload()
-    features = payload["features"]
-    return "\n".join(
-        [
-            f"Servicio: {payload['service']}",
-            f"Environment: {payload['environment']}",
-            f"Version: {payload['version']}",
-            f"Commit: {payload['commit_short']}",
-            f"Python: {payload['python']}",
-            f"Email verification: {'on' if features['email_verification_enabled'] else 'off'}",
-            f"HIBP key: {'configured' if features['has_hibp_api_key'] else 'missing'}",
-            f"Session agent: {'configured' if features['has_session_agent'] else 'missing'}",
-            f"Handoff provider: {features['handoff_provider']}",
-        ]
-    )
+    return _build_version_text(build_version_payload())
 
 
 def build_paused_reply(session_vars: dict[str, Any]) -> str:
@@ -1912,9 +1547,7 @@ def apply_paused_anti_loop_guard(
 
 
 def _parse_bool_query(value: str | None, default: bool = False) -> bool:
-    if value is None:
-        return default
-    return value.strip().lower() in ("1", "true", "yes", "on")
+    return parse_bool_query(value, default)
 
 
 def _is_authorized_for_audit() -> bool:
@@ -1940,14 +1573,7 @@ def _is_authorized_for_audit() -> bool:
 @app.get("/health")
 def health() -> Any:
     payload = build_version_payload()
-    return jsonify(
-        {
-            "status": "ok",
-            "service": payload["service"],
-            "version": payload["version"],
-            "commit": payload["commit_short"],
-        }
-    )
+    return jsonify(build_health_response(payload))
 
 
 @app.get("/audit/conversations")
@@ -2001,120 +1627,13 @@ def audit_dashboard() -> Any:
         except Exception as exc:  # pragma: no cover
                 return f"Audit error: {exc}", 500
 
-        totals = report.get("totals", {})
-        issue_counts = report.get("issue_counts", {})
-        status_counts = report.get("status_counts", {})
-        message_stats = report.get("message_stats", {})
-        problematic = report.get("problematic_conversations", [])
-
-        issue_rows = "".join(
-                f"<tr><td>{issue}</td><td>{count}</td></tr>"
-                for issue, count in sorted(issue_counts.items(), key=lambda item: item[1], reverse=True)
-        )
-        if not issue_rows:
-                issue_rows = "<tr><td colspan='2'>No issues detected</td></tr>"
-
-        problem_rows = "".join(
-                "<tr>"
-                f"<td>{row.get('conversation_id', '-')}</td>"
-                f"<td>{row.get('message_count', 0)}</td>"
-                f"<td>{', '.join(row.get('issues', []))}</td>"
-                "</tr>"
-                for row in problematic[:20]
-        )
-        if not problem_rows:
-                problem_rows = "<tr><td colspan='3'>No problematic conversations in current window</td></tr>"
-
-        html = f"""
-<!doctype html>
-<html lang='es'>
-<head>
-    <meta charset='utf-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <title>Acomara Audit Dashboard</title>
-    <style>
-        :root {{
-            --bg: #f6f7f9;
-            --panel: #ffffff;
-            --ink: #1a2433;
-            --muted: #6a7485;
-            --accent: #0b6db7;
-            --warn: #d9480f;
-            --ok: #1b7f3b;
-        }}
-        * {{ box-sizing: border-box; }}
-        body {{ margin: 0; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; background: radial-gradient(circle at top right, #e6f2fb 0%, var(--bg) 45%); color: var(--ink); }}
-        .wrap {{ max-width: 1160px; margin: 0 auto; padding: 28px 20px 40px; }}
-        h1 {{ margin: 0; font-size: 1.7rem; letter-spacing: 0.2px; }}
-        .meta {{ margin-top: 6px; color: var(--muted); font-size: 0.95rem; }}
-        .grid {{ margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }}
-        .card {{ background: var(--panel); border: 1px solid #dde3ea; border-radius: 12px; padding: 14px; box-shadow: 0 4px 14px rgba(14, 33, 53, 0.05); }}
-        .label {{ color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }}
-        .value {{ margin-top: 6px; font-size: 1.45rem; font-weight: 700; }}
-        .value.ok {{ color: var(--ok); }}
-        .value.warn {{ color: var(--warn); }}
-        h2 {{ margin: 22px 0 10px; font-size: 1.05rem; }}
-        table {{ width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid #dde3ea; }}
-        th, td {{ padding: 10px 12px; border-bottom: 1px solid #edf1f5; text-align: left; font-size: 0.92rem; vertical-align: top; }}
-        th {{ background: #f2f7fc; color: #314257; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }}
-        tr:last-child td {{ border-bottom: 0; }}
-        .foot {{ margin-top: 14px; color: var(--muted); font-size: 0.85rem; }}
-    </style>
-</head>
-<body>
-    <div class='wrap'>
-        <h1>Acomara Conversation Audit</h1>
-        <div class='meta'>Generado: {report.get('generated_at', '-')} | Organization: {report.get('organization_id', '-')}</div>
-
-        <div class='grid'>
-            <div class='card'><div class='label'>Conversaciones auditadas</div><div class='value'>{totals.get('audited_conversations', 0)}</div></div>
-            <div class='card'><div class='label'>Con problemas</div><div class='value warn'>{totals.get('conversations_with_issues', 0)}</div></div>
-            <div class='card'><div class='label'>Quality rate</div><div class='value ok'>{totals.get('quality_rate_percent', 0)}%</div></div>
-            <div class='card'><div class='label'>Mensajes totales</div><div class='value'>{message_stats.get('total_messages', 0)}</div></div>
-            <div class='card'><div class='label'>Promedio mensajes</div><div class='value'>{message_stats.get('avg', 0)}</div></div>
-            <div class='card'><div class='label'>Estado OK</div><div class='value'>{status_counts.get('OK', 0)}</div></div>
-        </div>
-
-        <h2>Problemas por tipo</h2>
-        <table>
-            <thead><tr><th>Tipo</th><th>Cantidad</th></tr></thead>
-            <tbody>{issue_rows}</tbody>
-        </table>
-
-        <h2>Conversaciones problemáticas (top 20 por tamaño)</h2>
-        <table>
-            <thead><tr><th>Conversation ID</th><th>Mensajes</th><th>Issues</th></tr></thead>
-            <tbody>{problem_rows}</tbody>
-        </table>
-
-        <div class='foot'>
-            Query options: days_back, include_test, organization_id, api_key
-        </div>
-    </div>
-</body>
-</html>
-"""
-        return html
+        return render_audit_dashboard_html(report)
 
 
 @app.get("/version")
 def version() -> Any:
     payload = build_version_payload()
-    safe_payload = {
-        "service": payload["service"],
-        "environment": payload["environment"],
-        "runtime_mode": payload["runtime_mode"],
-        "version": payload["version"],
-        "commit": payload["commit_short"],
-        "features": {
-            "email_verification_enabled": payload["features"]["email_verification_enabled"],
-            "has_hibp_api_key": payload["features"]["has_hibp_api_key"],
-            "has_session_agent": payload["features"]["has_session_agent"],
-            "handoff_provider": payload["features"]["handoff_provider"],
-            "openbsp_send_configured": payload["features"]["openbsp_send_configured"],
-        },
-    }
-    return jsonify(safe_payload)
+    return jsonify(build_safe_version_response(payload))
 
 
 # NOTE: legacy `/webhooks/openbsp` handler removed (2026-05-20).
@@ -2148,18 +1667,14 @@ def apply_email_ack_or_request_policy(
     when the conversation is in the email-request window and no email has
     been seen yet, append the proactive ask.
     """
-    if extracted_email and not session_vars.get("email_received_acked"):
-        reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
-        session_vars["email_received_acked"] = True
-        session_vars["email_captured"] = True
-        session_vars["captured_email"] = extracted_email
-        session_vars["email_requested"] = True
-        session_vars["proactive_email_capture_pending"] = False
-    elif should_request_email(session_vars):
-        reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
-        session_vars["email_requested"] = True
-        session_vars["proactive_email_capture_pending"] = True
-    return reply
+    return _apply_email_ack_or_request_policy(
+        reply,
+        session_vars,
+        extracted_email,
+        lang,
+        get_phrase=get_phrase,
+        should_request_email=should_request_email,
+    )
 
 
 def apply_out_of_season_policy(
@@ -2169,32 +1684,28 @@ def apply_out_of_season_policy(
     lang: str,
 ) -> str:
     """Fix #7: prepend an out-of-season heads-up once per conversation."""
-    if mentions_out_of_season(user_text) and not session_vars.get("out_of_season_warned"):
-        reply = f"{get_phrase('out_of_season', lang)}\n\n{reply}"
-        session_vars["out_of_season_warned"] = True
-    return reply
+    return _apply_out_of_season_policy(
+        reply,
+        user_text,
+        session_vars,
+        lang,
+        mentions_out_of_season=mentions_out_of_season,
+        get_phrase=get_phrase,
+    )
 
 
 def apply_language_commit_policy(user_text: str, session_vars: dict[str, Any]) -> None:
     """Fix #2: only commit conversation_language when the new user message
     has a confident language signal; otherwise keep the previous value.
     """
-    explicit_pref = detect_explicit_language_preference(user_text)
-    if explicit_pref and explicit_pref in I18N_PHRASES:
-        session_vars["conversation_language"] = explicit_pref
-        session_vars["conversation_language_source"] = "user_preference_explicit"
-        session_vars["conversation_language_locked"] = True
-        return
-
-    confident_lang = detect_language_confident(user_text)
-    if confident_lang and confident_lang in I18N_PHRASES:
-        session_vars["conversation_language"] = confident_lang
-        session_vars["conversation_language_source"] = "message_detected"
-        session_vars["conversation_language_locked"] = False
-    elif not session_vars.get("conversation_language"):
-        session_vars["conversation_language"] = get_session_language(session_vars, user_text)
-        session_vars["conversation_language_source"] = "message_detected_low_confidence"
-        session_vars["conversation_language_locked"] = False
+    _apply_language_commit_policy(
+        user_text,
+        session_vars,
+        detect_explicit_language_preference=detect_explicit_language_preference,
+        detect_language_confident=detect_language_confident,
+        i18n_languages=set(I18N_PHRASES.keys()),
+        get_session_language=get_session_language,
+    )
 
 
 def process_inbound_message(
