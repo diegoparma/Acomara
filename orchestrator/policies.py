@@ -68,6 +68,11 @@ def apply_language_commit_policy(
         session_vars["conversation_language_locked"] = True
         return
 
+    # Keep explicit lock stable for ambiguous/non-linguistic messages
+    # (emails, short acknowledgements, etc.).
+    if session_vars.get("conversation_language_locked") and session_vars.get("conversation_language") in i18n_languages:
+        return
+
     confident_lang = detect_language_confident(user_text)
     if confident_lang and confident_lang in i18n_languages:
         session_vars["conversation_language"] = confident_lang

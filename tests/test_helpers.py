@@ -115,6 +115,9 @@ class LanguageDetectionTests(unittest.TestCase):
             "es",
         )
 
+    def test_email_payload_is_not_confident_language_signal(self):
+        self.assertIsNone(detect_language_confident("kfmcdonnell@yahoo.co.uk"))
+
 
 class SessionLanguageTests(unittest.TestCase):
     def test_default_when_empty(self):
@@ -303,6 +306,17 @@ class LanguageCommitPolicyTests(unittest.TestCase):
     def test_explicit_english_preference_locks_language(self):
         sv: dict = {"conversation_language": "es"}
         apply_language_commit_policy("I don't speak Spanish, English please", sv)
+        self.assertEqual(sv["conversation_language"], "en")
+        self.assertEqual(sv["conversation_language_source"], "user_preference_explicit")
+        self.assertTrue(sv["conversation_language_locked"])
+
+    def test_explicit_lock_survives_email_message(self):
+        sv: dict = {
+            "conversation_language": "en",
+            "conversation_language_source": "user_preference_explicit",
+            "conversation_language_locked": True,
+        }
+        apply_language_commit_policy("kfmcdonnell@yahoo.co.uk", sv)
         self.assertEqual(sv["conversation_language"], "en")
         self.assertEqual(sv["conversation_language_source"], "user_preference_explicit")
         self.assertTrue(sv["conversation_language_locked"])

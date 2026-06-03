@@ -382,6 +382,9 @@ def detect_language_confident(text: str) -> str | None:
         return None
 
     stripped = text.strip()
+    # Non-linguistic payloads must not rotate session language.
+    if "@" in stripped or stripped.startswith("http://") or stripped.startswith("https://"):
+        return None
     if len(stripped) < 6:
         return None
 
