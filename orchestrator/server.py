@@ -159,6 +159,7 @@ I18N_PHRASES = {
         "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
         "email_received_ack": "¡Gracias! Ya tengo tu correo ({email}) registrado. Un asesor humano va a revisar tu consulta y te contacta en breve por este medio. Mientras tanto, si querés agregar más detalles (fechas, número de personas, experiencia previa), escribilos y los sumamos a la derivación.",
         "out_of_season": "Importante: las expediciones al Aconcagua se realizan únicamente entre noviembre y marzo (temporada del hemisferio sur). Para la fecha que mencionás no tenemos salidas. Si querés, te paso el calendario disponible de la próxima temporada.",
+        "opening_welcome": "¡Hola! Gracias por contactarnos — ¿en qué te puedo ayudar?\n\nPara orientarte mejor, además de responder tus preguntas aquí, me gustaría enviarte más información por email: precios, fechas, servicios, lista de equipo, referencias y recomendaciones.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
@@ -174,6 +175,7 @@ I18N_PHRASES = {
         "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
         "email_received_ack": "Thanks! I've saved your email ({email}). A human advisor will review your request and contact you shortly through this channel. In the meantime, feel free to add any extra details (dates, number of people, previous experience) and I'll include them in the handoff.",
         "out_of_season": "Heads up: Aconcagua expeditions run only between November and March (Southern Hemisphere season). We don't have departures on the date you mentioned. If you'd like, I can share the available calendar for the next season.",
+        "opening_welcome": "Hi! Thanks for contacting us — how can I help you?\n\nFor better guidance, in addition to answering your questions here, I'd also like to send you more info by email: prices, dates, services, gear list, references & recommendations.",
     },
     "pt": {
         "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
@@ -189,6 +191,7 @@ I18N_PHRASES = {
         "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
         "email_received_ack": "Obrigado! Já registrei seu email ({email}). Um consultor humano vai revisar sua consulta e entrar em contato em breve por este canal. Enquanto isso, se quiser adicionar mais detalhes (datas, número de pessoas, experiência prévia), me envie e os incluo na transferência.",
         "out_of_season": "Atenção: as expedições ao Aconcágua acontecem somente entre novembro e março (temporada do hemisfério sul). Para a data que você mencionou não temos saídas. Se quiser, posso te passar o calendário disponível da próxima temporada.",
+        "opening_welcome": "Olá! Obrigado por entrar em contato — como posso ajudá-lo?\n\nPara orientá-lo melhor, além de responder suas perguntas aqui, também gostaria de enviar mais informações por email: preços, datas, serviços, lista de equipamentos, referências e recomendações.",
     },
 }
 
@@ -945,6 +948,31 @@ def hits_to_context(hits: list[dict[str, Any]]) -> str:
     return "\n\n---\n\n".join(parts)
 
 
+def build_crm_client_context(session_vars: dict[str, Any]) -> str:
+    crm_client_context = ""
+    if session_vars.get("crm_client_found"):
+        client_name = session_vars.get("crm_client_name", "Cliente")
+        consultation_count = session_vars.get("crm_consultation_count", 0)
+        if session_vars.get("crm_client_contacted"):
+            crm_client_context = (
+                f"\n⭐ CLIENTE REGISTRADO: {client_name} ya fue contactado anteriormente "
+                f"({consultation_count} consulta(s) previa(s)). "
+                "Ofrece trato VIP/preferencial: sé más personal, recuerda detalles de sus consultas anteriores si es relevante, "
+                "y prioriza su comodidad."
+            )
+        else:
+            crm_client_context = (
+                f"\n👤 CLIENTE NUEVO: {client_name} es un cliente registrado pero sin consultas previas. "
+                "Es su primer contacto: responde en dos bloques breves separados por una línea en blanco. "
+                "El primer bloque debe ser un saludo y bienvenida. "
+                "El segundo bloque debe explicar de forma clara los servicios disponibles."
+            )
+    else:
+        crm_client_context = "\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema."
+
+    return crm_client_context
+
+
 def generate_reply(
     client: OpenAI,
     chat_model: str,
@@ -962,24 +990,7 @@ def generate_reply(
         "pt": "Responda em português.",
     }.get(user_lang, "Respond in the user's language.")
 
-    crm_client_context = ""
-    if session_vars.get("crm_client_found"):
-        client_name = session_vars.get("crm_client_name", "Cliente")
-        consultation_count = session_vars.get("crm_consultation_count", 0)
-        if session_vars.get("crm_client_contacted"):
-            crm_client_context = (
-                f"\n⭐ CLIENTE REGISTRADO: {client_name} ya fue contactado anteriormente "
-                f"({consultation_count} consulta(s) previa(s)). "
-                "Ofrece trato VIP/preferencial: sé más personal, recuerda detalles de sus consultas anteriores si es relevante, "
-                "y prioriza su comodidad."
-            )
-        else:
-            crm_client_context = (
-                f"\n👤 CLIENTE NUEVO: {client_name} es un cliente registrado pero sin consultas previas. "
-                "Es su primer contacto, sé bienvenido y explica bien los servicios."
-            )
-    else:
-        crm_client_context = "\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema."
+    crm_client_context = build_crm_client_context(session_vars)
 
     # Override conversation_language in the dumped state so the LLM does not
     # see a stale/contradictory signal vs the explicit lang_instruction.
@@ -1166,6 +1177,26 @@ def normalize_for_intent(text: str) -> str:
     folded = unicodedata.normalize("NFKD", text)
     ascii_text = folded.encode("ascii", "ignore").decode("ascii")
     return " ".join(ascii_text.lower().split())
+
+
+_PURE_GREETING_TOKENS: frozenset[str] = frozenset({
+    "hola", "hi", "hello", "hey", "oi", "ola",
+    "buenas", "buen", "dia", "buenos", "dias",
+    "good", "morning", "afternoon", "evening",
+    "bom", "boa", "tarde", "noite",
+})
+
+
+def _is_pure_greeting(text: str) -> bool:
+    """Return True when the message is only a greeting with no substantive question."""
+    normalized = normalize_for_intent(text)
+    # Strip punctuation for token matching
+    cleaned = re.sub(r"[^\w\s]", " ", normalized).strip()
+    if len(cleaned) > 50:
+        return False
+    tokens = set(cleaned.split())
+    # Must have at least one known greeting token and no non-greeting words
+    return bool(tokens & _PURE_GREETING_TOKENS) and tokens <= _PURE_GREETING_TOKENS
 
 
 def build_inbound_signature(msg: dict[str, str]) -> str:
@@ -1907,29 +1938,34 @@ def process_inbound_message(
         )
     else:
         lang = get_session_language(session_vars, msg.text)
-        guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
-        if guided_reply is not None:
-            decision.reply = guided_reply
+        # On the very first turn, respond with a hardcoded opening welcome for
+        # pure greetings (e.g. "Hi", "Hola") instead of calling the LLM.
+        if session_vars.get("conversation_turn_count") == 1 and _is_pure_greeting(msg.text):
+            decision.reply = get_phrase("opening_welcome", lang)
         else:
-            decision.hits = retrieve_top_k(
-                client,
-                runtime["embed_model"],
-                runtime["rows"],
-                msg.text,
-                runtime["top_k"],
-            )
-            decision.reply = generate_reply(
-                client,
-                runtime["chat_model"],
-                runtime["system_prompt"],
-                msg_dict,
-                decision.hits,
-                session_vars,
-            )
-            decision.reply = apply_email_ack_or_request_policy(
-                decision.reply, session_vars, context.extracted_email, lang
-            )
-            decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
+            guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
+            if guided_reply is not None:
+                decision.reply = guided_reply
+            else:
+                decision.hits = retrieve_top_k(
+                    client,
+                    runtime["embed_model"],
+                    runtime["rows"],
+                    msg.text,
+                    runtime["top_k"],
+                )
+                decision.reply = generate_reply(
+                    client,
+                    runtime["chat_model"],
+                    runtime["system_prompt"],
+                    msg_dict,
+                    decision.hits,
+                    session_vars,
+                )
+                decision.reply = apply_email_ack_or_request_policy(
+                    decision.reply, session_vars, context.extracted_email, lang
+                )
+                decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
     decision.reply = format_whatsapp_departure_dates(decision.reply, msg.channel)
 

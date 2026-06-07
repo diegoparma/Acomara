@@ -26,6 +26,7 @@ from orchestrator.server import (  # noqa: E402
     apply_language_commit_policy,
     apply_out_of_season_policy,
     build_inbound_signature,
+    build_crm_client_context,
     detect_language_confident,
     format_whatsapp_departure_dates,
     get_session_language,
@@ -199,6 +200,33 @@ class FormatWhatsappDatesTests(unittest.TestCase):
             out,
         )
         self.assertNotIn("\n-\n", out)
+
+
+class CRMClientContextTests(unittest.TestCase):
+    def test_first_contact_requests_two_blocks(self):
+        out = build_crm_client_context(
+            {
+                "crm_client_found": True,
+                "crm_client_contacted": False,
+                "crm_client_name": "Diego",
+                "crm_consultation_count": 0,
+            }
+        )
+        self.assertIn("CLIENTE NUEVO", out)
+        self.assertIn("dos bloques breves", out)
+        self.assertIn("línea en blanco", out)
+
+    def test_returning_client_keeps_vip_context(self):
+        out = build_crm_client_context(
+            {
+                "crm_client_found": True,
+                "crm_client_contacted": True,
+                "crm_client_name": "Diego",
+                "crm_consultation_count": 2,
+            }
+        )
+        self.assertIn("CLIENTE REGISTRADO", out)
+        self.assertIn("trato VIP", out)
 
 
 class NormalizeAndSignatureTests(unittest.TestCase):
