@@ -70,15 +70,20 @@ def should_request_email(session_vars: dict[str, Any]) -> bool:
     is engaged but before attempting to convert.
     """
     turn_count = session_vars.get("conversation_turn_count", 0)
-    
-    # Already requested or already verified
-    if session_vars.get("email_requested"):
+
+    # Block re-request if the email was already requested, captured or verified
+    # (single-ask rule). Any of these flags means we must not ask again.
+    blocking_flags = (
+        "email_requested",
+        "email_captured",
+        "captured_email",
+        "email_verified",
+        "verified_email",
+        "email_compromised",
+    )
+    if any(session_vars.get(flag) for flag in blocking_flags):
         return False
-    if session_vars.get("email_verified"):
-        return False
-    if session_vars.get("email_compromised"):
-        return False
-    
+
     # Request specifically around turns 3-4 in normal flow.
     return 3 <= turn_count <= 4
 

@@ -65,8 +65,6 @@ from orchestrator.session_client import (
     try_session_delete as _try_session_delete,
 )
 from orchestrator.inbound import (
-    find_text_candidate as _find_text_candidate,
-    normalize_inbound as _normalize_inbound,
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
@@ -676,22 +674,9 @@ def cosine(a: list[float], b: list[float]) -> float:
     return dot / (na * nb)
 
 
-def find_text_candidate(obj: Any, preferred_keys: list[str]) -> str:
-    return _find_text_candidate(obj, preferred_keys)
-
-
 def validate_and_normalize_headers(headers: Any, max_length: int = 1000) -> dict[str, str]:
     """Validate and normalize HTTP headers with size limits."""
     return _validate_and_normalize_headers(headers, max_length=max_length)
-
-
-def normalize_inbound(payload: dict[str, Any]) -> dict[str, str]:
-    return _normalize_inbound(payload)
-
-
-def normalize_inbound_message(payload: dict[str, Any]) -> InboundMessage:
-    """Typed wrapper over normalize_inbound for safer downstream wiring."""
-    return InboundMessage(**normalize_inbound(payload))
 
 
 def http_json(
@@ -1040,34 +1025,6 @@ def generate_reply(
         ],
     )
     return resp.output_text.strip()
-
-
-def maybe_send_openbsp(
-    send_url: str | None,
-    api_key: str | None,
-    msg: dict[str, str],
-    reply_text: str,
-) -> tuple[bool, int, dict[str, Any]]:
-    if not send_url:
-        return False, 0, {"info": "OPENBSP_SEND_URL not configured"}
-
-    headers: dict[str, str] = {}
-    if api_key:
-        headers["Authorization"] = f"Bearer {api_key}"
-
-    status, data = http_json(
-        method="POST",
-        url=send_url,
-        headers=headers,
-        body={
-            "conversation_id": msg["conversation_id"],
-            "contact_id": msg["contact_id"],
-            "contact_address": msg["contact_address"],
-            "channel": msg["channel"],
-            "text": reply_text,
-        },
-    )
-    return True, status, data
 
 
 def supports_respond_tool(tools_payload: Any) -> bool:
@@ -1496,8 +1453,6 @@ def ensure_runtime() -> dict[str, Any]:
         "session_base_url": _env("SESSION_AGENT_BASE_URL"),
         "session_agent_id": _env("SESSION_AGENT_ID", "sales-agent-v1")
         or "sales-agent-v1",
-        "openbsp_send_url": _env("OPENBSP_SEND_URL"),
-        "openbsp_api_key": _env("OPENBSP_API_KEY"),
         "handoff_email_provider": _env("HANDOFF_EMAIL_PROVIDER", "resend") or "resend",
         "handoff_email_api_key": _env("HANDOFF_EMAIL_API_KEY"),
         "handoff_email_from": _env("HANDOFF_EMAIL_FROM"),
@@ -1718,14 +1673,6 @@ def audit_dashboard() -> Any:
 def version() -> Any:
     payload = build_version_payload()
     return jsonify(build_safe_version_response(payload))
-
-
-# NOTE: legacy `/webhooks/openbsp` handler removed (2026-05-20).
-# In production OpenBSP integrates via Chat Completions custom-model mode and
-# only `/v1/chat/completions` receives traffic. The webhook required
-# `OPENBSP_SEND_URL` (not configured) to deliver replies, so it could not work
-# even if hit. Keeping a single entry point eliminates the duplicated logic
-# that caused recurring email/language regressions.
 
 
 # ---------------------------------------------------------------------------

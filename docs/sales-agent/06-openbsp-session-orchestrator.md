@@ -9,9 +9,13 @@ Conectar WhatsApp (via OpenBSP) con memoria de sesion (session-agent) y respuest
 - `docs/sales-agent/02-system-prompt.md`: prompt comercial de sistema.
 
 ## Endpoint principal
-- `POST /webhooks/openbsp`
+- `POST /v1/chat/completions`
 
-Recibe payload inbound, normaliza campos, consulta RAG, actualiza sesion y devuelve respuesta.
+Es un endpoint compatible con OpenAI Chat Completions. OpenBSP lo consume en modo
+"modelo personalizado": envia el contexto de la conversacion por headers
+(`conversation-id`, `contact-id`, `contact-address`, etc.) y el mensaje del
+usuario en `messages`. El orquestador normaliza campos, consulta RAG, actualiza
+sesion y devuelve la respuesta como una completion.
 
 ## Variables de entorno
 Ver `.env.example`.
@@ -22,16 +26,18 @@ Claves importantes:
 - `OPENAI_CHAT_MODEL`
 - `TOP_K`
 - `SESSION_AGENT_BASE_URL` (opcional)
-- `OPENBSP_SEND_URL` (opcional)
+- `ORCHESTRATOR_API_KEY` (protege `/v1/chat/completions`)
+- `OPENBSP_MULTI_MESSAGE_ENABLED` (opcional; activa respuestas multi-mensaje via tool `respond`)
 
 ## Flujo de ejecucion
-1. Inbound entra por `/webhooks/openbsp`.
+1. Inbound entra por `/v1/chat/completions`.
 2. Se extraen campos minimos: mensaje, conversation_id, contact_id, etc.
 3. Se registra evento inbound en session-agent (si esta configurado).
 4. Se recuperan `top_k` FAQs por similitud.
 5. Se genera respuesta comercial con evidencia.
 6. Se guarda estado y evento outbound en session-agent.
-7. Opcional: se envia mensaje a OpenBSP via `OPENBSP_SEND_URL`.
+7. La respuesta se devuelve a OpenBSP como completion (texto o, si esta
+   habilitado, varios mensajes via el tool `respond`).
 
 ## Arranque local
 1. Crear/activar venv
@@ -50,25 +56,28 @@ Claves importantes:
 Ejemplo con curl:
 
 ```bash
-curl -X POST http://localhost:8080/webhooks/openbsp \
+curl -X POST http://localhost:8080/v1/chat/completions \
   -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer YOUR_ORCHESTRATOR_API_KEY' \
+  -H 'organization-id: acomara' \
+  -H 'organization-address: 54911XXXXXXX' \
+  -H 'conversation-id: conv-001' \
+  -H 'contact-id: lead-001' \
+  -H 'contact-address: 54911YYYYYYY' \
   -d '{
-    "channel": "whatsapp",
-    "organization_id": "acomara",
-    "organization_address": "54911XXXXXXX",
-    "conversation_id": "conv-001",
-    "contact_id": "lead-001",
-    "contact_address": "54911YYYYYYY",
-    "text": "Que diferencia hay entre ruta normal y polish?"
+    "model": "gpt-4.1-mini",
+    "messages": [{"role": "user", "content": "Que diferencia hay entre ruta normal y polish?"}]
   }'
 ```
 
 ## Respuesta esperada
-El endpoint devuelve JSON con:
-- `reply`: texto sugerido para cliente
-- `sources`: chunks FAQ usados como evidencia
-- `openbsp_send`: estado de envio outbound (si aplica)
+El endpoint devuelve una completion compatible con OpenAI Chat Completions:
+- `choices[0].message.content`: texto sugerido para el cliente.
+- Si `OPENBSP_MULTI_MESSAGE_ENABLED` esta activo y OpenBSP envia el tool
+  `respond`, la respuesta puede venir como `tool_calls` con varios mensajes
+  cortos en lugar de un unico bloque.
 
 ## Nota sobre OpenBSP
-El envio real depende del contrato HTTP que configures en `OPENBSP_SEND_URL`.
-El orquestador ya envia un payload estandar, pero puedes adaptar facilmente el shape en `maybe_send_openbsp()`.
+OpenBSP integra como "modelo personalizado" (protocolo Chat Completions) y llama
+a `POST /v1/chat/completions`. El envio al cliente lo realiza OpenBSP a partir de
+la completion devuelta; el orquestador no hace POST de salida por su cuenta.

@@ -49,7 +49,6 @@ def build_version_payload(
             "has_hibp_api_key": bool(env("HIBP_API_KEY", None)),
             "has_session_agent": bool(env("SESSION_AGENT_BASE_URL", None)),
             "handoff_provider": env("HANDOFF_EMAIL_PROVIDER", "resend"),
-            "openbsp_send_configured": bool(env("OPENBSP_SEND_URL", None)),
         },
     }
 
@@ -92,7 +91,6 @@ def build_safe_version_response(payload: dict[str, Any]) -> dict[str, Any]:
             "has_hibp_api_key": payload["features"]["has_hibp_api_key"],
             "has_session_agent": payload["features"]["has_session_agent"],
             "handoff_provider": payload["features"]["handoff_provider"],
-            "openbsp_send_configured": payload["features"]["openbsp_send_configured"],
         },
     }
 

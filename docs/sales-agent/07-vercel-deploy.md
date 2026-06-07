@@ -19,8 +19,7 @@ Configura estas variables en el proyecto Vercel:
 - `ORCHESTRATOR_API_KEY` (token para proteger `/v1/chat/completions`)
 
 Opcionales:
-- `OPENBSP_SEND_URL`
-- `OPENBSP_API_KEY`
+- `OPENBSP_MULTI_MESSAGE_ENABLED` (activa respuestas multi-mensaje via tool `respond`)
 
 ## Deploy rapido
 1. Instalar CLI:
