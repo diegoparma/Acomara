@@ -157,7 +157,7 @@ I18N_PHRASES = {
         "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
         "email_received_ack": "¡Gracias! Ya tengo tu correo ({email}) registrado. Un asesor humano va a revisar tu consulta y te contacta en breve por este medio. Mientras tanto, si querés agregar más detalles (fechas, número de personas, experiencia previa), escribilos y los sumamos a la derivación.",
         "out_of_season": "Importante: las expediciones al Aconcagua se realizan únicamente entre noviembre y marzo (temporada del hemisferio sur). Para la fecha que mencionás no tenemos salidas. Si querés, te paso el calendario disponible de la próxima temporada.",
-        "opening_welcome": "¡Hola! Gracias por contactarnos — ¿en qué te puedo ayudar?\n\nPara orientarte mejor, además de responder tus preguntas aquí, me gustaría enviarte más información por email: precios, fechas, servicios, lista de equipo, referencias y recomendaciones.",
+        "opening_welcome": "Hola! Gracias por contactarnos. ¿En qué te puedo ayudar?\n\nPara orientarte mejor, además de responder tus preguntas, si te parece te envío más información por email: precios, fechas, servicios, lista de equipo, referencias y recomendaciones.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
@@ -173,7 +173,7 @@ I18N_PHRASES = {
         "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
         "email_received_ack": "Thanks! I've saved your email ({email}). A human advisor will review your request and contact you shortly through this channel. In the meantime, feel free to add any extra details (dates, number of people, previous experience) and I'll include them in the handoff.",
         "out_of_season": "Heads up: Aconcagua expeditions run only between November and March (Southern Hemisphere season). We don't have departures on the date you mentioned. If you'd like, I can share the available calendar for the next season.",
-        "opening_welcome": "Hi! Thanks for contacting us — how can I help you?\n\nFor better guidance, in addition to answering your questions here, I'd also like to send you more info by email: prices, dates, services, gear list, references & recommendations.",
+        "opening_welcome": "Hi! Thanks for reaching out. How can I help you?\n\nTo guide you better, besides answering your questions here, if you'd like I can send you more info by email: prices, dates, services, gear list, references and recommendations.",
     },
     "pt": {
         "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
@@ -189,7 +189,7 @@ I18N_PHRASES = {
         "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
         "email_received_ack": "Obrigado! Já registrei seu email ({email}). Um consultor humano vai revisar sua consulta e entrar em contato em breve por este canal. Enquanto isso, se quiser adicionar mais detalhes (datas, número de pessoas, experiência prévia), me envie e os incluo na transferência.",
         "out_of_season": "Atenção: as expedições ao Aconcágua acontecem somente entre novembro e março (temporada do hemisfério sul). Para a data que você mencionou não temos saídas. Se quiser, posso te passar o calendário disponível da próxima temporada.",
-        "opening_welcome": "Olá! Obrigado por entrar em contato — como posso ajudá-lo?\n\nPara orientá-lo melhor, além de responder suas perguntas aqui, também gostaria de enviar mais informações por email: preços, datas, serviços, lista de equipamentos, referências e recomendações.",
+        "opening_welcome": "Olá! Obrigado por entrar em contato. Como posso te ajudar?\n\nPara te orientar melhor, além de responder suas perguntas aqui, se quiser te envio mais informações por email: preços, datas, serviços, lista de equipamentos, referências e recomendações.",
     },
 }
 
