@@ -1070,6 +1070,56 @@ def maybe_send_openbsp(
     return True, status, data
 
 
+def supports_respond_tool(tools_payload: Any) -> bool:
+    """Return True when upstream Chat Completions tools include `respond`."""
+    if not isinstance(tools_payload, list):
+        return False
+    for tool in tools_payload:
+        if not isinstance(tool, dict):
+            continue
+        function_obj = tool.get("function")
+        if isinstance(function_obj, dict) and function_obj.get("name") == "respond":
+            return True
+    return False
+
+
+def split_reply_into_messages(reply_text: str) -> list[str]:
+    """Split a single assistant reply into short message chunks.
+
+    Preferred separator is blank lines. If none are present, return a single
+    chunk to avoid brittle sentence-level splitting.
+    """
+    if not reply_text:
+        return []
+    parts = [p.strip() for p in re.split(r"\n\s*\n+", reply_text) if p.strip()]
+    return parts
+
+
+def build_respond_tool_call_message(reply_parts: list[str]) -> dict[str, Any]:
+    """Build assistant tool call payload for OpenBSP multi-message responses."""
+    args = {
+        "messages": [{"type": "text", "text": part} for part in reply_parts],
+    }
+    return {
+        "role": "assistant",
+        "tool_calls": [
+            {
+                "id": f"call_{uuid4().hex[:24]}",
+                "type": "function",
+                "function": {
+                    "name": "respond",
+                    "arguments": json.dumps(args, ensure_ascii=False),
+                },
+            }
+        ],
+    }
+
+
+def is_multi_message_enabled() -> bool:
+    raw = str(_env("OPENBSP_MULTI_MESSAGE_ENABLED", "false") or "false").strip().lower()
+    return raw in ("1", "true", "yes", "on")
+
+
 _MONTH_ABBR: dict[str, str] = {
     "enero": "Ene", "febrero": "Feb", "marzo": "Mar", "abril": "Abr",
     "mayo": "May", "junio": "Jun", "julio": "Jul", "agosto": "Ago",
@@ -2037,6 +2087,7 @@ def chat_completions_compatible() -> Any:
 
     model = body.get("model")
     messages = body.get("messages")
+    tools_payload = body.get("tools")
     stream = body.get("stream")
     if not isinstance(model, str) or not isinstance(messages, list):
         return (
@@ -2082,26 +2133,49 @@ def chat_completions_compatible() -> Any:
 
         # Use best-known language from the pre-reset session and current text.
         reply_lang = get_session_language(pre_reset_vars, user_text)
-        reply = get_phrase("reset_acknowledge", reply_lang)
-        completion = {
-            "id": f"chatcmpl-{uuid4().hex[:24]}",
-            "object": "chat.completion",
-            "created": int(time.time()),
-            "model": model,
-            "choices": [
-                {
-                    "index": 0,
-                    "message": {"role": "assistant", "content": reply},
-                    "finish_reason": "stop",
-                    "logprobs": None,
-                }
-            ],
-            "usage": {
-                "prompt_tokens": 0,
-                "completion_tokens": 0,
-                "total_tokens": 0,
-            },
-        }
+        reply = get_phrase("opening_welcome", reply_lang)
+        split_parts = split_reply_into_messages(reply)
+        can_emit_multi = is_multi_message_enabled() and supports_respond_tool(tools_payload)
+        if can_emit_multi and len(split_parts) >= 2:
+            completion = {
+                "id": f"chatcmpl-{uuid4().hex[:24]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": build_respond_tool_call_message(split_parts),
+                        "finish_reason": "tool_calls",
+                        "logprobs": None,
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0,
+                },
+            }
+        else:
+            completion = {
+                "id": f"chatcmpl-{uuid4().hex[:24]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": {"role": "assistant", "content": reply},
+                        "finish_reason": "stop",
+                        "logprobs": None,
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0,
+                },
+            }
         return jsonify(completion)
     msg = inbound_msg.as_dict()
 
@@ -2213,6 +2287,16 @@ def chat_completions_compatible() -> Any:
             context=context,
         )
 
+        multi_message_enabled = is_multi_message_enabled()
+        can_emit_multi = multi_message_enabled and supports_respond_tool(tools_payload)
+        should_split_opening = (
+            can_emit_multi
+            and session_vars.get("conversation_turn_count") == 1
+            and _is_pure_greeting(msg["text"])
+            and decision.reply.strip()
+        )
+        split_parts = split_reply_into_messages(decision.reply) if should_split_opening else []
+
         try_session_upsert(
             session_base_url,
             msg,
@@ -2255,25 +2339,46 @@ def chat_completions_compatible() -> Any:
                 },
             )
 
-        completion = {
-            "id": f"chatcmpl-{uuid4().hex[:24]}",
-            "object": "chat.completion",
-            "created": int(time.time()),
-            "model": model,
-            "choices": [
-                {
-                    "index": 0,
-                    "message": {"role": "assistant", "content": decision.reply},
-                    "finish_reason": "stop",
-                    "logprobs": None,
-                }
-            ],
-            "usage": {
-                "prompt_tokens": 0,
-                "completion_tokens": 0,
-                "total_tokens": 0,
-            },
-        }
+        if len(split_parts) >= 2:
+            completion = {
+                "id": f"chatcmpl-{uuid4().hex[:24]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": build_respond_tool_call_message(split_parts),
+                        "finish_reason": "tool_calls",
+                        "logprobs": None,
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0,
+                },
+            }
+        else:
+            completion = {
+                "id": f"chatcmpl-{uuid4().hex[:24]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": {"role": "assistant", "content": decision.reply},
+                        "finish_reason": "stop",
+                        "logprobs": None,
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0,
+                },
+            }
         return jsonify(completion)
     except Exception as exc:  # pragma: no cover
         print(f"[ERROR] /v1/chat/completions: {exc}", flush=True)

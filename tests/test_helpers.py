@@ -27,11 +27,14 @@ from orchestrator.server import (  # noqa: E402
     apply_out_of_season_policy,
     build_inbound_signature,
     build_crm_client_context,
+    build_respond_tool_call_message,
     detect_language_confident,
     format_whatsapp_departure_dates,
     get_session_language,
     mentions_out_of_season,
     normalize_for_intent,
+    split_reply_into_messages,
+    supports_respond_tool,
 )
 
 
@@ -227,6 +230,26 @@ class CRMClientContextTests(unittest.TestCase):
         )
         self.assertIn("CLIENTE REGISTRADO", out)
         self.assertIn("trato VIP", out)
+
+
+class MultiMessageHelpersTests(unittest.TestCase):
+    def test_supports_respond_tool_true(self):
+        tools = [{"type": "function", "function": {"name": "respond"}}]
+        self.assertTrue(supports_respond_tool(tools))
+
+    def test_supports_respond_tool_false(self):
+        tools = [{"type": "function", "function": {"name": "other_tool"}}]
+        self.assertFalse(supports_respond_tool(tools))
+
+    def test_split_reply_by_blank_lines(self):
+        out = split_reply_into_messages("Hola\n\nTe paso opciones")
+        self.assertEqual(out, ["Hola", "Te paso opciones"])
+
+    def test_build_respond_tool_call_message(self):
+        msg = build_respond_tool_call_message(["Hola", "Te paso opciones"])
+        self.assertEqual(msg["role"], "assistant")
+        self.assertEqual(msg["tool_calls"][0]["function"]["name"], "respond")
+        self.assertIn("messages", msg["tool_calls"][0]["function"]["arguments"])
 
 
 class NormalizeAndSignatureTests(unittest.TestCase):
