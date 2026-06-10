@@ -204,6 +204,20 @@ class FormatWhatsappDatesTests(unittest.TestCase):
         )
         self.assertNotIn("\n-\n", out)
 
+    def test_formats_inline_programs_as_numbered_list(self):
+        original = (
+            "Para subir Aconcagua, tenemos salidas 2026/27: "
+            "Normal Extendido (18+2 días) Nov14,22 Dic1,4,20,27 Ene2,10,31 Feb7; "
+            "Ascenso Rápido (14+2 días) Nov18,26 Dic5,10 Ene6,14 Feb11; "
+            "Ascenso Extremo (12+2 días) Nov20,28 Dic7,12,26 Ene2,8,16 Feb6,13."
+        )
+        out = format_whatsapp_departure_dates(original, "whatsapp")
+        self.assertIn("1. *Normal Extendido* (18+2 días): Nov 14, 22", out)
+        self.assertIn("2. *Ascenso Rápido* (14+2 días): Nov 18, 26", out)
+        self.assertIn("3. *Ascenso Extremo* (12+2 días): Nov 20, 28", out)
+        self.assertIn("Dic 1, 4, 20, 27 · Ene 2, 10, 31 · Feb 7", out)
+        self.assertNotIn("; ", out)
+
 
 class CRMClientContextTests(unittest.TestCase):
     def test_first_contact_requests_two_blocks(self):

@@ -1002,7 +1002,7 @@ def generate_reply(
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
         "- {response_length_instruction}\n"
-        "- Si compartes fechas de salida y el canal es WhatsApp, usa un formato compacto: una línea por programa y meses abreviados con días agrupados.\n"
+        "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
         "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
     ).format(
@@ -1105,24 +1105,76 @@ def _format_program_title(match: "re.Match[str]") -> str:
     return f"{indent}*{days} días - {rest.title()}*"
 
 
+def _format_inline_program_list(text: str) -> str:
+    """Convert semicolon-separated inline program dates into a numbered list."""
+    if ";" not in text or not re.search(r"\(\s*\d+\s*\+\s*\d+\s*d[íi]as\s*\)", text, re.IGNORECASE):
+        return text
+
+    prefix = ""
+    body = text
+    if ":" in text:
+        maybe_prefix, maybe_body = text.split(":", 1)
+        if re.search(r"\(\s*\d+\s*\+\s*\d+\s*d[íi]as\s*\)", maybe_body, re.IGNORECASE):
+            prefix = maybe_prefix.strip()
+            body = maybe_body.strip()
+
+    entry_re = re.compile(
+        r"^\s*(?P<name>[^()]+?)\s*\(\s*(?P<days>\d+\s*\+\s*\d+)\s*d[íi]as\s*\)\s*(?P<schedule>.+?)\s*$",
+        re.IGNORECASE,
+    )
+    month_keys = "|".join(sorted(_MONTH_ABBR.keys(), key=len, reverse=True))
+    abbr_keys = "|".join(sorted(set(_MONTH_ABBR.values()), key=len, reverse=True))
+    month_day_re = re.compile(
+        rf"\b(?P<month>{month_keys}|{abbr_keys})\.?\s*(?P<days>\d{{1,2}}(?:\s*,\s*\d{{1,2}})*)",
+        re.IGNORECASE,
+    )
+
+    lines: list[str] = []
+    for raw_entry in [p.strip() for p in body.split(";") if p.strip()]:
+        entry = raw_entry.rstrip(".")
+        m = entry_re.match(entry)
+        if not m:
+            return text
+
+        name = m.group("name").strip().title()
+        days = re.sub(r"\s+", "", m.group("days"))
+        schedule = m.group("schedule").strip()
+        month_chunks: list[str] = []
+        for mm in month_day_re.finditer(schedule):
+            month_raw = mm.group("month").lower()
+            abbr = _MONTH_ABBR.get(month_raw, mm.group("month").title())
+            day_list = [d.strip() for d in mm.group("days").split(",") if d.strip()]
+            month_chunks.append(f"{abbr} {', '.join(day_list)}")
+        schedule_fmt = " · ".join(month_chunks) if month_chunks else schedule
+        lines.append(f"{len(lines) + 1}. *{name}* ({days} días): {schedule_fmt}")
+
+    if not lines:
+        return text
+    return f"{prefix}:\n" + "\n".join(lines) if prefix else "\n".join(lines)
+
+
 def format_whatsapp_departure_dates(reply_text: str, channel: str) -> str:
     """Render departure-date blocks compactly for WhatsApp readability."""
     if not reply_text or channel.strip().lower() != "whatsapp":
         return reply_text
 
     text = reply_text
-    looks_like_dates_response = (
-        "|" in text
-        and any(
-            token in text.lower()
-            for token in (
-                "fechas",
-                "salidas",
-                "departure",
-                "departures",
-            )
+    lower_text = text.lower()
+    has_dates_marker = any(
+        token in lower_text
+        for token in (
+            "fechas",
+            "salidas",
+            "departure",
+            "departures",
         )
     )
+    has_structured_dates = "|" in text or re.search(
+        r"\(\s*\d+\s*\+\s*\d+\s*d[íi]as\s*\).+;",
+        text,
+        re.IGNORECASE,
+    )
+    looks_like_dates_response = bool(has_dates_marker and has_structured_dates)
     if not looks_like_dates_response:
         return reply_text
 
@@ -1175,6 +1227,7 @@ def format_whatsapp_departure_dates(reply_text: str, channel: str) -> str:
 
     formatted = "\n".join(out_lines)
     formatted = _TITLE_PATTERN.sub(_format_program_title, formatted)
+    formatted = _format_inline_program_list(formatted)
     formatted = re.sub(r"[ \t]+\n", "\n", formatted)
     formatted = re.sub(r"\n{3,}", "\n\n", formatted)
     return formatted.strip()
