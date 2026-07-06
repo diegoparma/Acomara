@@ -13,6 +13,31 @@ def parse_bool_query(value: str | None, default: bool = False) -> bool:
     return value.strip().lower() in ("1", "true", "yes", "on")
 
 
+def _normalize_deployment_url(raw_url: str | None) -> str:
+    if not raw_url:
+        return "unknown"
+    cleaned = raw_url.strip()
+    if not cleaned:
+        return "unknown"
+    if cleaned.startswith("http://") or cleaned.startswith("https://"):
+        return cleaned
+    return f"https://{cleaned}"
+
+
+def _resolve_app_version(env: EnvFn, commit_sha: str, deployment_id: str) -> str:
+    explicit = (env("APP_VERSION", None) or "").strip()
+    if explicit:
+        return explicit
+
+    if commit_sha and commit_sha != "unknown":
+        return f"git-{commit_sha[:12]}"
+
+    if deployment_id and deployment_id != "unknown":
+        return f"deploy-{deployment_id}"
+
+    return "dev"
+
+
 def build_version_payload(
     *,
     env: EnvFn,
@@ -25,20 +50,20 @@ def build_version_payload(
         or env("GIT_COMMIT", None)
         or "unknown"
     )
-    deployment = (
-        env("VERCEL_DEPLOYMENT_ID", None)
-        or env("VERCEL_URL", None)
-        or env("RENDER_SERVICE_ID", None)
-        or "unknown"
-    )
+    deployment_id = env("VERCEL_DEPLOYMENT_ID", None) or env("RENDER_SERVICE_ID", None) or "unknown"
+    deployment_url = _normalize_deployment_url(env("VERCEL_URL", None))
+    deployment = deployment_id if deployment_id != "unknown" else deployment_url
+    version = _resolve_app_version(env, commit_sha, deployment_id)
     return {
         "service": "acomara-orchestrator",
         "environment": env("VERCEL_ENV", env("ENV", "unknown")),
         "runtime_mode": "cloud" if is_cloud_runtime() else "local",
-        "version": env("APP_VERSION", "dev"),
+        "version": version,
         "commit": commit_sha,
         "commit_short": commit_sha[:12] if commit_sha != "unknown" else "unknown",
         "deployed_at": env("BUILD_TIMESTAMP", "unknown"),
+        "deployment_id": deployment_id,
+        "deployment_url": deployment_url,
         "deployment": deployment,
         "python": python_version,
         "features": {
@@ -49,6 +74,17 @@ def build_version_payload(
             "has_hibp_api_key": bool(env("HIBP_API_KEY", None)),
             "has_session_agent": bool(env("SESSION_AGENT_BASE_URL", None)),
             "handoff_provider": env("HANDOFF_EMAIL_PROVIDER", "resend"),
+            "openai_embed_model": env("OPENAI_EMBED_MODEL", "text-embedding-3-large"),
+            "openai_chat_model": env("OPENAI_CHAT_MODEL", "gpt-5.4"),
+            "chat_model_from_request": str(env("OPENAI_CHAT_MODEL_FROM_REQUEST", "false") or "false")
+            .strip()
+            .lower()
+            in ("1", "true", "yes", "on"),
+            "openai_allowed_chat_models": [
+                part.strip()
+                for part in str(env("OPENAI_ALLOWED_CHAT_MODELS", "") or "").split(",")
+                if part.strip()
+            ],
         },
     }
 
@@ -61,11 +97,22 @@ def build_version_text(payload: dict[str, Any]) -> str:
             f"Environment: {payload['environment']}",
             f"Version: {payload['version']}",
             f"Commit: {payload['commit_short']}",
+            f"Deployment ID: {payload['deployment_id']}",
+            f"Deployment URL: {payload['deployment_url']}",
             f"Python: {payload['python']}",
             f"Email verification: {'on' if features['email_verification_enabled'] else 'off'}",
             f"HIBP key: {'configured' if features['has_hibp_api_key'] else 'missing'}",
             f"Session agent: {'configured' if features['has_session_agent'] else 'missing'}",
             f"Handoff provider: {features['handoff_provider']}",
+            f"OpenAI embed model: {features['openai_embed_model']}",
+            f"OpenAI chat model: {features['openai_chat_model']}",
+            f"Chat model override from request: {'on' if features['chat_model_from_request'] else 'off'}",
+            "OpenAI allowed chat models: "
+            + (
+                ", ".join(features["openai_allowed_chat_models"])
+                if features["openai_allowed_chat_models"]
+                else "(any)"
+            ),
         ]
     )
 
@@ -86,11 +133,17 @@ def build_safe_version_response(payload: dict[str, Any]) -> dict[str, Any]:
         "runtime_mode": payload["runtime_mode"],
         "version": payload["version"],
         "commit": payload["commit_short"],
+        "deployment_id": payload["deployment_id"],
+        "deployment_url": payload["deployment_url"],
         "features": {
             "email_verification_enabled": payload["features"]["email_verification_enabled"],
             "has_hibp_api_key": payload["features"]["has_hibp_api_key"],
             "has_session_agent": payload["features"]["has_session_agent"],
             "handoff_provider": payload["features"]["handoff_provider"],
+            "openai_embed_model": payload["features"]["openai_embed_model"],
+            "openai_chat_model": payload["features"]["openai_chat_model"],
+            "chat_model_from_request": payload["features"]["chat_model_from_request"],
+            "openai_allowed_chat_models": payload["features"]["openai_allowed_chat_models"],
         },
     }
 

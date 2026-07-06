@@ -4,8 +4,8 @@
 Usar la base FAQ de Acomara con modelos externos por API, sin descargar modelos GGUF locales.
 
 ## Stack recomendado
-- Embeddings: OpenAI `text-embedding-3-small`
-- Respuesta comercial: OpenAI `gpt-4.1-mini`
+- Embeddings: OpenAI `text-embedding-3-large`
+- Respuesta comercial: OpenAI `gpt-5.4`
 - Conocimiento base: `docs/knowledge/faq_rag_chunks.jsonl`
 
 ## Archivos creados

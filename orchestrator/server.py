@@ -1481,6 +1481,34 @@ def extract_last_user_text(messages: Any) -> str:
     return ""
 
 
+def parse_csv_set(value: str | None) -> set[str]:
+    if not value:
+        return set()
+    items = [part.strip() for part in value.split(",")]
+    return {item for item in items if item}
+
+
+def resolve_effective_chat_model(requested_model: str | None, runtime: dict[str, Any]) -> tuple[str, str]:
+    """Resolve effective chat model and source label.
+
+    Source labels:
+    - runtime_default
+    - request
+    - request_rejected_not_allowlisted
+    """
+    configured_model = str(runtime.get("chat_model") or "").strip()
+    requested = str(requested_model or "").strip()
+    allow_from_request = bool(runtime.get("chat_model_from_request", False))
+    allowlist = runtime.get("allowed_chat_models")
+    allowset = allowlist if isinstance(allowlist, set) else set()
+
+    if allow_from_request and requested:
+        if allowset and requested not in allowset:
+            return configured_model, "request_rejected_not_allowlisted"
+        return requested, "request"
+    return configured_model, "runtime_default"
+
+
 def ensure_runtime() -> dict[str, Any]:
     load_local_env()
 
@@ -1500,8 +1528,13 @@ def ensure_runtime() -> dict[str, Any]:
 
     return {
         "api_key": api_key,
-        "embed_model": _env("OPENAI_EMBED_MODEL", "text-embedding-3-small"),
-        "chat_model": _env("OPENAI_CHAT_MODEL", "gpt-4.1-mini"),
+        "embed_model": _env("OPENAI_EMBED_MODEL", "text-embedding-3-large"),
+        "chat_model": _env("OPENAI_CHAT_MODEL", "gpt-5.4"),
+        "chat_model_from_request": str(_env("OPENAI_CHAT_MODEL_FROM_REQUEST", "false") or "false")
+        .strip()
+        .lower()
+        in ("1", "true", "yes", "on"),
+        "allowed_chat_models": parse_csv_set(_env("OPENAI_ALLOWED_CHAT_MODELS", "") or ""),
         "top_k": int(_env("TOP_K", "4") or "4"),
         "session_base_url": _env("SESSION_AGENT_BASE_URL"),
         "session_agent_id": _env("SESSION_AGENT_ID", "sales-agent-v1")
@@ -1757,7 +1790,7 @@ def apply_email_ack_or_request_policy(
         extracted_email,
         lang,
         get_phrase=get_phrase,
-        should_request_email=should_request_email,
+        should_request_email=lambda sv: should_request_email(sv or {}),
     )
 
 
@@ -2121,6 +2154,19 @@ def chat_completions_compatible() -> Any:
 
     headers_dict = validate_and_normalize_headers(request.headers)
     inbound_msg = InboundMessage.from_headers(user_text, headers_dict)
+    load_local_env()
+    lightweight_model_runtime = {
+        "chat_model": _env("OPENAI_CHAT_MODEL", "gpt-5.4"),
+        "chat_model_from_request": str(_env("OPENAI_CHAT_MODEL_FROM_REQUEST", "false") or "false")
+        .strip()
+        .lower()
+        in ("1", "true", "yes", "on"),
+        "allowed_chat_models": parse_csv_set(_env("OPENAI_ALLOWED_CHAT_MODELS", "") or ""),
+    }
+    effective_chat_model, effective_chat_model_source = resolve_effective_chat_model(
+        model,
+        lightweight_model_runtime,
+    )
     command = extract_command(user_text)
     if command in ("/reset", "/new"):
         session_base_url = _env("SESSION_AGENT_BASE_URL")
@@ -2141,7 +2187,7 @@ def chat_completions_compatible() -> Any:
                 "id": f"chatcmpl-{uuid4().hex[:24]}",
                 "object": "chat.completion",
                 "created": int(time.time()),
-                "model": model,
+                "model": effective_chat_model,
                 "choices": [
                     {
                         "index": 0,
@@ -2161,7 +2207,7 @@ def chat_completions_compatible() -> Any:
                 "id": f"chatcmpl-{uuid4().hex[:24]}",
                 "object": "chat.completion",
                 "created": int(time.time()),
-                "model": model,
+                "model": effective_chat_model,
                 "choices": [
                     {
                         "index": 0,
@@ -2189,6 +2235,13 @@ def chat_completions_compatible() -> Any:
                 session_vars = snapshot["variables"]
             detected_lang = get_session_language(session_vars, msg["text"])
             version_text = build_version_text()
+            model_text = (
+                f"\nConfigured chat model: {runtime.get('chat_model')}"
+                f"\nConfigured embed model: {runtime.get('embed_model')}"
+                f"\nRequested chat model: {str(model).strip()}"
+                f"\nEffective chat model: {effective_chat_model}"
+                f"\nModel source: {effective_chat_model_source}"
+            )
 
             client_status_text = ""
             if session_vars.get("crm_client_found"):
@@ -2197,14 +2250,18 @@ def chat_completions_compatible() -> Any:
             else:
                 client_status_text = "\nCRM Client: Not found in system"
 
-            reply = f"{version_text}{client_status_text}\nConversation Language: {detected_lang}\nDetected from: {get_language_source(session_vars)}"
+            reply = (
+                f"{version_text}{model_text}{client_status_text}"
+                f"\nConversation Language: {detected_lang}"
+                f"\nDetected from: {get_language_source(session_vars)}"
+            )
         except Exception:
             reply = build_version_text()
         completion = {
             "id": f"chatcmpl-{uuid4().hex[:24]}",
             "object": "chat.completion",
             "created": int(time.time()),
-            "model": model,
+            "model": effective_chat_model,
             "choices": [
                 {
                     "index": 0,
@@ -2223,6 +2280,7 @@ def chat_completions_compatible() -> Any:
 
     try:
         runtime = ensure_runtime()
+        runtime["chat_model"] = effective_chat_model
         client = OpenAI(api_key=runtime["api_key"])
 
         session_vars: dict[str, Any] = {}
@@ -2240,7 +2298,7 @@ def chat_completions_compatible() -> Any:
                     "id": f"chatcmpl-{uuid4().hex[:24]}",
                     "object": "chat.completion",
                     "created": int(time.time()),
-                    "model": model,
+                    "model": effective_chat_model,
                     "choices": [
                         {
                             "index": 0,
@@ -2336,6 +2394,8 @@ def chat_completions_compatible() -> Any:
                     "text": decision.reply,
                     "source": "acomara-orchestrator-chat-completions",
                     "faq_sources": [h["id"] for h in decision.hits],
+                    "llm_model": effective_chat_model,
+                    "llm_model_source": effective_chat_model_source,
                 },
             )
 
@@ -2344,7 +2404,7 @@ def chat_completions_compatible() -> Any:
                 "id": f"chatcmpl-{uuid4().hex[:24]}",
                 "object": "chat.completion",
                 "created": int(time.time()),
-                "model": model,
+                "model": effective_chat_model,
                 "choices": [
                     {
                         "index": 0,
@@ -2364,7 +2424,7 @@ def chat_completions_compatible() -> Any:
                 "id": f"chatcmpl-{uuid4().hex[:24]}",
                 "object": "chat.completion",
                 "created": int(time.time()),
-                "model": model,
+                "model": effective_chat_model,
                 "choices": [
                     {
                         "index": 0,

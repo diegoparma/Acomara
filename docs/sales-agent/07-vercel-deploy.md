@@ -11,8 +11,10 @@ Publicar el endpoint compatible con Chat Completions para usarlo en OpenBSP:
 ## Variables de entorno en Vercel
 Configura estas variables en el proyecto Vercel:
 - `OPENAI_API_KEY`
-- `OPENAI_EMBED_MODEL` (ej: `text-embedding-3-small`)
-- `OPENAI_CHAT_MODEL` (ej: `gpt-4.1-mini`)
+- `OPENAI_EMBED_MODEL` (ej: `text-embedding-3-large`)
+- `OPENAI_CHAT_MODEL` (ej: `gpt-5.4`)
+- `OPENAI_CHAT_MODEL_FROM_REQUEST` (opcional; `true` para usar `model` del request)
+- `OPENAI_ALLOWED_CHAT_MODELS` (opcional; CSV allowlist para validar `model`)
 - `TOP_K` (ej: `4`)
 - `SESSION_AGENT_BASE_URL` (ej: `https://session-agent-memory-live.onrender.com`)
 - `SESSION_AGENT_ID` (ej: `sales-agent-v1`)
@@ -45,7 +47,7 @@ curl -X POST https://YOUR_DOMAIN/v1/chat/completions \
   -H 'contact-id: lead-prod-001' \
   -H 'contact-address: 54911YYYYYYY' \
   -d '{
-    "model": "gpt-4.1-mini",
+   "model": "gpt-5.4",
     "messages": [{"role":"user","content":"Cual es la mejor epoca para subir al Aconcagua?"}]
   }'
 ```
@@ -56,6 +58,6 @@ En el formulario:
 - Protocolo: `Chat Completions`
 - API URL: `https://YOUR_DOMAIN/v1`
 - Clave API: `YOUR_ORCHESTRATOR_API_KEY`
-- Modelo: `gpt-4.1-mini`
+- Modelo: `gpt-5.4`
 
 OpenBSP llamara a `POST /v1/chat/completions` automaticamente.

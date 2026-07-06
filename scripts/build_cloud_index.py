@@ -40,7 +40,7 @@ def main() -> None:
     load_dotenv(ROOT / ".env")
 
     api_key = os.getenv("OPENAI_API_KEY")
-    model = os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small")
+    model = os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-large")
 
     if not api_key:
         raise SystemExit("Missing OPENAI_API_KEY in .env")

@@ -24,6 +24,8 @@ Claves importantes:
 - `OPENAI_API_KEY`
 - `OPENAI_EMBED_MODEL`
 - `OPENAI_CHAT_MODEL`
+- `OPENAI_CHAT_MODEL_FROM_REQUEST` (opcional; si `true`, usa `body.model` cuando llegue)
+- `OPENAI_ALLOWED_CHAT_MODELS` (opcional; allowlist CSV para `body.model`)
 - `TOP_K`
 - `SESSION_AGENT_BASE_URL` (opcional)
 - `ORCHESTRATOR_API_KEY` (protege `/v1/chat/completions`)
@@ -65,7 +67,7 @@ curl -X POST http://localhost:8080/v1/chat/completions \
   -H 'contact-id: lead-001' \
   -H 'contact-address: 54911YYYYYYY' \
   -d '{
-    "model": "gpt-4.1-mini",
+   "model": "gpt-5.4",
     "messages": [{"role": "user", "content": "Que diferencia hay entre ruta normal y polish?"}]
   }'
 ```

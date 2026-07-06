@@ -95,7 +95,7 @@ def main() -> None:
     load_dotenv(ROOT / ".env")
 
     api_key = os.getenv("OPENAI_API_KEY")
-    model = os.getenv("OPENAI_CHAT_MODEL", "gpt-4.1-mini")
+    model = os.getenv("OPENAI_CHAT_MODEL", "gpt-5.4")
 
     if not api_key:
         raise SystemExit("Missing OPENAI_API_KEY in .env")
