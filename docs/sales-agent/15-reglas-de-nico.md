@@ -21,7 +21,7 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 | 7 | **Conversación pausada** | Un solo aviso ("te vamos a contactar"), después un mensaje de cierre, y después silencio. | `PAUSED_REPLY_THRESHOLD` (1) |
 | 8 | **Primer saludo** | Si el primer mensaje es solo un saludo ("Hola", "Hi"), responde una bienvenida fija y ofrece mandar info por email. | — |
 | 9 | **Opciones de programas** | Si pregunta por opciones sin nombrar un programa: recomienda 18+2 y 12+2; si pide más, lista 14+2 y 17+2. | — |
-| 10 | **Respuesta con IA** | En cualquier otro caso: busca en la base de preguntas frecuentes (4 fragmentos) y genera la respuesta con el modelo, bajo las reglas del system prompt (sección 2). | `OPENAI_CHAT_MODEL` (gpt-5.4), `TOP_K` (4) |
+| 10 | **Respuesta con IA** | En cualquier otro caso: busca en la base de preguntas frecuentes (4 fragmentos) y genera la respuesta con el modelo, bajo las reglas del system prompt (sección 2). | `OPENAI_CHAT_MODEL` (en producción: gpt-4.1-mini), `TOP_K` (4) |
 | 11 | **Pedido de email** | Una sola vez, en los turnos 3 o 4, si todavía no lo tiene. | — |
 | 12 | **Fuera de temporada** | Si menciona un viaje entre abril y octubre, avisa una vez que la temporada es de noviembre a marzo. | — |
 | 13 | **Formato de fechas** | Formatea las fechas de salida para que se lean bien en WhatsApp. | — |
@@ -81,4 +81,4 @@ Prioridad de la información: políticas del Parque → seguridad → logística
 
 1. **Email sin filtraciones ya no pausa (cambiado 2026-09-26).** Antes, un email que no aparecía en ninguna filtración pausaba la conversación: pasó en 33 de 34 pausas, y 29 de esas conversaciones eran charlas reales de 3 o más mensajes. Ahora es solo un dato del aviso a Fer. Con los emails reales, la regla nueva habría pausado 3 conversaciones en lugar de 33. Revisar en unas semanas si se cuela algún bot.
 2. **Silencio por humano activo (12 h).** En la simulación con el historial real, se habrían silenciado 310 de 1.119 mensajes de clientes. En 202 respondió Fer después y en 13 no respondió nadie. Revisar el número después de unas semanas.
-3. **Registro temporal `[OPENBSP_SHAPE]`.** Muestra si OpenBSP ya manda el historial en cada pedido. Si lo manda, la regla 3 puede dejar de consultar Supabase. Quitar el registro cuando se decida.
+3. **Registro `[OPENBSP_SHAPE]`: resuelto.** OpenBSP manda solo el último mensaje del cliente, sin historial (verificado 2026-09-26), así que la regla 3 necesita consultar Supabase. El registro se puede quitar en el próximo cambio.
