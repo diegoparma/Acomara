@@ -413,5 +413,42 @@ class LanguageCommitPolicyTests(unittest.TestCase):
         self.assertTrue(sv["conversation_language_locked"])
 
 
+class DuplicateReplyGuardTests(unittest.TestCase):
+    def test_same_reply_within_window_is_duplicate(self):
+        from orchestrator.server import is_recent_duplicate_reply
+        stored = {"last_assistant_reply": "Great! We'll be in touch shortly.", "last_assistant_reply_ts": 1000}
+        # Regression (audit 2026-09): retries ~60-70s apart slipped past the old 45s window.
+        self.assertTrue(is_recent_duplicate_reply("Great! We'll be in touch shortly.", stored, 1070))
+
+    def test_same_reply_after_window_is_allowed(self):
+        from orchestrator.server import is_recent_duplicate_reply
+        stored = {"last_assistant_reply": "Hola", "last_assistant_reply_ts": 1000}
+        self.assertFalse(is_recent_duplicate_reply("Hola", stored, 1000 + 181))
+
+    def test_different_reply_is_allowed(self):
+        from orchestrator.server import is_recent_duplicate_reply
+        stored = {"last_assistant_reply": "Hola", "last_assistant_reply_ts": 1000}
+        self.assertFalse(is_recent_duplicate_reply("Las fechas son...", stored, 1010))
+
+    def test_empty_inputs(self):
+        from orchestrator.server import is_recent_duplicate_reply
+        self.assertFalse(is_recent_duplicate_reply("", {"last_assistant_reply": "", "last_assistant_reply_ts": 1}, 2))
+        self.assertFalse(is_recent_duplicate_reply("Hola", None, 2))
+
+
+class PausedAntiLoopGuardTests(unittest.TestCase):
+    def test_one_paused_reply_then_final_then_silence(self):
+        from orchestrator.server import apply_paused_anti_loop_guard
+        session = {"conversation_paused": True, "pause_reason": "suspicious_email", "conversation_language": "en"}
+        runtime = {"paused_reply_threshold": 1, "handoff_email_cooldown_seconds": 0}
+        msg = {"text": "ok"}
+        first = apply_paused_anti_loop_guard(session, msg, runtime, 1000)[0]
+        second = apply_paused_anti_loop_guard(session, msg, runtime, 1010)[0]
+        third = apply_paused_anti_loop_guard(session, msg, runtime, 1020)[0]
+        self.assertEqual(first, "Great! We'll be in touch shortly.")
+        self.assertIn("closing this automated thread", second)
+        self.assertEqual(third, "")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

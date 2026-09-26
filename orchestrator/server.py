@@ -1274,6 +1274,26 @@ def _is_pure_greeting(text: str) -> bool:
     return bool(tokens & _PURE_GREETING_TOKENS) and tokens <= _PURE_GREETING_TOKENS
 
 
+OUTBOUND_DUPLICATE_WINDOW_SECONDS = 180
+
+
+def is_recent_duplicate_reply(reply: str, session_vars: dict[str, Any] | None, now_ts: int) -> bool:
+    """Return True when `reply` repeats the last stored assistant reply recently."""
+    if not reply.strip() or not session_vars:
+        return False
+    last_reply = str(session_vars.get("last_assistant_reply") or "").strip()
+    try:
+        last_ts = int(session_vars.get("last_assistant_reply_ts") or 0)
+    except (TypeError, ValueError):
+        last_ts = 0
+    return bool(
+        last_reply
+        and last_ts
+        and (now_ts - last_ts) <= OUTBOUND_DUPLICATE_WINDOW_SECONDS
+        and normalize_for_intent(reply) == normalize_for_intent(last_reply)
+    )
+
+
 def build_inbound_signature(msg: dict[str, str]) -> str:
     """Build a deterministic signature for inbound de-duplication."""
     normalized_text = normalize_for_intent(msg.get("text", ""))
@@ -1569,7 +1589,7 @@ def ensure_runtime() -> dict[str, Any]:
         "handoff_email_cooldown_seconds": int(
             _env("HANDOFF_EMAIL_COOLDOWN_SECONDS", "1800") or "1800"
         ),
-        "paused_reply_threshold": int(_env("PAUSED_REPLY_THRESHOLD", "2") or "2"),
+        "paused_reply_threshold": int(_env("PAUSED_REPLY_THRESHOLD", "1") or "1"),
         "email_verification_enabled": str(_env("EMAIL_VERIFICATION_ENABLED", "true") or "true")
         .strip()
         .lower()
@@ -1634,11 +1654,11 @@ def apply_paused_anti_loop_guard(
     now_ts: int,
 ) -> tuple[str, bool, int, dict[str, Any], bool]:
     """Limit repetitive paused replies and finalize automated thread replies."""
-    raw_threshold = runtime.get("paused_reply_threshold", 2)
+    raw_threshold = runtime.get("paused_reply_threshold", 1)
     try:
         threshold = max(1, int(raw_threshold))
     except (TypeError, ValueError):
-        threshold = 2
+        threshold = 1
 
     try:
         paused_reply_count = int(session_vars.get("paused_reply_count") or 0)
@@ -2074,19 +2094,7 @@ def process_inbound_message(
         decision.outbound_safety_blocked = True
 
     # Short-window anti-duplicate guard for same assistant reply bursts.
-    last_reply = str(session_vars.get("last_assistant_reply") or "").strip()
-    raw_last_ts = session_vars.get("last_assistant_reply_ts")
-    try:
-        last_reply_ts = int(raw_last_ts) if raw_last_ts is not None else 0
-    except (TypeError, ValueError):
-        last_reply_ts = 0
-    if (
-        decision.reply.strip()
-        and last_reply
-        and normalize_for_intent(decision.reply) == normalize_for_intent(last_reply)
-        and last_reply_ts
-        and (context.now_ts - last_reply_ts) <= 45
-    ):
+    if is_recent_duplicate_reply(decision.reply, session_vars, context.now_ts):
         decision.reply = ""
         decision.outbound_suppressed = True
 
@@ -2307,29 +2315,31 @@ def chat_completions_compatible() -> Any:
         now_ts = int(time.time())
         inbound_signature = build_inbound_signature(msg)
         if is_duplicate_inbound(session_vars, inbound_signature, now_ts):
-            replay_reply = str(session_vars.get("last_assistant_reply") or "").strip()
-            if replay_reply:
-                completion = {
-                    "id": f"chatcmpl-{uuid4().hex[:24]}",
-                    "object": "chat.completion",
-                    "created": int(time.time()),
-                    "model": effective_chat_model,
-                    "choices": [
-                        {
-                            "index": 0,
-                            "message": {"role": "assistant", "content": replay_reply},
-                            "finish_reason": "stop",
-                            "logprobs": None,
-                        }
-                    ],
-                    "usage": {
-                        "prompt_tokens": 0,
-                        "completion_tokens": 0,
-                        "total_tokens": 0,
-                    },
-                    "deduplicated": True,
-                }
-                return jsonify(completion)
+            # The first delivery was already answered; replaying that answer
+            # made OpenBSP send it to the client a second time (audit
+            # 2026-09: email acks arriving twice, ~60s apart). Acknowledge the
+            # retry with an empty reply, which OpenBSP does not send.
+            completion = {
+                "id": f"chatcmpl-{uuid4().hex[:24]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": effective_chat_model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": {"role": "assistant", "content": ""},
+                        "finish_reason": "stop",
+                        "logprobs": None,
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0,
+                },
+                "deduplicated": True,
+            }
+            return jsonify(completion)
 
         # Increment conversation turn counter
         current_turn = session_vars.get("conversation_turn_count", 0)
@@ -2369,6 +2379,19 @@ def chat_completions_compatible() -> Any:
             and decision.reply.strip()
         )
         split_parts = split_reply_into_messages(decision.reply) if should_split_opening else []
+
+        # Two client messages sent seconds apart are processed in parallel and
+        # both read the session before either saved its reply, so both sent
+        # the same text (audit 2026-09). Re-read the session right before
+        # persisting and drop the reply if a concurrent request already sent it.
+        latest = try_session_get(session_base_url, msg["conversation_id"])
+        latest_vars = latest.get("variables") if isinstance(latest, dict) else None
+        if isinstance(latest_vars, dict) and is_recent_duplicate_reply(decision.reply, latest_vars, int(time.time())):
+            decision.reply = ""
+            decision.outbound_suppressed = True
+            split_parts = []
+            updated_vars["last_assistant_reply"] = latest_vars.get("last_assistant_reply")
+            updated_vars["last_assistant_reply_ts"] = latest_vars.get("last_assistant_reply_ts")
 
         try_session_upsert(
             session_base_url,
