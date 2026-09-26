@@ -292,15 +292,17 @@ def _fetch_conversations(
 
 
 def _fetch_text_messages(base_url: str, api_key: str, conversation_id: str) -> list[dict[str, Any]]:
-    # OpenBSP no longer stores a direction column: inbound messages have no
-    # agent_id, outbound ones (bot or human agent) carry the agent's id.
+    # OpenBSP no longer stores a direction column. Inbound messages carry the
+    # client's sender_address; outbound ones either carry an agent_id (bot or
+    # platform user) or have no sender at all (sent from the WhatsApp Business
+    # phone app, e.g. an advisor replying from their phone).
     messages = _supabase_get(
         base_url,
         api_key,
         "messages",
         {
             "conversation_id": f"eq.{conversation_id}",
-            "select": "agent_id,content,status,timestamp",
+            "select": "agent_id,sender_address,content,status,timestamp",
             "order": "timestamp.asc",
             "limit": 1000,
         },
@@ -314,7 +316,7 @@ def _fetch_text_messages(base_url: str, api_key: str, conversation_id: str) -> l
         status = message.get("status")
         text_messages.append(
             {
-                "role": "assistant" if message.get("agent_id") else "user",
+                "role": "user" if message.get("sender_address") and not message.get("agent_id") else "assistant",
                 "text": str(content.get("text") or ""),
                 "timestamp": str(message.get("timestamp") or ""),
                 "failed": isinstance(status, dict) and "failed" in status,

@@ -202,8 +202,18 @@ def detect_language_from_text(text: str) -> str:
     keeps the previous session language instead of locking in on the first
     greeting (which historically caused language drift).
     """
+    return _detect_language_with_evidence(text) or "es"
+
+
+def _detect_language_with_evidence(text: str) -> str | None:
+    """Detect es/pt/en from message content, or None when there is no signal.
+
+    Keeping "no signal" separate from "Spanish" matters: callers that rotate the
+    session language must not treat the Spanish fallback as a real detection
+    (that made English speakers get Spanish replies mid-conversation).
+    """
     if not text:
-        return "es"
+        return None
 
     text_lower = text.lower()
     normalized_text = unicodedata.normalize("NFKD", text_lower)
@@ -292,7 +302,8 @@ def detect_language_from_text(text: str) -> str:
         "tengo",
         "me interesa",
         "ascenso",
-        "aconcagua",
+        # NOTE: do not add "aconcagua" — it is a proper noun used in every
+        # language and made English messages tie with Spanish.
     )
     pt_keywords = (
         "oi",
@@ -347,6 +358,10 @@ def detect_language_from_text(text: str) -> str:
     en_stopwords = {
         "the", "and", "for", "with", "to", "from", "please", "hello", "hi", "thanks",
         "i", "you", "we", "can", "do", "have", "sir", "week", "next", "my",
+        "is", "are", "it", "what", "how", "will", "am", "this", "that", "of",
+        "if", "now", "about", "because", "only", "any", "there", "your", "be",
+        "would", "should", "price", "yes", "appreciate", "available", "climb",
+        "climbing",
     }
     es_word_score = len(word_set & es_stopwords)
     pt_word_score = len(word_set & pt_stopwords)
@@ -369,7 +384,7 @@ def detect_language_from_text(text: str) -> str:
     if es_word_score > pt_word_score and es_word_score > en_word_score and es_word_score >= 2:
         return "es"
 
-    return "es"
+    return None
 
 
 def detect_language_confident(text: str) -> str | None:
@@ -417,10 +432,10 @@ def detect_language_confident(text: str) -> str | None:
         if tok in normalized_text:
             return "es"
 
-    # Fallback: only commit if the heuristic returns something other than the
-    # blind "es" default. A non-trivial message with mostly english/portuguese
-    # keywords is reasonable evidence; a single "hola" is not.
-    detected = detect_language_from_text(text)
+    # Fallback: only commit when the heuristic found actual evidence. A
+    # non-trivial message with mostly english/portuguese keywords is reasonable
+    # evidence; a single "hola" is not.
+    detected = _detect_language_with_evidence(text)
     if detected == "es" and len(stripped) < 20:
         return None
     return detected

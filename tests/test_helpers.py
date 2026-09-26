@@ -122,6 +122,32 @@ class LanguageDetectionTests(unittest.TestCase):
     def test_email_payload_is_not_confident_language_signal(self):
         self.assertIsNone(detect_language_confident("kfmcdonnell@yahoo.co.uk"))
 
+    def test_aconcagua_is_not_a_spanish_signal(self):
+        # Regression (audit 2026-09): "aconcagua" counted as Spanish and tied
+        # with "hello", so the English speaker got a Spanish reply.
+        self.assertEqual(
+            detect_language_confident("Hello, What is the price for climbing Mount Aconcagua? I am 40"),
+            "en",
+        )
+
+    def test_english_without_keywords_is_not_confident_spanish(self):
+        # Regression (audit 2026-09): with no keyword the detector fell back to
+        # "es" and, for messages >= 20 chars, reported it as confident.
+        for text in (
+            "I will appreciate it!",
+            "Even now if you’re available",
+            "Yes it’s only about the price because I’m on a tight budget",
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(detect_language_confident(text), "en")
+
+    def test_no_signal_is_not_confident(self):
+        self.assertIsNone(detect_language_confident("Anytime today"))
+
+    def test_english_keeps_session_language(self):
+        out = get_session_language({"conversation_language": "en"}, "I will appreciate it!")
+        self.assertEqual(out, "en")
+
 
 class SessionLanguageTests(unittest.TestCase):
     def test_default_when_empty(self):
