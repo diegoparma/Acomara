@@ -9,7 +9,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from orchestrator.conversation_audit import _count_language_drift, _detect_language, _dominant_language  # noqa: E402
+from orchestrator.conversation_audit import (  # noqa: E402
+    _count_language_drift,
+    _detect_language,
+    _dominant_language,
+    _paused_unanswered,
+)
 
 
 class ConversationAuditLanguageDetectionTests(unittest.TestCase):
@@ -76,6 +81,37 @@ class ConversationAuditLanguageDetectionTests(unittest.TestCase):
         ]
         mismatches, _ = _count_language_drift(messages)
         self.assertEqual(mismatches, 1)
+
+
+class PausedUnansweredTests(unittest.TestCase):
+    PAUSED = {"extra": {"paused": "2026-09-10T12:00:00+00:00"}}
+
+    def test_flags_user_messages_after_pause(self):
+        messages = [
+            {"role": "user", "text": "Hola", "timestamp": "2026-09-10T11:00:00+00:00"},
+            {"role": "assistant", "text": "Te deriva un asesor", "timestamp": "2026-09-10T11:59:00+00:00"},
+            {"role": "user", "text": "¿Hay novedades?", "timestamp": "2026-09-12T09:00:00+00:00"},
+            {"role": "user", "text": "¿Hola?", "timestamp": "2026-09-14T09:00:00+00:00"},
+        ]
+        result = _paused_unanswered(self.PAUSED, messages)
+        self.assertEqual(result["pending_user_messages"], 2)
+        self.assertEqual(result["waiting_since"], "2026-09-12T09:00:00+00:00")
+
+    def test_ignores_when_someone_replied_last(self):
+        messages = [
+            {"role": "user", "text": "¿Hay novedades?", "timestamp": "2026-09-12T09:00:00+00:00"},
+            {"role": "assistant", "text": "Sí, te escribo por mail", "timestamp": "2026-09-12T10:00:00+00:00"},
+        ]
+        self.assertIsNone(_paused_unanswered(self.PAUSED, messages))
+
+    def test_ignores_messages_sent_before_pause(self):
+        messages = [{"role": "user", "text": "Hola", "timestamp": "2026-09-10T11:00:00+00:00"}]
+        self.assertIsNone(_paused_unanswered(self.PAUSED, messages))
+
+    def test_ignores_conversations_not_paused(self):
+        messages = [{"role": "user", "text": "Hola", "timestamp": "2026-09-12T09:00:00+00:00"}]
+        self.assertIsNone(_paused_unanswered({"extra": {}}, messages))
+        self.assertIsNone(_paused_unanswered({"extra": None}, messages))
 
 
 if __name__ == "__main__":

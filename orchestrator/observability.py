@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 from typing import Any, Callable
 
 
@@ -154,6 +155,7 @@ def render_audit_dashboard_html(report: dict[str, Any]) -> str:
     status_counts = report.get("status_counts", {})
     message_stats = report.get("message_stats", {})
     problematic = report.get("problematic_conversations", [])
+    needs_human = report.get("needs_human_reply", [])
 
     issue_rows = "".join(
         f"<tr><td>{issue}</td><td>{count}</td></tr>"
@@ -172,6 +174,18 @@ def render_audit_dashboard_html(report: dict[str, Any]) -> str:
     )
     if not problem_rows:
         problem_rows = "<tr><td colspan='3'>No problematic conversations in current window</td></tr>"
+
+    needs_human_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(row.get('contact_address') or '-'))}</td>"
+        f"<td>{html.escape(str(row.get('waiting_since') or '-'))[:16].replace('T', ' ')}</td>"
+        f"<td>{row.get('pending_user_messages', 0)}</td>"
+        f"<td>{row.get('conversation_id', '-')}</td>"
+        "</tr>"
+        for row in needs_human
+    )
+    if not needs_human_rows:
+        needs_human_rows = "<tr><td colspan='4'>Nadie esperando respuesta</td></tr>"
 
     return f"""
 <!doctype html>
@@ -220,8 +234,15 @@ def render_audit_dashboard_html(report: dict[str, Any]) -> str:
             <div class='card'><div class='label'>Quality rate</div><div class='value ok'>{totals.get('quality_rate_percent', 0)}%</div></div>
             <div class='card'><div class='label'>Mensajes totales</div><div class='value'>{message_stats.get('total_messages', 0)}</div></div>
             <div class='card'><div class='label'>Promedio mensajes</div><div class='value'>{message_stats.get('avg', 0)}</div></div>
+            <div class='card'><div class='label'>Esperando respuesta humana</div><div class='value warn'>{len(needs_human)}</div></div>
             <div class='card'><div class='label'>Estado OK</div><div class='value'>{status_counts.get('OK', 0)}</div></div>
         </div>
+
+        <h2>Esperando respuesta humana (pausadas, el cliente volvió a escribir)</h2>
+        <table>
+            <thead><tr><th>Contacto</th><th>Esperando desde (UTC)</th><th>Mensajes sin responder</th><th>Conversation ID</th></tr></thead>
+            <tbody>{needs_human_rows}</tbody>
+        </table>
 
         <h2>Problemas por tipo</h2>
         <table>

@@ -268,7 +268,7 @@ def _fetch_conversations(
     while True:
         params: dict[str, Any] = {
             "organization_id": f"eq.{organization_id}",
-            "select": "id,created_at,updated_at,contact_address",
+            "select": "id,created_at,updated_at,address,extra",
             "order": "updated_at.asc",
             "limit": page_size,
             "offset": offset,
@@ -291,32 +291,74 @@ def _fetch_conversations(
     return conversations
 
 
-def _fetch_text_messages(base_url: str, api_key: str, conversation_id: str) -> list[dict[str, str]]:
+def _fetch_text_messages(base_url: str, api_key: str, conversation_id: str) -> list[dict[str, Any]]:
+    # OpenBSP no longer stores a direction column: inbound messages have no
+    # agent_id, outbound ones (bot or human agent) carry the agent's id.
     messages = _supabase_get(
         base_url,
         api_key,
         "messages",
         {
             "conversation_id": f"eq.{conversation_id}",
-            "select": "direction,content,timestamp",
+            "select": "agent_id,content,status,timestamp",
             "order": "timestamp.asc",
             "limit": 1000,
         },
     )
 
-    text_messages: list[dict[str, str]] = []
+    text_messages: list[dict[str, Any]] = []
     for message in messages:
         content = message.get("content")
         if not isinstance(content, dict) or content.get("kind") != "text":
             continue
+        status = message.get("status")
         text_messages.append(
             {
-                "role": "assistant" if message.get("direction") == "outgoing" else "user",
+                "role": "assistant" if message.get("agent_id") else "user",
                 "text": str(content.get("text") or ""),
                 "timestamp": str(message.get("timestamp") or ""),
+                "failed": isinstance(status, dict) and "failed" in status,
             }
         )
     return text_messages
+
+
+def _parse_timestamp(raw: Any) -> datetime | None:
+    raw_timestamp = str(raw or "").strip()
+    if not raw_timestamp:
+        return None
+    try:
+        return datetime.fromisoformat(raw_timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _paused_unanswered(conv: dict[str, Any], messages: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Return details when a paused conversation ends with unanswered user messages.
+
+    Pausing hands the conversation to a human; if the user keeps writing after
+    the pause and nobody replies, the lead is silently dropped.
+    """
+    extra = conv.get("extra")
+    paused_at = _parse_timestamp(extra.get("paused")) if isinstance(extra, dict) else None
+    if paused_at is None or not messages or messages[-1]["role"] != "user":
+        return None
+
+    pending: list[dict[str, Any]] = []
+    for msg in reversed(messages):
+        if msg["role"] != "user":
+            break
+        pending.append(msg)
+
+    after_pause = [m for m in pending if (_parse_timestamp(m["timestamp"]) or paused_at) > paused_at]
+    if not after_pause:
+        return None
+
+    return {
+        "paused_at": paused_at.isoformat(),
+        "pending_user_messages": len(after_pause),
+        "waiting_since": after_pause[-1]["timestamp"],
+    }
 
 
 def _latest_message_timestamp(messages: list[dict[str, str]]) -> datetime | None:
@@ -428,6 +470,7 @@ def run_conversation_audit(
     status_counts: Counter[str] = Counter()
     message_counts: list[int] = []
     problematic_rows: list[dict[str, Any]] = []
+    needs_human: list[dict[str, Any]] = []
 
     excluded_test_conversations = 0
 
@@ -445,7 +488,7 @@ def run_conversation_audit(
                     "conversation_id": conv_id,
                     "created_at": conv.get("created_at"),
                     "updated_at": conv.get("updated_at"),
-                    "contact_address": conv.get("contact_address"),
+                    "contact_address": conv.get("address"),
                     "message_count": 0,
                     "issues": ["NO_MESSAGES"],
                 }
@@ -499,6 +542,20 @@ def run_conversation_audit(
         if sensitive_hits > 0:
             issues.append("INFO_EXPOSURE")
 
+        if any(m["role"] == "assistant" and m.get("failed") for m in messages):
+            issues.append("SEND_BLOCKED")
+
+        unanswered = _paused_unanswered(conv, messages)
+        if unanswered:
+            issues.append("PAUSED_UNANSWERED")
+            needs_human.append(
+                {
+                    "conversation_id": conv_id,
+                    "contact_address": conv.get("address"),
+                    **unanswered,
+                }
+            )
+
         if issues:
             status_counts["ERROR_OR_WARN"] += 1
             for issue in issues:
@@ -509,7 +566,7 @@ def run_conversation_audit(
                     "created_at": conv.get("created_at"),
                     "updated_at": conv.get("updated_at"),
                     "latest_activity_at": latest_activity_at.isoformat() if latest_activity_at else None,
-                    "contact_address": conv.get("contact_address"),
+                    "contact_address": conv.get("address"),
                     "message_count": len(messages),
                     "issues": issues,
                     "language_drift_mismatches": mismatches,
@@ -557,4 +614,5 @@ def run_conversation_audit(
         "message_stats": message_stats,
         "language_distribution": dict(language_counts),
         "problematic_conversations": top_problematic,
+        "needs_human_reply": sorted(needs_human, key=lambda x: x["waiting_since"], reverse=True),
     }
