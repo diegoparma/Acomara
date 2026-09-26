@@ -68,6 +68,7 @@ from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
+from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1590,6 +1591,11 @@ def ensure_runtime() -> dict[str, Any]:
             _env("HANDOFF_EMAIL_COOLDOWN_SECONDS", "1800") or "1800"
         ),
         "paused_reply_threshold": int(_env("PAUSED_REPLY_THRESHOLD", "1") or "1"),
+        # Nico stays silent while an advisor is handling the conversation (0 disables).
+        "human_silence_hours": float(_env("HUMAN_SILENCE_HOURS", "12") or "12"),
+        "nico_agent_id": _env("NICO_AGENT_ID", DEFAULT_NICO_AGENT_ID) or DEFAULT_NICO_AGENT_ID,
+        "supabase_url": _env("SUPABASE_URL"),
+        "supabase_key": _env("SUPABASE_SECRET_KEY"),
         "email_verification_enabled": str(_env("EMAIL_VERIFICATION_ENABLED", "true") or "true")
         .strip()
         .lower()
@@ -2161,6 +2167,20 @@ def chat_completions_compatible() -> Any:
     # We currently return a non-streaming completion payload.
     _ = bool(stream)
 
+    # Temporary: learn whether OpenBSP sends conversation history (roles only,
+    # never content) to decide if the Supabase lookup can be replaced.
+    print(
+        "[OPENBSP_SHAPE] "
+        + json.dumps(
+            {
+                "messages": len(messages),
+                "roles": [m.get("role") for m in messages if isinstance(m, dict)][-12:],
+                "has_tools": bool(tools_payload),
+            }
+        ),
+        flush=True,
+    )
+
     user_text = extract_last_user_text(messages)
     if not user_text:
         return (
@@ -2340,6 +2360,55 @@ def chat_completions_compatible() -> Any:
                 "deduplicated": True,
             }
             return jsonify(completion)
+
+        human_active, human_info = human_replied_recently(
+            supabase_url=runtime.get("supabase_url"),
+            supabase_key=runtime.get("supabase_key"),
+            conversation_id=msg["conversation_id"],
+            window_hours=runtime.get("human_silence_hours", 12),
+            nico_agent_id=runtime.get("nico_agent_id", DEFAULT_NICO_AGENT_ID),
+        )
+        print(f"[HUMAN_ACTIVITY] {msg['conversation_id']} silenced={human_active} {human_info}", flush=True)
+        if human_active:
+            # An advisor wrote in this conversation recently (often from the
+            # WhatsApp Business phone app). Stay out of it: no reply, but keep
+            # the inbound on record and mark the signature so retries dedupe.
+            try_session_append_event(
+                session_base_url,
+                msg["conversation_id"],
+                "inbound_message_silenced_human_active",
+                {"text": msg["text"], "channel": msg["channel"], **human_info},
+            )
+            try_session_upsert(
+                session_base_url,
+                msg,
+                runtime["session_agent_id"],
+                {
+                    **session_vars,
+                    "last_user_message": msg["text"],
+                    "last_inbound_signature": inbound_signature,
+                    "last_inbound_signature_ts": now_ts,
+                    "human_active_last_seen": human_info.get("last_human_message_at"),
+                },
+            )
+            return jsonify(
+                {
+                    "id": f"chatcmpl-{uuid4().hex[:24]}",
+                    "object": "chat.completion",
+                    "created": int(time.time()),
+                    "model": effective_chat_model,
+                    "choices": [
+                        {
+                            "index": 0,
+                            "message": {"role": "assistant", "content": ""},
+                            "finish_reason": "stop",
+                            "logprobs": None,
+                        }
+                    ],
+                    "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+                    "silenced_human_active": True,
+                }
+            )
 
         # Increment conversation turn counter
         current_turn = session_vars.get("conversation_turn_count", 0)
