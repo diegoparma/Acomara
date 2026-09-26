@@ -71,6 +71,7 @@ def send_handoff_email(
             f"conversation_turn_count: {sanitize_for_email(str(session_vars.get('conversation_turn_count', '')))}",
             f"verified_email: {sanitize_for_email(str(session_vars.get('verified_email', '')))}",
             f"email_verified_real: {sanitize_for_email(str(session_vars.get('email_verified_real', False)))}",
+            f"email_en_filtraciones: {sanitize_for_email(_breach_label(session_vars))}",
             f"pause_reason: {sanitize_for_email(str(session_vars.get('pause_reason', 'human_handoff_in_progress')))}",
             "",
             f"ultimo_mensaje_cliente: {sanitize_for_email(msg['text'])}",
@@ -140,33 +141,51 @@ def send_compromised_email_alert(
     email: str,
     session_vars: dict[str, Any],
 ) -> tuple[bool, int, dict[str, Any]]:
-    """Send alert to admin when prospect's email is suspicious/unverified."""
-    provider = str(runtime.get("handoff_email_provider") or "resend").strip().lower()
-    from_email = runtime.get("handoff_email_from")
-    to_email = runtime.get("handoff_email_to")
-    if not from_email or not to_email:
-        return False, 0, {"info": "alert email not configured"}
-
-    subject = f"[ACOMARA SECURITY] Email sospechoso detectado - {msg['conversation_id']}"
+    """Send alert to admin when the conversation looks automated (paused)."""
+    reason = str(session_vars.get("bot_signal") or "sin detalle")
+    subject = f"[ACOMARA SECURITY] Posible bot - {msg['conversation_id']}"
     text_body = "\n".join(
         [
             "⚠️ ALERTA DE SEGURIDAD",
             "",
-            "Se detecto que el email proporcionado por un prospecto NO tiene historial en bases de datos de breaches.",
+            "La conversacion tiene señales de ser automatizada y fue PAUSADA.",
+            f"Motivo: {reason}",
+            f"Email en filtraciones: {_breach_label(session_vars)}",
             "",
-            f"Email sospechoso: {email}",
+            f"Email: {email}",
             f"conversation_id: {msg['conversation_id']}",
             f"organization_id: {msg['organization_id']}",
             f"contact_id: {msg['contact_id']}",
             f"contact_address: {msg['contact_address']}",
             f"channel: {msg['channel']}",
             "",
-            "La conversacion ha sido PAUSADA automaticamente.",
-            "El prospecto debera ser contactado por un asesor humano.",
+            "Si es una persona real, un asesor tiene que contactarla.",
             "",
             f"Ultimo mensaje del cliente: {msg['text']}",
         ]
     )
+
+    return _send_admin_email(runtime, subject, text_body)
+
+
+def _breach_label(session_vars: dict[str, Any]) -> str:
+    in_breaches = session_vars.get("email_in_breaches")
+    if in_breaches is None:
+        return "sin verificar"
+    return "si" if in_breaches else "no (cuenta posiblemente nueva, revisar)"
+
+
+def _send_admin_email(
+    runtime: dict[str, Any],
+    subject: str,
+    text_body: str,
+) -> tuple[bool, int, dict[str, Any]]:
+    """Send a plain-text email to the configured advisor inbox (SMTP or Resend)."""
+    provider = str(runtime.get("handoff_email_provider") or "resend").strip().lower()
+    from_email = runtime.get("handoff_email_from")
+    to_email = runtime.get("handoff_email_to")
+    if not from_email or not to_email:
+        return False, 0, {"info": "admin email not configured"}
 
     if provider == "smtp":
         smtp_host = runtime.get("handoff_smtp_host")
@@ -175,7 +194,7 @@ def send_compromised_email_alert(
         smtp_password = runtime.get("handoff_smtp_password")
         smtp_starttls = bool(runtime.get("handoff_smtp_starttls"))
         if not smtp_host or not smtp_user or not smtp_password:
-            return False, 0, {"info": "smtp alert email not configured"}
+            return False, 0, {"info": "smtp admin email not configured"}
 
         message = EmailMessage()
         message["Subject"] = subject
@@ -191,25 +210,57 @@ def send_compromised_email_alert(
         return True, 200, {"ok": True, "provider": "smtp"}
 
     if provider != "resend":
-        return False, 0, {"info": f"unsupported alert email provider: {provider}"}
+        return False, 0, {"info": f"unsupported admin email provider: {provider}"}
 
     api_key = runtime.get("handoff_email_api_key")
     if not api_key:
-        return False, 0, {"info": "alert email not configured"}
+        return False, 0, {"info": "admin email not configured"}
 
     status, data = _http_json(
         method="POST",
         url="https://api.resend.com/emails",
         headers={"Authorization": f"Bearer {api_key}"},
-        body={
-            "from": from_email,
-            "to": [to_email],
-            "subject": subject,
-            "text": text_body,
-        },
+        body={"from": from_email, "to": [to_email], "subject": subject, "text": text_body},
         timeout=20,
     )
     return True, status, data
+
+
+def send_new_lead_email(
+    runtime: dict[str, Any],
+    msg: dict[str, str],
+    email: str,
+    session_vars: dict[str, Any],
+) -> tuple[bool, int, dict[str, Any]]:
+    """Tell the advisor a lead shared their email. Nico keeps the conversation."""
+    subject = f"[Acomara] Nuevo lead con email - {email}"
+    text_body = "\n".join(
+        [
+            "Un cliente compartio su email. Nico sigue atendiendo la conversacion.",
+            "",
+            f"Email: {email}",
+            f"Email en filtraciones: {_breach_label(session_vars)}",
+            f"Telefono: {msg['contact_address']}",
+            f"Mensajes del cliente hasta ahora: {session_vars.get('conversation_turn_count', '')}",
+            f"conversation_id: {msg['conversation_id']}",
+            "",
+            f"Ultimo mensaje del cliente: {msg['text']}",
+        ]
+    )
+    return _send_admin_email(runtime, subject, text_body)
+
+
+def try_send_new_lead_email(
+    runtime: dict[str, Any],
+    msg: dict[str, str],
+    email: str,
+    session_vars: dict[str, Any],
+) -> tuple[bool, int, dict[str, Any]]:
+    try:
+        return send_new_lead_email(runtime, msg, email, session_vars)
+    except Exception as exc:  # pragma: no cover
+        LOGGER.warning("send_new_lead_email exception: %s", exc)
+        return True, 0, {"error": str(exc)}
 
 
 def try_send_compromised_email_alert(

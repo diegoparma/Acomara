@@ -117,3 +117,33 @@ def pause_conversation(
     if email:
         updated["paused_email"] = email
     return updated
+
+
+BARE_EMAIL_MAX_EXTRA_CHARS = 15
+MAX_DISTINCT_EMAILS = 3
+
+
+def bot_signal(
+    session_vars: dict[str, Any],
+    text: str,
+    email: str,
+    email_in_breaches: bool,
+) -> str | None:
+    """Return a reason when the conversation looks automated, else None.
+
+    A missing breach history alone is NOT a bot signal: in real traffic one in
+    three genuine leads (long, specific conversations) had emails absent from
+    HIBP. Only pause when the behaviour itself looks automated.
+    """
+    emails_seen = {str(e).lower() for e in session_vars.get("emails_seen") or []}
+    emails_seen.add(email.lower())
+    if len(emails_seen) >= MAX_DISTINCT_EMAILS:
+        return "many_distinct_emails"
+
+    turn_count = int(session_vars.get("conversation_turn_count") or 0)
+    extra_text = (text or "").replace(email, "").strip()
+    if not email_in_breaches and turn_count <= 2 and len(extra_text) < BARE_EMAIL_MAX_EXTRA_CHARS:
+        return "bare_email_without_conversation"
+
+    return None
+

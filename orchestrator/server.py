@@ -31,6 +31,7 @@ from flask import Flask, jsonify, request
 from openai import OpenAI
 
 from orchestrator.security import (
+    bot_signal,
     check_email_reputation,
     extract_email_from_text,
     pause_conversation,
@@ -38,6 +39,7 @@ from orchestrator.security import (
 )
 from orchestrator.handoff_email import (
     try_send_handoff_email,
+    try_send_new_lead_email,
     try_send_suspicious_admin_alert,
 )
 from orchestrator.policies import (
@@ -1902,6 +1904,10 @@ def process_inbound_message(
     # Fix #1: persist email capture as soon as the user shares any email,
     # regardless of HIBP outcome. This blocks the proactive-email loop.
     if context.extracted_email:
+        emails_seen = list(session_vars.get("emails_seen") or [])
+        if context.extracted_email.lower() not in (e.lower() for e in emails_seen):
+            emails_seen.append(context.extracted_email)
+        session_vars["emails_seen"] = emails_seen[-10:]
         session_vars["email_captured"] = True
         if not session_vars.get("captured_email"):
             session_vars["captured_email"] = context.extracted_email
@@ -1931,14 +1937,24 @@ def process_inbound_message(
                 session_vars["email_verified"] = True
                 session_vars["verified_email"] = context.extracted_email
                 session_vars["email_checked_at_ts"] = int(time.time())
+                # HIBP "not found" is recorded as information, not as a reason to
+                # pause: one in three genuine leads had no breach history.
+                session_vars["email_in_breaches"] = not is_suspicious
+                bot_reason = bot_signal(
+                    session_vars,
+                    msg.text,
+                    context.extracted_email,
+                    email_in_breaches=not is_suspicious,
+                )
 
-                if is_suspicious:
+                if bot_reason:
                     context.email_suspicious = True
                     context.suspicious_email_value = context.extracted_email
+                    session_vars["bot_signal"] = bot_reason
                     session_vars = pause_conversation(
                         session_vars,
                         context.extracted_email,
-                        "Email appears to be unverified or new, requires manual validation",
+                        f"Conversation looks automated: {bot_reason}",
                     )
 
                     if not session_vars.get("suspicious_email_alert_sent"):
@@ -1958,6 +1974,16 @@ def process_inbound_message(
                         session_vars["suspicious_email_alert_sent_ts"] = int(time.time())
                 else:
                     session_vars["email_verified_real"] = True
+                    if not session_vars.get("new_lead_email_sent"):
+                        lead_attempted, lead_status, _ = try_send_new_lead_email(
+                            runtime,
+                            msg_dict,
+                            context.extracted_email,
+                            session_vars,
+                        )
+                        if lead_attempted and lead_status in (200, 201, 202):
+                            session_vars["new_lead_email_sent"] = True
+                            session_vars["new_lead_email_sent_ts"] = int(time.time())
             else:
                 session_vars["email_check_failed"] = True
                 session_vars["email_check_failed_at_ts"] = int(time.time())
