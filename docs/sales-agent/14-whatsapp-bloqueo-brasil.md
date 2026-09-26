@@ -33,8 +33,9 @@ No es un error del orquestador: es una restricción de Meta sobre la cuenta de W
 >
 > Could you tell us why this restriction applies to our account and what we need to do to remove it (business verification, policy review, or any other step)?
 >
-> WABA ID: [completar]
-> Phone number ID: [completar]
-> Example message ID (wamid): [completar, sacar uno de la tabla messages con status failed]
+> Business portfolio ID: 1901192336563444
+> WABA ID: 354572315205907
+> Phone number ID: 2484308534965026 (+54 9 261 618-1000, verified name "Acomara")
+> Example failed message ID (wamid): wamid.HBgMNTU2Nzk5MDg3Mjg5FQIAERgUQ0U3QTlGQUQ0RDFFQzgxMjlCMjAA (2026-09-24)
 >
 > Thank you.
