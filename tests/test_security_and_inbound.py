@@ -85,7 +85,7 @@ class EmailCapturePolicyTests(unittest.TestCase):
     def test_email_shared_is_acknowledged_once(self):
         session = {"conversation_turn_count": 3}
         first = apply_email_ack_or_request_policy("Respuesta IA", session, "ana@gmail.com", "es")
-        self.assertIn("Ya tengo tu correo", first)
+        self.assertIn("Ya tengo tu email", first)
         self.assertEqual(session["captured_email"], "ana@gmail.com")
         self.assertTrue(session["email_requested"])
         self.assertFalse(session["proactive_email_capture_pending"])

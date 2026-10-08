@@ -71,6 +71,13 @@ from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
+from orchestrator.humanize import (
+    append_recent_turns,
+    assistant_already_spoke,
+    history_to_messages,
+    humanize_reply,
+    trim_to_last_sentence,
+)
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 
@@ -149,51 +156,51 @@ class ReplyDecision:
 I18N_PHRASES = {
     "es": {
         "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
-        "handoff_ask_email": "Para conectarte con un asesor, primero necesito tu correo electrónico para poder derivarte correctamente. ¿Cuál es tu correo?",
-        "handoff_executed": "Perfecto, ya derivé tu solicitud a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
-        "handoff_pending": "Todavía necesito tu correo electrónico para derivarte con el asesor. ¿Cuál es tu correo?",
-        "proactive_email_request": "Si te parece, compartime tu correo electrónico ahora y lo verifico para dejar lista una posible derivación con un asesor.",
-        "proactive_email_saved": "Gracias. Ya verifiqué tu correo y quedó registrado. Si después querés que te conecte con un asesor, ya lo tengo listo.",
-        "proactive_email_check_failed": "Gracias. Ya recibí tu correo, pero no pude validarlo en este momento. Igual quedó registrado por si necesitás derivación con un asesor.",
-        "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
-        "paused_suspicious": "Excelente, te vamos a estar contactando en breve.",
-        "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
-        "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
-        "email_received_ack": "¡Gracias! Ya tengo tu correo ({email}) registrado. Un asesor humano va a revisar tu consulta y te contacta en breve por este medio. Mientras tanto, si querés agregar más detalles (fechas, número de personas, experiencia previa), escribilos y los sumamos a la derivación.",
-        "out_of_season": "Importante: las expediciones al Aconcagua se realizan únicamente entre noviembre y marzo (temporada del hemisferio sur). Para la fecha que mencionás no tenemos salidas. Si querés, te paso el calendario disponible de la próxima temporada.",
-        "opening_welcome": "Hola! Gracias por contactarnos. ¿En qué te puedo ayudar?\n\nPara orientarte mejor, además de responder tus preguntas, si te parece te envío más información por email: precios, fechas, servicios, lista de equipo, referencias y recomendaciones.",
+        "handoff_ask_email": "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?",
+        "handoff_executed": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
+        "handoff_pending": "Me falta tu email para pasarte con el asesor. ¿Cuál es?",
+        "proactive_email_request": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+        "proactive_email_saved": "Genial, ya me quedó tu email. Si después querés hablar con un asesor, avisame y te paso.",
+        "proactive_email_check_failed": "Gracias, ya me quedó tu email. Si en algún momento querés hablar con un asesor, avisame.",
+        "paused_handoff": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
+        "paused_suspicious": "Perfecto, te escribimos en breve.",
+        "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
+        "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+        "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
+        "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
+        "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
-        "handoff_ask_email": "To connect you with an advisor, I first need your email address. What is your email?",
-        "handoff_executed": "Perfect, I've forwarded your request to a human advisor. A team member will contact you shortly.",
-        "handoff_pending": "I still need your email address to connect you with an advisor. What is your email?",
-        "proactive_email_request": "If you'd like, share your email now and I'll verify it so a possible handoff to an advisor is ready.",
-        "proactive_email_saved": "Thanks. I already verified your email and saved it. If you want me to connect you with an advisor later, it's ready.",
-        "proactive_email_check_failed": "Thanks. I received your email, but I couldn't validate it right now. It was still saved in case you need a handoff to an advisor.",
-        "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
+        "handoff_ask_email": "Sure, I'll put you in touch with one of our advisors. What's your email so they can reach you?",
+        "handoff_executed": "Done, I've passed your request to one of our advisors. They'll message you here shortly 🙌",
+        "handoff_pending": "I just need your email to pass you to the advisor. What is it?",
+        "proactive_email_request": "If you'd like, send me your email and I'll share the full details with prices and dates.",
+        "proactive_email_saved": "Great, got your email. If you want to talk to an advisor later, just let me know.",
+        "proactive_email_check_failed": "Thanks, got your email. If you'd like to talk to an advisor at some point, just let me know.",
+        "paused_handoff": "I've passed your request to an advisor, they'll message you here shortly.",
         "paused_suspicious": "Great! We'll be in touch shortly.",
-        "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
-        "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
-        "email_received_ack": "Thanks! I've saved your email ({email}). A human advisor will review your request and contact you shortly through this channel. In the meantime, feel free to add any extra details (dates, number of people, previous experience) and I'll include them in the handoff.",
-        "out_of_season": "Heads up: Aconcagua expeditions run only between November and March (Southern Hemisphere season). We don't have departures on the date you mentioned. If you'd like, I can share the available calendar for the next season.",
-        "opening_welcome": "Hi! Thanks for reaching out. How can I help you?\n\nTo guide you better, besides answering your questions here, if you'd like I can send you more info by email: prices, dates, services, gear list, references and recommendations.",
+        "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
+        "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
+        "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
+        "out_of_season": "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.",
+        "opening_welcome": "Hi! Thanks for reaching out. How can I help?\n\nIf it's useful, besides answering here I can email you all the info: prices, dates, services, gear list and recommendations.",
     },
     "pt": {
-        "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
-        "handoff_ask_email": "Para conectá-lo com um consultor, primeiro preciso do seu endereço de email. Qual é o seu email?",
-        "handoff_executed": "Perfeito, encaminhei sua solicitação para um consultor humano. Um membro da equipe o contatará em breve.",
-        "handoff_pending": "Ainda preciso do seu endereço de email para conectá-lo com um consultor. Qual é o seu email?",
-        "proactive_email_request": "Se você quiser, compartilhe seu email agora e eu o verifico para deixar pronta uma possível transferência para um consultor.",
-        "proactive_email_saved": "Obrigado. Já verifiquei seu email e ele ficou registrado. Se depois você quiser falar com um consultor, já está pronto.",
-        "proactive_email_check_failed": "Obrigado. Recebi seu email, mas não consegui validá-lo agora. Mesmo assim ele ficou registrado caso você precise de transferência para um consultor.",
-        "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
-        "paused_suspicious": "Excelente, vamos estar em contato em breve.",
-        "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
-        "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
-        "email_received_ack": "Obrigado! Já registrei seu email ({email}). Um consultor humano vai revisar sua consulta e entrar em contato em breve por este canal. Enquanto isso, se quiser adicionar mais detalhes (datas, número de pessoas, experiência prévia), me envie e os incluo na transferência.",
-        "out_of_season": "Atenção: as expedições ao Aconcágua acontecem somente entre novembro e março (temporada do hemisfério sul). Para a data que você mencionou não temos saídas. Se quiser, posso te passar o calendário disponível da próxima temporada.",
-        "opening_welcome": "Olá! Obrigado por entrar em contato. Como posso te ajudar?\n\nPara te orientar melhor, além de responder suas perguntas aqui, se quiser te envio mais informações por email: preços, datas, serviços, lista de equipamentos, referências e recomendações.",
+        "reset_acknowledge": "Conversa reiniciada. Como posso te ajudar?",
+        "handoff_ask_email": "Claro, vou te passar para um consultor da equipe. Qual é o seu email para ele entrar em contato?",
+        "handoff_executed": "Pronto, já passei sua consulta para um consultor da equipe. Ele te escreve por aqui em breve 🙌",
+        "handoff_pending": "Só falta seu email para te passar para o consultor. Qual é?",
+        "proactive_email_request": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+        "proactive_email_saved": "Ótimo, já anotei seu email. Se depois quiser falar com um consultor, é só me avisar.",
+        "proactive_email_check_failed": "Obrigado, já anotei seu email. Se em algum momento quiser falar com um consultor, é só me avisar.",
+        "paused_handoff": "Já passei sua consulta para um consultor, ele te escreve por aqui em breve.",
+        "paused_suspicious": "Perfeito, vamos te escrever em breve.",
+        "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
+        "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
+        "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
+        "out_of_season": "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.",
+        "opening_welcome": "Olá! Obrigado por escrever. Como posso te ajudar?\n\nSe for útil, além de responder por aqui te mando por email todas as informações: preços, datas, serviços, lista de equipamentos e recomendações.",
     },
 }
 
@@ -1002,6 +1009,20 @@ def build_crm_client_context(session_vars: dict[str, Any]) -> str:
     return crm_client_context
 
 
+# The transcript goes to the model as chat history; the internal ids and
+# timestamps add nothing to a reply.
+_SESSION_KEYS_HIDDEN_FROM_LLM = frozenset(
+    {
+        "recent_turns",
+        "last_assistant_reply",
+        "last_assistant_reply_ts",
+        "last_user_message",
+        "last_inbound_signature",
+        "last_inbound_signature_ts",
+    }
+)
+
+
 # Argentina has no DST: Mendoza is UTC-3 all year.
 ARGENTINA_TZ = timezone(timedelta(hours=-3), "ART")
 
@@ -1033,7 +1054,13 @@ def generate_reply(
 
     # Override conversation_language in the dumped state so the LLM does not
     # see a stale/contradictory signal vs the explicit lang_instruction.
-    session_vars_for_llm = {**session_vars, "conversation_language": user_lang}
+    session_vars_for_llm = {
+        key: value
+        for key, value in session_vars.items()
+        if key not in _SESSION_KEYS_HIDDEN_FROM_LLM
+    }
+    session_vars_for_llm["conversation_language"] = user_lang
+    recent_turns = session_vars.get("recent_turns")
 
     is_whatsapp = str(msg.get("channel", "")).strip().lower() == "whatsapp"
     response_length_instruction = (
@@ -1060,8 +1087,11 @@ def generate_reply(
         "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
         "- Si compartes fechas de salida, omite las que ya pasaron respecto de la fecha de hoy "
         "(en una temporada, noviembre y diciembre son del primer año; enero a marzo, del segundo).\n"
+        "- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, "
+        "no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
-        "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
+        "- Si no hay evidencia suficiente, decí con naturalidad que eso no lo tenés a mano y ofrecé que un asesor del equipo lo confirme. "
+        "Nunca menciones FAQ, documentación, evidencia ni base de datos."
     ).format(
         today=today.isoformat(),
         channel=msg["channel"],
@@ -1079,10 +1109,18 @@ def generate_reply(
         max_output_tokens=220,
         input=[
             {"role": "system", "content": system_prompt},
+            *history_to_messages(recent_turns),
             {"role": "user", "content": user_prompt},
         ],
     )
-    return resp.output_text.strip()
+    reply = (resp.output_text or "").strip()
+    if getattr(resp, "status", None) == "incomplete":
+        reply = trim_to_last_sentence(reply)
+    return humanize_reply(
+        reply,
+        channel="whatsapp" if is_whatsapp else "other",
+        already_spoke=assistant_already_spoke(recent_turns),
+    )
 
 
 def supports_respond_tool(tools_payload: Any) -> bool:
@@ -1496,7 +1534,7 @@ def _first_program_options_reply(lang: str) -> str:
         "Para empezar, te recomiendo estas dos opciones:\n"
         "1. 18+2 (muy recomendada)\n"
         "2. 12+2 (recomendada)\n\n"
-        "También hay otras alternativas. Si quieres, te las listo en detalle."
+        "También hay otras alternativas. Si querés, te las paso en detalle."
     )
 
 
@@ -2195,6 +2233,9 @@ def process_inbound_message(
     if decision.reply.strip():
         updated_vars["last_assistant_reply"] = decision.reply
         updated_vars["last_assistant_reply_ts"] = context.now_ts
+    updated_vars["recent_turns"] = append_recent_turns(
+        session_vars.get("recent_turns"), msg.text, decision.reply
+    )
 
     if decision.handoff_sent:
         updated_vars["handoff_email_last_sent_ts"] = context.now_ts
@@ -2243,20 +2284,6 @@ def chat_completions_compatible() -> Any:
     # Compatibility: some providers always send stream=true.
     # We currently return a non-streaming completion payload.
     _ = bool(stream)
-
-    # Temporary: learn whether OpenBSP sends conversation history (roles only,
-    # never content) to decide if the Supabase lookup can be replaced.
-    print(
-        "[OPENBSP_SHAPE] "
-        + json.dumps(
-            {
-                "messages": len(messages),
-                "roles": [m.get("role") for m in messages if isinstance(m, dict)][-12:],
-                "has_tools": bool(tools_payload),
-            }
-        ),
-        flush=True,
-    )
 
     user_text = extract_last_user_text(messages)
     if not user_text:
@@ -2466,6 +2493,7 @@ def chat_completions_compatible() -> Any:
                     "last_inbound_signature": inbound_signature,
                     "last_inbound_signature_ts": now_ts,
                     "human_active_last_seen": human_info.get("last_human_message_at"),
+                    "recent_turns": append_recent_turns(session_vars.get("recent_turns"), msg["text"], ""),
                 },
             )
             return jsonify(
@@ -2538,6 +2566,11 @@ def chat_completions_compatible() -> Any:
             split_parts = []
             updated_vars["last_assistant_reply"] = latest_vars.get("last_assistant_reply")
             updated_vars["last_assistant_reply_ts"] = latest_vars.get("last_assistant_reply_ts")
+        if isinstance(latest_vars, dict) and "recent_turns" in latest_vars:
+            # Build on the freshest transcript so a parallel request's turn is kept.
+            updated_vars["recent_turns"] = append_recent_turns(
+                latest_vars.get("recent_turns"), msg["text"], decision.reply
+            )
 
         try_session_upsert(
             session_base_url,

@@ -78,7 +78,7 @@ class OutOfSeasonPolicyTests(unittest.TestCase):
         session: dict = {}
         first = apply_out_of_season_policy("Respuesta.", "expedicion en julio", session, "es")
         second = apply_out_of_season_policy("Otra.", "y en agosto? expedicion", session, "es")
-        self.assertTrue(first.startswith("Importante: las expediciones"))
+        self.assertTrue(first.startswith("Ojo: las expediciones"))
         self.assertTrue(first.endswith("Respuesta."))
         self.assertEqual(second, "Otra.")
         self.assertTrue(session["out_of_season_warned"])
