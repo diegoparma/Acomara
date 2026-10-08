@@ -60,6 +60,7 @@ class ConversationFlowTests(unittest.TestCase):
             mock.patch.object(server, "load_local_env", lambda: None),
             mock.patch.object(server, "OpenAI", lambda api_key: SimpleNamespace(responses=self.model)),
             mock.patch.object(server, "retrieve_top_k", lambda *a, **k: []),
+            mock.patch.object(server, "retrieve_with_context", lambda *a, **k: []),
             mock.patch.object(server, "try_session_get", self._session_get),
             mock.patch.object(server, "try_session_upsert", self._session_upsert),
             mock.patch.object(server, "try_session_append_event", lambda *a, **k: None),

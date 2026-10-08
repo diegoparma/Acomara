@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Callable
 
 
@@ -9,6 +10,13 @@ MentionsOutOfSeasonFn = Callable[[str], bool]
 DetectExplicitLanguagePreferenceFn = Callable[[str], str | None]
 DetectLanguageConfidentFn = Callable[[str], str | None]
 GetSessionLanguageFn = Callable[[dict[str, Any] | None, str], str]
+
+
+_EMAIL_WORD_RE = re.compile(r"\b(?:e-?mail|correo|mail)\b", re.IGNORECASE)
+
+
+def _reply_asks_for_email(reply: str) -> bool:
+    return bool(_EMAIL_WORD_RE.search(reply or ""))
 
 
 def _asks_more_than_email(user_text: str, email: str) -> bool:
@@ -40,7 +48,9 @@ def apply_email_ack_or_request_policy(
         session_vars["email_requested"] = True
         session_vars["proactive_email_capture_pending"] = False
     elif should_request_email(session_vars):
-        reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
+        if not _reply_asks_for_email(reply):
+            # The model often asks for it itself; asking twice in one message reads as a bot.
+            reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
         session_vars["email_requested"] = True
         session_vars["proactive_email_capture_pending"] = True
     return reply

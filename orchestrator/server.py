@@ -166,6 +166,8 @@ I18N_PHRASES = {
         "paused_suspicious": "Perfecto, te escribimos en breve.",
         "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
         "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+        "repeat_prefix": "Como te decía,",
+        "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
         "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
         "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
         "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
@@ -183,6 +185,8 @@ I18N_PHRASES = {
         "paused_suspicious": "Great! We'll be in touch shortly.",
         "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
         "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
+        "repeat_prefix": "As I mentioned,",
+        "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
         "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
         "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
         "out_of_season": "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.",
@@ -200,6 +204,8 @@ I18N_PHRASES = {
         "paused_suspicious": "Perfeito, vamos te escrever em breve.",
         "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
         "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
+        "repeat_prefix": "Como te falei,",
+        "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
         "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
         "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
         "out_of_season": "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.",
@@ -971,6 +977,51 @@ def retrieve_top_k(
     return scored[:top_k]
 
 
+def build_contextual_query(query_text: str, recent_turns: Any, max_chars: int = 700) -> str:
+    """Current message plus what was just talked about, for retrieval.
+
+    "¿Y cuánto sale?" finds nothing alone; with the previous turns ("el 18+2
+    es ideal para ustedes") it finds the 18+2 price.
+    """
+    turns = recent_turns if isinstance(recent_turns, list) else []
+    previous = [
+        str(t.get("text") or "")
+        for t in turns[-3:]
+        if isinstance(t, dict) and t.get("role") in ("user", "assistant")
+    ]
+    context = " ".join(p for p in previous if p).strip()
+    if not context:
+        return query_text
+    return f"{query_text}\n{context[-max_chars:]}"
+
+
+def retrieve_with_context(
+    client: OpenAI,
+    embed_model: str,
+    rows: list[dict[str, Any]],
+    query_text: str,
+    recent_turns: Any,
+    top_k: int,
+) -> list[dict[str, Any]]:
+    """Retrieve with the message alone and with recent context, keep the best of both.
+
+    One embeddings call with two inputs. The plain query keeps a new topic from
+    being pulled back to the old one; the contextual query resolves follow-ups.
+    """
+    contextual = build_contextual_query(query_text, recent_turns)
+    if contextual == query_text:
+        return retrieve_top_k(client, embed_model, rows, query_text, top_k)
+    data = client.embeddings.create(model=embed_model, input=[query_text, contextual]).data
+    best: dict[Any, dict[str, Any]] = {}
+    for item in data:
+        for row in rows:
+            score = cosine(item.embedding, row["embedding"])
+            key = row.get("id", id(row))
+            if key not in best or score > best[key]["score"]:
+                best[key] = {"score": score, **row}
+    return sorted(best.values(), key=lambda x: x["score"], reverse=True)[:top_k]
+
+
 def hits_to_context(hits: list[dict[str, Any]]) -> str:
     parts = []
     for h in hits:
@@ -1104,7 +1155,10 @@ def generate_reply(
         "\n\nEvidencia interna recuperada:\n{context}\n\n"
         "Instrucciones CRÍTICAS:\n"
         "- {lang_instruction}\n"
-        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada.\n"
+        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación "
+        "(si ya le diste un precio o una fecha, podés repetirlo).\n"
+        "- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. "
+        "Decir que no lo tenés es el último recurso.\n"
         "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
@@ -1115,8 +1169,10 @@ def generate_reply(
         "- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, "
         "no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
-        "- Si no hay evidencia suficiente, decí con naturalidad que eso no lo tenés a mano y ofrecé que un asesor del equipo lo confirme. "
-        "Nunca menciones FAQ, documentación, evidencia ni base de datos."
+        "- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. "
+        "Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n"
+        "- No pidas el email si ya lo pediste en esta conversación.\n"
+        "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
     ).format(
         today=today.isoformat(),
         channel=msg["channel"],
@@ -1399,6 +1455,10 @@ def _is_pure_greeting(text: str) -> bool:
 
 
 OUTBOUND_DUPLICATE_WINDOW_SECONDS = 180
+# Same reply this soon after the last one means a burst of client messages
+# answered in parallel: drop it. Later, the client asked again and must get
+# an answer.
+OUTBOUND_DUPLICATE_BURST_SECONDS = 30
 
 
 def is_recent_duplicate_reply(reply: str, session_vars: dict[str, Any] | None, now_ts: int) -> bool:
@@ -1416,6 +1476,22 @@ def is_recent_duplicate_reply(reply: str, session_vars: dict[str, Any] | None, n
         and (now_ts - last_ts) <= OUTBOUND_DUPLICATE_WINDOW_SECONDS
         and normalize_for_intent(reply) == normalize_for_intent(last_reply)
     )
+
+
+def resolve_duplicate_reply(reply: str, session_vars: dict[str, Any], now_ts: int, lang: str) -> str:
+    """What to send when the reply repeats the previous one.
+
+    Within a burst, nothing (the client already has it). Otherwise the client
+    asked again: say it again the way a person does instead of going silent.
+    """
+    try:
+        last_ts = int(session_vars.get("last_assistant_reply_ts") or 0)
+    except (TypeError, ValueError):
+        last_ts = 0
+    if now_ts - last_ts <= OUTBOUND_DUPLICATE_BURST_SECONDS:
+        return ""
+    text = reply.strip()
+    return f"{get_phrase('repeat_prefix', lang)} {text[:1].lower()}{text[1:]}"
 
 
 def build_inbound_signature(msg: dict[str, str]) -> str:
@@ -1487,6 +1563,21 @@ _HANDOFF_REQUEST_RE = re.compile(
     r"(?:real\s+|de\s+verdad\s+)?"
     rf"{_HANDOFF_TARGET}\b"
 )
+
+
+_BOT_QUESTION_RE = re.compile(
+    r"\b(?:sos|eres|es|sera|será|are you|is this|r u|voce e|você é|vc e|vc é)\s+(?:un|una|a|an|um|uma)?\s*"
+    r"(?:bot|robot|robo|robô|ia|ai|inteligencia artificial|inteligência artificial|chatbot|maquina|máquina|machine)\b"
+    r"|\b(?:sos|eres|are you|voce e|você é)\s+(?:una?\s+)?(?:persona|humano|human|real person|pessoa)\b"
+    r"|\b(?:hablo|estoy hablando|am i talking|am i chatting|estou falando)\s+(?:con|with|com|to)\s+(?:un|una|a|an|um|uma)\s+"
+    r"(?:real\s+|de\s+verdad\s+)?(?:bot|robot|robo|robô|ia|ai|maquina|máquina|machine|persona|humano|human|person|pessoa)\b",
+    re.IGNORECASE,
+)
+
+
+def asks_if_bot(text: str) -> bool:
+    """True when the client asks whether they are talking to a bot or a person."""
+    return bool(_BOT_QUESTION_RE.search(normalize_for_intent(text)))
 
 
 def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -> bool:
@@ -2229,14 +2320,18 @@ def process_inbound_message(
             decision.reply = get_phrase("opening_welcome", lang)
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
-            if guided_reply is not None:
+            if asks_if_bot(msg.text):
+                # Honest and fixed: the model tended to dodge it with "no lo tengo a mano".
+                decision.reply = get_phrase("bot_question", lang)
+            elif guided_reply is not None:
                 decision.reply = guided_reply
             else:
-                decision.hits = retrieve_top_k(
+                decision.hits = retrieve_with_context(
                     client,
                     runtime["embed_model"],
                     runtime["rows"],
                     msg.text,
+                    session_vars.get("recent_turns"),
                     runtime["top_k"],
                 )
                 decision.reply = generate_reply(
@@ -2263,8 +2358,8 @@ def process_inbound_message(
 
     # Short-window anti-duplicate guard for same assistant reply bursts.
     if is_recent_duplicate_reply(decision.reply, session_vars, context.now_ts):
-        decision.reply = ""
-        decision.outbound_suppressed = True
+        decision.reply = resolve_duplicate_reply(decision.reply, session_vars, context.now_ts, effective_lang)
+        decision.outbound_suppressed = not decision.reply
 
     apply_language_commit_policy(msg.text, session_vars)
 

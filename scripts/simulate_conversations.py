@@ -81,6 +81,7 @@ TELLS = {
     "mentions_docs": re.compile(r"\bFAQ\b|documentaci[oó]n|base de (datos|conocimiento)", re.IGNORECASE),
     "asesor_humano": re.compile(r"asesor humano|human advisor", re.IGNORECASE),
 }
+EMAIL_WORD = re.compile(r"\b(e-?mail|correo)\b", re.IGNORECASE)
 GREETING = re.compile(r"^\s*(¡\s*)?(hola|hi|hello|ol[aá])\b", re.IGNORECASE)
 
 
@@ -159,7 +160,15 @@ def run(only: str | None) -> dict:
         patch.start()
 
     client = server.app.test_client()
-    results: dict = {"scenarios": {}, "tells": {k: 0 for k in TELLS}, "repeated_greetings": 0}
+    results: dict = {
+        "scenarios": {},
+        "tells": {k: 0 for k in TELLS},
+        "repeated_greetings": 0,
+        "empty_replies": 0,
+        "email_asked_twice_in_one_message": 0,
+        "identical_replies": 0,
+    }
+    seen_sentences: dict[str, int] = {}
     for name, turns in SCENARIOS.items():
         if only and name != only:
             continue
@@ -189,6 +198,17 @@ def run(only: str | None) -> dict:
                     results["tells"][tell] += 1
             if i > 0 and GREETING.search(reply) and not GREETING.search(text):
                 results["repeated_greetings"] += 1
+            if not reply.strip():
+                results["empty_replies"] += 1
+            if len(EMAIL_WORD.findall(reply)) >= 2:
+                results["email_asked_twice_in_one_message"] += 1
+            # The same long sentence word for word across replies reads as canned.
+            for sentence in re.split(r"(?<=[.!?])\s+", reply):
+                key = sentence.strip().lower()
+                if len(key) >= 40:
+                    seen_sentences[key] = seen_sentences.get(key, 0) + 1
+                    if seen_sentences[key] == 2:
+                        results["identical_replies"] += 1
             transcript.append({"client": text, "nico": reply, "usage": turn_usage})
         results["scenarios"][name] = transcript
 
@@ -207,7 +227,15 @@ def run(only: str | None) -> dict:
         "avg_output_per_call": round(total_out / calls) if calls else None,
     }
     print("\n=== Resumen ===")
-    print(json.dumps({k: results[k] for k in ("tells", "repeated_greetings", "usage")}, indent=2, ensure_ascii=False))
+    summary_keys = (
+        "tells",
+        "repeated_greetings",
+        "empty_replies",
+        "email_asked_twice_in_one_message",
+        "identical_replies",
+        "usage",
+    )
+    print(json.dumps({k: results[k] for k in summary_keys}, indent=2, ensure_ascii=False))
     return results
 
 
