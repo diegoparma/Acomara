@@ -894,6 +894,7 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "last_user_message": "",
         "last_assistant_reply": "",
         "last_assistant_reply_ts": None,
+        "recent_turns": [],
         "handoff_requested": False,
         "handoff_pending_confirmation": False,
         "proactive_email_capture_pending": False,

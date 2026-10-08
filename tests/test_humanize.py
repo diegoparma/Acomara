@@ -23,7 +23,12 @@ from orchestrator.humanize import (  # noqa: E402
     humanize_reply,
     trim_to_last_sentence,
 )
-from orchestrator.server import I18N_PHRASES, choose_reply_bubbles, generate_reply  # noqa: E402
+from orchestrator.server import (  # noqa: E402
+    I18N_PHRASES,
+    build_reset_session_vars,
+    choose_reply_bubbles,
+    generate_reply,
+)
 
 
 class RecentTurnsTests(unittest.TestCase):
@@ -64,6 +69,9 @@ class RecentTurnsTests(unittest.TestCase):
             [{"role": "user", "content": "Hola"}, {"role": "assistant", "content": "¡Hola! ¿En qué te ayudo?"}],
         )
         self.assertEqual(history_to_messages(None), [])
+
+    def test_reset_clears_the_transcript(self):
+        self.assertEqual(build_reset_session_vars(1000)["recent_turns"], [])
 
     def test_assistant_already_spoke(self):
         self.assertFalse(assistant_already_spoke([]))
