@@ -1,6 +1,6 @@
 # Reglas de Nico
 
-*Manual de comportamiento del agente de ventas. Actualizado 2026-09-26.*
+*Manual de comportamiento del agente de ventas. Actualizado 2026-10-06.*
 
 Este documento describe **todo lo que Nico decide antes de responder**, en el orden en que lo evalúa, más las alertas de la auditoría. Si cambiás una regla en el código, actualizá este archivo.
 
@@ -17,13 +17,13 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 | 3 | **Humano activo** | Si Fer (u otro asesor) escribió en la conversación en las últimas 12 h, desde el celular o desde la plataforma, Nico no responde. Si Supabase no contesta en 2 s, Nico responde igual. | `HUMAN_SILENCE_HOURS` (12; 0 desactiva) |
 | 4 | **Cliente en el CRM** | Busca el teléfono (y después el email) en el CRM. Si ya fue contactado, Nico lo trata como cliente conocido. | — |
 | 5 | **Email compartido** | Guarda el email, lo verifica contra Have I Been Pwned (solo como dato) y le manda a Fer un aviso de **nuevo lead** que dice si el email aparece en filtraciones. Nico sigue atendiendo. Solo pausa si parece un bot: email casi sin charla previa (turno 1-2) que tampoco aparece en filtraciones, o 3 emails distintos en la misma conversación. | `EMAIL_VERIFICATION_ENABLED` (true) |
-| 6 | **Derivación a asesor** | Solo si el cliente lo pide explícitamente ("hablar con un asesor", "talk to a human", etc.). Si no tiene email verificado, primero lo pide. Al derivar: manda email al asesor y pausa la conversación. | `HANDOFF_EMAIL_COOLDOWN_SECONDS` (1800) |
+| 6 | **Derivación a asesor** | Solo si el cliente lo pide explícitamente ("hablar con un asesor", "talk to a human", "falar com um atendente", etc.). Tiene que nombrar a un humano: "quiero hablar con mi esposa" no deriva. Si no tiene email verificado, primero lo pide. Al derivar: manda email al asesor y pausa la conversación. | `HANDOFF_EMAIL_COOLDOWN_SECONDS` (1800) |
 | 7 | **Conversación pausada** | Un solo aviso ("te vamos a contactar"), después un mensaje de cierre, y después silencio. | `PAUSED_REPLY_THRESHOLD` (1) |
 | 8 | **Primer saludo** | Si el primer mensaje es solo un saludo ("Hola", "Hi"), responde una bienvenida fija y ofrece mandar info por email. | — |
 | 9 | **Opciones de programas** | Si pregunta por opciones sin nombrar un programa: recomienda 18+2 y 12+2; si pide más, lista 14+2 y 17+2. | — |
-| 10 | **Respuesta con IA** | En cualquier otro caso: busca en la base de preguntas frecuentes (4 fragmentos) y genera la respuesta con el modelo, bajo las reglas del system prompt (sección 2). | `OPENAI_CHAT_MODEL` (en producción: gpt-4.1-mini), `TOP_K` (4) |
+| 10 | **Respuesta con IA** | En cualquier otro caso: busca en la base de preguntas frecuentes (4 fragmentos) y genera la respuesta con el modelo, bajo las reglas del system prompt (sección 3). El modelo recibe la fecha de hoy (hora de Argentina) y no ofrece salidas que ya pasaron. | `OPENAI_CHAT_MODEL` (en producción: gpt-4.1-mini), `TOP_K` (4) |
 | 11 | **Pedido de email** | Una sola vez, en los turnos 3 o 4, si todavía no lo tiene. | — |
-| 12 | **Fuera de temporada** | Si menciona un viaje entre abril y octubre, avisa una vez que la temporada es de noviembre a marzo. | — |
+| 12 | **Fuera de temporada** | Si menciona un viaje entre abril y octubre, avisa una vez que la temporada es de noviembre a marzo. Una fecha numérica solo cuenta si cae fuera de temporada leída como día/mes y como mes/día ("5/12" es el 5 de diciembre); los rangos con unidad ("4-6 personas") y el "may" verbo en inglés no cuentan. | — |
 | 13 | **Formato de fechas** | Formatea las fechas de salida para que se lean bien en WhatsApp. | — |
 | 14 | **Filtro de seguridad** | Nunca envía nada que parezca una contraseña, token o credencial. | — |
 | 15 | **Respuesta duplicada** | Si la respuesta es idéntica a la última enviada hace menos de 3 minutos, no la manda. Antes de enviar vuelve a leer la sesión, por si otro mensaje del cliente procesado en paralelo ya la mandó. | — |

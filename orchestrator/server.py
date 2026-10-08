@@ -13,6 +13,7 @@ MVP flow:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta, timezone
 import json
 import math
 import os
@@ -478,18 +479,41 @@ def detect_explicit_language_preference(text: str) -> str | None:
 
 # Months treated as out-of-Aconcagua-season (April-October).
 OUT_OF_SEASON_MONTH_TOKENS = (
-    # English
-    "april", "may", "june", "july", "august", "september", "october",
+    # English ("may" is handled separately: it is also a modal verb)
+    "april", "june", "july", "august", "september", "october",
     # Spanish (normalized: no accents)
     "abril", "mayo", "junio", "julio", "agosto", "septiembre", "setiembre", "octubre",
     # Portuguese
     "maio", "junho", "julho", "agosto", "setembro", "outubro",
 )
-# Numeric date patterns indicating month 04-10 in DD/MM or MM/DD form.
-_OUT_OF_SEASON_DATE_PATTERNS = (
-    re.compile(r"\b\d{1,2}[/-](0?[4-9]|10)\b"),  # 27/05, 03-09
-    re.compile(r"\b(0?[4-9]|10)[/-]\d{1,2}\b"),  # 05/27, 09-03
+_OUT_OF_SEASON_MONTHS = range(4, 11)
+# English "may" only counts as the month next to a date-like context
+# ("in May", "May 12", "12th of May"), never as the modal verb ("May I...").
+_MAY_MONTH_RE = re.compile(
+    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until)\s+may\b"
+    r"|\bmay\s+\d"
+    r"|\d(?:st|nd|rd|th)?\s+(?:of\s+)?may\b"
 )
+# Numeric day/month pairs (27/05, 05-27, 15/05/2027). Ranges followed by a
+# unit ("4-6 personas", "5-7 dias") are quantities, not dates.
+_NUMERIC_DATE_RE = re.compile(
+    r"\b(\d{1,2})[/-](\d{1,2})\b(?!\s*(?:personas?|pessoas?|people|persons?|pax|dias?|days?"
+    r"|noches?|noites?|nights?|semanas?|weeks?|horas?|hours?|km|kg|anos?|years?))"
+)
+
+
+def _numeric_date_is_out_of_season(first: int, second: int) -> bool:
+    """True only when every valid reading (DD/MM and MM/DD) lands in Apr-Oct.
+
+    "5/12" is 5 December for a Spanish/Portuguese speaker, a real departure,
+    so an ambiguous pair must not trigger the out-of-season warning.
+    """
+    months = []
+    if 1 <= second <= 12 and 1 <= first <= 31:
+        months.append(second)  # DD/MM
+    if 1 <= first <= 12 and 1 <= second <= 31:
+        months.append(first)  # MM/DD
+    return bool(months) and all(m in _OUT_OF_SEASON_MONTHS for m in months)
 _TRIP_INTENT_TOKENS = (
     "tour", "expedicion", "expedición", "expedition", "trek", "trekking",
     "ascen", "subir", "climb", "summit", "viaje", "viagem", "paseo",
@@ -514,8 +538,10 @@ def mentions_out_of_season(text: str) -> bool:
     for tok in OUT_OF_SEASON_MONTH_TOKENS:
         if re.search(r"\b" + re.escape(tok) + r"\b", normalized):
             return True
-    for pattern in _OUT_OF_SEASON_DATE_PATTERNS:
-        if pattern.search(normalized):
+    if _MAY_MONTH_RE.search(normalized):
+        return True
+    for match in _NUMERIC_DATE_RE.finditer(normalized):
+        if _numeric_date_is_out_of_season(int(match.group(1)), int(match.group(2))):
             return True
     return False
 
@@ -976,6 +1002,14 @@ def build_crm_client_context(session_vars: dict[str, Any]) -> str:
     return crm_client_context
 
 
+# Argentina has no DST: Mendoza is UTC-3 all year.
+ARGENTINA_TZ = timezone(timedelta(hours=-3), "ART")
+
+
+def today_in_argentina(now: datetime | None = None) -> date:
+    return (now or datetime.now(timezone.utc)).astimezone(ARGENTINA_TZ).date()
+
+
 def generate_reply(
     client: OpenAI,
     chat_model: str,
@@ -983,8 +1017,10 @@ def generate_reply(
     msg: dict[str, str],
     hits: list[dict[str, Any]],
     session_vars: dict[str, Any],
+    today: date | None = None,
 ) -> str:
     context = hits_to_context(hits)
+    today = today or today_in_argentina()
     user_lang = get_session_language(session_vars, msg["text"])
 
     lang_instruction = {
@@ -1007,6 +1043,7 @@ def generate_reply(
     )
 
     user_prompt = (
+        "Fecha de hoy (Argentina): {today}\n"
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
         "Cliente pregunta:\n{question}\n\n"
@@ -1021,9 +1058,12 @@ def generate_reply(
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
         "- {response_length_instruction}\n"
         "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
+        "- Si compartes fechas de salida, omite las que ya pasaron respecto de la fecha de hoy "
+        "(en una temporada, noviembre y diciembre son del primer año; enero a marzo, del segundo).\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
         "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
     ).format(
+        today=today.isoformat(),
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],
@@ -1349,39 +1389,50 @@ def extract_command(text: str) -> str | None:
     return parts[0].lower()
 
 
+_HANDOFF_VERB = (
+    r"(?:hablar|hablarlo|charlar|comunicarme|contactar(?:me)?|pas(?:a|as|ás|ame|arme)|comunicame"
+    r"|falar|conversar|speak|talk|chat|connect me|put me through)"
+)
+_HANDOFF_TARGET = (
+    r"(?:asesor(?:a|es)?|persona|humano|alguien|agente|vendedor(?:a)?|representante|operador(?:a)?"
+    r"|atendente|consultor(?:a)?|pessoa|alguem"
+    r"|human|person|someone|somebody|agent|representative|advisor|adviser|sales ?rep|real person)"
+)
+# "<verb> con/com/to/with [un/una/a/...] <human target>". The target is
+# required: "quiero hablar con mi esposa" is not a handoff request.
+_HANDOFF_REQUEST_RE = re.compile(
+    rf"\b{_HANDOFF_VERB}\s+(?:con|com|to|with|a)?\s*"
+    r"(?:(?:un|una|um|uma|a|an|the|el|la|o|algun|alguna|algum|alguma)\s+)?"
+    r"(?:real\s+|de\s+verdad\s+)?"
+    rf"{_HANDOFF_TARGET}\b"
+)
+
+
 def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -> bool:
     """Return True only when the user *explicitly* requests a human agent.
 
     Affirmative detection ("si", "ok", etc.) was deliberately removed because
     the LLM often mentions "asesor" in normal replies, which caused every
-    short affirmative to be misdetected as a handoff request.
+    short affirmative to be misdetected as a handoff request. Generic phrases
+    like "quiero hablar con" also need a human target: users often say they
+    want to talk it over with their partner before booking.
     """
     normalized = normalize_for_intent(text)
     triggers = (
-        "contactar con un asesor",
-        "contactar asesor",
-        "hablar con un asesor",
-        "hablar con una persona",
-        "hablar con alguien",
-        "hablar con un humano",
-        "pasame con un asesor",
-        "pasame con un humano",
-        "pasame con alguien",
-        "quiero hablar con",
         "quiero un asesor",
         "quiero un humano",
         "necesito un asesor",
-        "necesito hablar",
         "agente humano",
         "representante humano",
         "operador humano",
-        "speak to human",
-        "talk to a human",
-        "talk to someone",
         "human agent",
-        "connect me with",
+        "speak to human",
+        "quero um atendente",
+        "quero um consultor",
     )
-    return any(trigger in normalized for trigger in triggers)
+    if any(trigger in normalized for trigger in triggers):
+        return True
+    return bool(_HANDOFF_REQUEST_RE.search(normalized))
 
 
 def _contains_known_program_duration(normalized_text: str) -> bool:
