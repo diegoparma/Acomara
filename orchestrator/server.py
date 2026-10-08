@@ -166,6 +166,7 @@ I18N_PHRASES = {
         "paused_suspicious": "Perfecto, te escribimos en breve.",
         "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
         "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+        "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
         "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
         "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
         "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
@@ -182,6 +183,7 @@ I18N_PHRASES = {
         "paused_suspicious": "Great! We'll be in touch shortly.",
         "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
         "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
+        "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
         "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
         "out_of_season": "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.",
         "opening_welcome": "Hi! Thanks for reaching out. How can I help?\n\nIf it's useful, besides answering here I can email you all the info: prices, dates, services, gear list and recommendations.",
@@ -198,6 +200,7 @@ I18N_PHRASES = {
         "paused_suspicious": "Perfeito, vamos te escrever em breve.",
         "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
         "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
+        "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
         "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
         "out_of_season": "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.",
         "opening_welcome": "Olá! Obrigado por escrever. Como posso te ajudar?\n\nSe for útil, além de responder por aqui te mando por email todas as informações: preços, datas, serviços, lista de equipamentos e recomendações.",
@@ -1148,6 +1151,23 @@ def split_reply_into_messages(reply_text: str) -> list[str]:
     return parts
 
 
+MAX_REPLY_BUBBLES = 3
+
+
+def choose_reply_bubbles(reply: str, can_emit_multi: bool, is_opening: bool) -> list[str]:
+    """Split a reply into WhatsApp bubbles the way a person types.
+
+    People send "Gracias!" and the answer as two messages. Paragraphs become
+    bubbles when there are 2-3 of them; a longer list stays in one message.
+    """
+    if not can_emit_multi or not (reply or "").strip():
+        return []
+    parts = split_reply_into_messages(reply)
+    if is_opening or 2 <= len(parts) <= MAX_REPLY_BUBBLES:
+        return parts
+    return []
+
+
 def build_respond_tool_call_message(reply_parts: list[str]) -> dict[str, Any]:
     """Build assistant tool call payload for OpenBSP multi-message responses."""
     args = {
@@ -1908,6 +1928,7 @@ def apply_email_ack_or_request_policy(
     session_vars: dict[str, Any],
     extracted_email: str | None,
     lang: str,
+    user_text: str = "",
 ) -> str:
     """Fix #6 + proactive email request.
 
@@ -1923,6 +1944,7 @@ def apply_email_ack_or_request_policy(
         lang,
         get_phrase=get_phrase,
         should_request_email=lambda sv: should_request_email(sv or {}),
+        user_text=user_text,
     )
 
 
@@ -2202,7 +2224,7 @@ def process_inbound_message(
                     session_vars,
                 )
                 decision.reply = apply_email_ack_or_request_policy(
-                    decision.reply, session_vars, context.extracted_email, lang
+                    decision.reply, session_vars, context.extracted_email, lang, msg.text
                 )
                 decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
@@ -2546,13 +2568,8 @@ def chat_completions_compatible() -> Any:
 
         multi_message_enabled = is_multi_message_enabled()
         can_emit_multi = multi_message_enabled and supports_respond_tool(tools_payload)
-        should_split_opening = (
-            can_emit_multi
-            and session_vars.get("conversation_turn_count") == 1
-            and _is_pure_greeting(msg["text"])
-            and decision.reply.strip()
-        )
-        split_parts = split_reply_into_messages(decision.reply) if should_split_opening else []
+        is_opening = session_vars.get("conversation_turn_count") == 1 and _is_pure_greeting(msg["text"])
+        split_parts = choose_reply_bubbles(decision.reply, can_emit_multi, is_opening)
 
         # Two client messages sent seconds apart are processed in parallel and
         # both read the session before either saved its reply, so both sent

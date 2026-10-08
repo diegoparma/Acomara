@@ -11,6 +11,11 @@ DetectLanguageConfidentFn = Callable[[str], str | None]
 GetSessionLanguageFn = Callable[[dict[str, Any] | None, str], str]
 
 
+def _asks_more_than_email(user_text: str, email: str) -> bool:
+    rest = (user_text or "").replace(email, " ").strip(" \t\n.,;:!-")
+    return "?" in rest or len(rest.split()) >= 6
+
+
 def apply_email_ack_or_request_policy(
     reply: str,
     session_vars: dict[str, Any],
@@ -19,10 +24,16 @@ def apply_email_ack_or_request_policy(
     *,
     get_phrase: GetPhraseFn,
     should_request_email: ShouldRequestEmailFn,
+    user_text: str = "",
 ) -> str:
     """Apply deterministic email ack/request policy without side effects outside session_vars."""
     if extracted_email and not session_vars.get("email_received_acked"):
-        reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
+        if _asks_more_than_email(user_text, extracted_email) and reply.strip():
+            # "mi mail es x, cuanto sale el 18+2?": thank briefly and still
+            # answer, instead of replacing the answer with the ack.
+            reply = f"{get_phrase('email_received_short', lang)}\n\n{reply}"
+        else:
+            reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
         session_vars["email_received_acked"] = True
         session_vars["email_captured"] = True
         session_vars["captured_email"] = extracted_email

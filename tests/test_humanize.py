@@ -23,7 +23,7 @@ from orchestrator.humanize import (  # noqa: E402
     humanize_reply,
     trim_to_last_sentence,
 )
-from orchestrator.server import I18N_PHRASES, generate_reply  # noqa: E402
+from orchestrator.server import I18N_PHRASES, choose_reply_bubbles, generate_reply  # noqa: E402
 
 
 class RecentTurnsTests(unittest.TestCase):
@@ -141,6 +141,20 @@ class TrimToLastSentenceTests(unittest.TestCase):
 
     def test_single_cut_sentence_is_kept(self):
         self.assertEqual(trim_to_last_sentence("El 18+2 tiene"), "El 18+2 tiene")
+
+
+class ReplyBubblesTests(unittest.TestCase):
+    def test_two_paragraphs_become_two_bubbles(self):
+        self.assertEqual(choose_reply_bubbles("¡Gracias!\n\nSale USD 6.990.", True, False), ["¡Gracias!", "Sale USD 6.990."])
+
+    def test_single_paragraph_stays_one_message(self):
+        self.assertEqual(choose_reply_bubbles("Sale USD 6.990.", True, False), [])
+
+    def test_long_lists_stay_in_one_message(self):
+        self.assertEqual(choose_reply_bubbles("a\n\nb\n\nc\n\nd", True, False), [])
+
+    def test_disabled_without_respond_tool(self):
+        self.assertEqual(choose_reply_bubbles("a\n\nb", False, False), [])
 
 
 class _FakeResponses:
