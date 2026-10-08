@@ -1027,6 +1027,26 @@ _SESSION_KEYS_HIDDEN_FROM_LLM = frozenset(
 )
 
 
+# How many past messages the model sees (env NICO_HISTORY_TURNS; 0 disables).
+DEFAULT_HISTORY_TURNS = 10
+
+
+def log_llm_usage(conversation_id: str, model: str, usage: Any) -> dict[str, Any]:
+    """Print one [LLM_USAGE] line per model call so spend can be tracked in the logs."""
+    if usage is None:
+        return {}
+    details = getattr(usage, "input_tokens_details", None)
+    record = {
+        "conversation_id": conversation_id,
+        "model": model,
+        "input_tokens": int(getattr(usage, "input_tokens", 0) or 0),
+        "cached_input_tokens": int(getattr(details, "cached_tokens", 0) or 0),
+        "output_tokens": int(getattr(usage, "output_tokens", 0) or 0),
+    }
+    print("[LLM_USAGE] " + json.dumps(record), flush=True)
+    return record
+
+
 # Argentina has no DST: Mendoza is UTC-3 all year.
 ARGENTINA_TZ = timezone(timedelta(hours=-3), "ART")
 
@@ -1043,6 +1063,7 @@ def generate_reply(
     hits: list[dict[str, Any]],
     session_vars: dict[str, Any],
     today: date | None = None,
+    history_turns: int = DEFAULT_HISTORY_TURNS,
 ) -> str:
     context = hits_to_context(hits)
     today = today or today_in_argentina()
@@ -1113,10 +1134,11 @@ def generate_reply(
         max_output_tokens=220,
         input=[
             {"role": "system", "content": system_prompt},
-            *history_to_messages(recent_turns),
+            *(history_to_messages(recent_turns)[-history_turns:] if history_turns > 0 else []),
             {"role": "user", "content": user_prompt},
         ],
     )
+    log_llm_usage(msg.get("conversation_id", ""), chat_model, getattr(resp, "usage", None))
     reply = (resp.output_text or "").strip()
     if getattr(resp, "status", None) == "incomplete":
         reply = trim_to_last_sentence(reply)
@@ -1684,6 +1706,7 @@ def ensure_runtime() -> dict[str, Any]:
         in ("1", "true", "yes", "on"),
         "allowed_chat_models": parse_csv_set(_env("OPENAI_ALLOWED_CHAT_MODELS", "") or ""),
         "top_k": int(_env("TOP_K", "4") or "4"),
+        "history_turns": int(_env("NICO_HISTORY_TURNS", str(DEFAULT_HISTORY_TURNS)) or DEFAULT_HISTORY_TURNS),
         "session_base_url": _env("SESSION_AGENT_BASE_URL"),
         "session_agent_id": _env("SESSION_AGENT_ID", "sales-agent-v1")
         or "sales-agent-v1",
@@ -2223,6 +2246,7 @@ def process_inbound_message(
                     msg_dict,
                     decision.hits,
                     session_vars,
+                    history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
                 )
                 decision.reply = apply_email_ack_or_request_policy(
                     decision.reply, session_vars, context.extracted_email, lang, msg.text

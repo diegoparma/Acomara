@@ -28,6 +28,7 @@ from orchestrator.server import (  # noqa: E402
     build_reset_session_vars,
     choose_reply_bubbles,
     generate_reply,
+    log_llm_usage,
 )
 
 
@@ -212,6 +213,27 @@ class GenerateReplyMemoryTests(unittest.TestCase):
         reply, model_input = self._run({})
         self.assertEqual(reply, "¡Hola! El 18+2 tiene *20 días*.")
         self.assertEqual([m["role"] for m in model_input], ["system", "user"])
+
+    def test_history_can_be_limited_or_disabled(self):
+        turns: list = []
+        for i in range(5):
+            turns = append_recent_turns(turns, f"u{i}", f"a{i}")
+        fake = _FakeResponses("ok")
+        client = SimpleNamespace(responses=fake)
+        msg = {"channel": "whatsapp", "conversation_id": "c1", "text": "?"}
+        generate_reply(client, "m", "S", msg, [], {"recent_turns": turns}, history_turns=2)
+        generate_reply(client, "m", "S", msg, [], {"recent_turns": turns}, history_turns=0)
+        self.assertEqual([m["content"] for m in fake.calls[0]["input"][1:-1]], ["u4", "a4"])
+        self.assertEqual(len(fake.calls[1]["input"]), 2)
+
+    def test_usage_is_logged_for_cost_tracking(self):
+        usage = SimpleNamespace(input_tokens=5200, output_tokens=80, input_tokens_details=SimpleNamespace(cached_tokens=2560))
+        record = log_llm_usage("c1", "gpt-4.1-mini", usage)
+        self.assertEqual(
+            record,
+            {"conversation_id": "c1", "model": "gpt-4.1-mini", "input_tokens": 5200, "cached_input_tokens": 2560, "output_tokens": 80},
+        )
+        self.assertEqual(log_llm_usage("c1", "m", None), {})
 
     def test_truncated_reply_is_cut_at_the_last_full_sentence(self):
         reply, _ = self._run({}, text="El 18+2 tiene 20 días. Incluye porteadores en los campa", status="incomplete")
