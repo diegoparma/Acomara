@@ -137,5 +137,15 @@ class ConversationFlowTests(unittest.TestCase):
         )
 
 
+    def test_thanks_and_bot_question_skip_the_model(self):
+        self.store["conv-flow"] = {"conversation_turn_count": 5, "conversation_language": "es"}
+        thanks = self._text(self._send("¡Gracias!"))
+        bot = self._text(self._send("¿Sos un bot?"))
+        self.assertEqual(thanks, "¡De nada! Cualquier cosa me escribís por acá.")
+        self.assertTrue(bot.startswith("Soy el asistente digital"))
+        self.assertEqual(self.model.calls, [])
+        self.assertEqual(self._text(self._send("Gracias de nuevo")), "¡Un placer! Si te surge otra duda, acá estoy.")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

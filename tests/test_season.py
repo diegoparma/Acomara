@@ -114,15 +114,32 @@ class GenerateReplyDateTests(unittest.TestCase):
     def _run(self, **kwargs):
         client = SimpleNamespace(responses=_FakeResponses())
         msg = {"channel": "whatsapp", "conversation_id": "c1", "text": "Que fechas de salida tienen?"}
-        reply = generate_reply(client, "model-x", "SYSTEM", msg, [], {"conversation_language": "es"}, **kwargs)
+        hits = kwargs.pop("hits", [])
+        reply = generate_reply(client, "model-x", "SYSTEM", msg, hits, {"conversation_language": "es"}, **kwargs)
         user_prompt = client.responses.calls[0]["input"][1]["content"]
         return reply, user_prompt
 
-    def test_prompt_includes_today_and_past_departure_rule(self):
+    def test_prompt_includes_today(self):
         reply, prompt = self._run(today=date(2026, 12, 10))
         self.assertEqual(reply, "Respuesta")
         self.assertIn("Fecha de hoy (Argentina): 2026-12-10", prompt)
-        self.assertIn("omite las que ya pasaron", prompt)
+
+    def test_past_departures_never_reach_the_model(self):
+        # Regression (simulation 2026-10-08): asked to drop past dates, the small
+        # model also dropped November and December while they were still ahead.
+        hit = {
+            "id": "faq-060",
+            "question": "Cuáles son las fechas de salida?",
+            "answer": "Salidas temporada 2026/27: 18+2 DÍAS Noviembre: 14 | 22 Diciembre: 1 | 20 Enero: 2",
+            "score": 0.9,
+        }
+        _, prompt = self._run(today=date(2026, 12, 10), hits=[hit])
+        self.assertNotIn("Noviembre", prompt)
+        self.assertIn("Diciembre: 20", prompt)
+        self.assertNotIn("Diciembre: 1 |", prompt)
+        self.assertIn("Enero: 2", prompt)
+        _, prompt_october = self._run(today=date(2026, 10, 8), hits=[hit])
+        self.assertIn("Noviembre: 14 | 22", prompt_october)
 
     def test_defaults_to_current_date(self):
         _, prompt = self._run()

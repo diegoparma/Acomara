@@ -71,6 +71,7 @@ from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
+from orchestrator.departures import ensure_departure_hit, filter_past_departures
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
@@ -167,6 +168,8 @@ I18N_PHRASES = {
         "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
         "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
         "repeat_prefix": "Como te decía,",
+        "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
+        "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy.",
         "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
         "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
         "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
@@ -186,6 +189,8 @@ I18N_PHRASES = {
         "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
         "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
         "repeat_prefix": "As I mentioned,",
+        "thanks_reply_1": "You're welcome! Message me here anytime.",
+        "thanks_reply_2": "My pleasure! If anything else comes up, I'm here.",
         "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
         "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
         "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
@@ -205,6 +210,8 @@ I18N_PHRASES = {
         "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
         "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
         "repeat_prefix": "Como te falei,",
+        "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
+        "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui.",
         "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
         "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
         "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
@@ -1064,17 +1071,14 @@ def build_crm_client_context(session_vars: dict[str, Any]) -> str:
     return crm_client_context
 
 
-# The transcript goes to the model as chat history; the internal ids and
-# timestamps add nothing to a reply.
-_SESSION_KEYS_HIDDEN_FROM_LLM = frozenset(
-    {
-        "recent_turns",
-        "last_assistant_reply",
-        "last_assistant_reply_ts",
-        "last_user_message",
-        "last_inbound_signature",
-        "last_inbound_signature_ts",
-    }
+# The only session variables the model gets. The rest (timestamps, alert
+# status, pause bookkeeping) cost ~400 tokens per reply and add nothing; the
+# transcript goes as chat history and the CRM data has its own block.
+_SESSION_KEYS_FOR_LLM = (
+    "conversation_turn_count",
+    "email_requested",
+    "email_captured",
+    "out_of_season_warned",
 )
 
 
@@ -1116,8 +1120,11 @@ def generate_reply(
     today: date | None = None,
     history_turns: int = DEFAULT_HISTORY_TURNS,
 ) -> str:
-    context = hits_to_context(hits)
     today = today or today_in_argentina()
+    # Past departures are removed here: the small model dropped future ones when asked to.
+    context = hits_to_context(
+        [{**h, "answer": filter_past_departures(str(h.get("answer") or ""), today)} for h in hits]
+    )
     user_lang = get_session_language(session_vars, msg["text"])
 
     lang_instruction = {
@@ -1130,11 +1137,7 @@ def generate_reply(
 
     # Override conversation_language in the dumped state so the LLM does not
     # see a stale/contradictory signal vs the explicit lang_instruction.
-    session_vars_for_llm = {
-        key: value
-        for key, value in session_vars.items()
-        if key not in _SESSION_KEYS_HIDDEN_FROM_LLM
-    }
+    session_vars_for_llm = {key: session_vars[key] for key in _SESSION_KEYS_FOR_LLM if key in session_vars}
     session_vars_for_llm["conversation_language"] = user_lang
     recent_turns = session_vars.get("recent_turns")
 
@@ -1164,8 +1167,7 @@ def generate_reply(
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
         "- {response_length_instruction}\n"
         "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
-        "- Si compartes fechas de salida, omite las que ya pasaron respecto de la fecha de hoy "
-        "(en una temporada, noviembre y diciembre son del primer año; enero a marzo, del segundo).\n"
+        "- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n"
         "- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, "
         "no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
@@ -1452,6 +1454,46 @@ def _is_pure_greeting(text: str) -> bool:
     tokens = set(cleaned.split())
     # Must have at least one known greeting token and no non-greeting words
     return bool(tokens & _PURE_GREETING_TOKENS) and tokens <= _PURE_GREETING_TOKENS
+
+
+_THANKS_TOKENS: frozenset[str] = frozenset({"gracias", "thanks", "thank", "thx", "ty", "obrigado", "obrigada", "valeu"})
+_THANKS_FILLER_TOKENS: frozenset[str] = frozenset({
+    "muchas", "muchisimas", "mil", "por", "todo", "la", "info", "informacion", "genial", "perfecto",
+    "dale", "ok", "buenisimo", "barbaro", "joya", "you", "so", "much", "very", "a", "lot", "for", "the",
+    "great", "info", "muito", "pela", "informacao", "otimo", "perfeito", "show", "de", "nuevo", "again",
+})
+
+
+def is_thanks_only(text: str) -> bool:
+    """A bare "gracias" / "thanks!": nothing to look up, just acknowledge.
+
+    Retrieval on "Thanks!" returned unrelated FAQ entries and the model
+    answered about gear rental (simulation 2026-10-08).
+    """
+    cleaned = re.sub(r"[^\w\s]", " ", normalize_for_intent(text)).split()
+    if not cleaned or len(cleaned) > 8:
+        return False
+    tokens = set(cleaned)
+    return bool(tokens & _THANKS_TOKENS) and tokens <= (_THANKS_TOKENS | _THANKS_FILLER_TOKENS)
+
+
+_INTEREST_RE = re.compile(
+    r"\b(?:interesad[oa]s?|interested|interessad[oa]s?|quiero info|quisiera info|me gustaria (?:saber|tener|recibir)"
+    r"|(?:mas )?informacion|info\b|would like (?:some |more )?info|i want (?:some |more )?info|gostaria de (?:saber|receber)"
+    r"|informac(?:ao|oes))"
+)
+
+
+def is_generic_opening(text: str) -> bool:
+    """First message that only shows interest ("Hi, I'm interested in climbing Aconcagua").
+
+    Answering it with a random FAQ entry (the guides) read like a bot; a
+    person greets and asks what they want to know.
+    """
+    normalized = normalize_for_intent(text)
+    if "?" in normalized or re.search(r"\d", normalized) or len(normalized.split()) > 14:
+        return False
+    return bool(_INTEREST_RE.search(normalized))
 
 
 OUTBOUND_DUPLICATE_WINDOW_SECONDS = 180
@@ -2316,8 +2358,14 @@ def process_inbound_message(
         lang = get_session_language(session_vars, msg.text)
         # On the very first turn, respond with a hardcoded opening welcome for
         # pure greetings (e.g. "Hi", "Hola") instead of calling the LLM.
-        if session_vars.get("conversation_turn_count") == 1 and _is_pure_greeting(msg.text):
+        if session_vars.get("conversation_turn_count") == 1 and (
+            _is_pure_greeting(msg.text) or is_generic_opening(msg.text)
+        ):
             decision.reply = get_phrase("opening_welcome", lang)
+        elif is_thanks_only(msg.text):
+            thanks_count = int(session_vars.get("thanks_reply_count") or 0)
+            decision.reply = get_phrase(f"thanks_reply_{thanks_count % 2 + 1}", lang)
+            session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
             if asks_if_bot(msg.text):
@@ -2333,6 +2381,9 @@ def process_inbound_message(
                     msg.text,
                     session_vars.get("recent_turns"),
                     runtime["top_k"],
+                )
+                decision.hits = ensure_departure_hit(
+                    decision.hits, runtime["rows"], msg.text, lang, runtime["top_k"]
                 )
                 decision.reply = generate_reply(
                     client,
