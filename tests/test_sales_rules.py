@@ -122,7 +122,7 @@ class ExtendedAlternativeTests(unittest.TestCase):
     def test_short_program_date_gets_the_nearest_18_plus_2(self):
         # Regression: picking 5/12 (14+2) never offered the 18+2 of 4/12.
         note = extended_alternative_note("Me interesa la del 5/12", DEPARTURES, TODAY, "es")
-        self.assertIn("esa salida es del 14+2", note)
+        self.assertIn("La del 5/12 es del 14+2", note)
         self.assertIn("la salida más cercana es el 4/12", note)
 
     def test_no_note_for_18_plus_2_or_polish_dates_or_experienced_climbers(self):
@@ -139,7 +139,26 @@ class ExtendedAlternativeTests(unittest.TestCase):
         note = extended_alternative_note("Me interesa la del 5/12", DEPARTURES, TODAY, "es")
         out = apply_video_call_close("El 5/12 es del 14+2.", "Me interesa la del 5/12", {}, "es", extra_note=note)
         self.assertLess(out.index("4/12"), out.index("videollamada"))
-        self.assertIn("La disponibilidad de esa fecha te la confirma un asesor.", out)
+        self.assertIn("La disponibilidad de la fecha que elijas te la confirma un asesor.", out)
+
+    def test_notes_after_a_listing_start_a_new_paragraph(self):
+        # Regression: "3) 17+2 Glaciar Polaco: Dic 1, 28 Ojo: la del 5/12..." glued to the list.
+        note = extended_alternative_note("Me interesa la del 5/12", DEPARTURES, TODAY, "es")
+        reply = "Para diciembre también hay:\n1) 18+2: Dic 1, 4\n2) 17+2: Dic 1, 28"
+        out = apply_video_call_close(reply, "Me interesa la del 5/12", {}, "es", extra_note=note)
+        self.assertIn("1) 18+2: Dic 1, 4\n2) 17+2: Dic 1, 28\n\nLa del 5/12 es del 14+2", out)
+
+    def test_models_altitude_sentence_is_not_repeated(self):
+        # Regression: the model and the note both said the 14+2 is for people above 6,000 m.
+        note = extended_alternative_note("Me interesa la del 5/12", DEPARTURES, TODAY, "es")
+        reply = (
+            "La salida del 5/12 corresponde al programa 14+2 días Ascenso Rápido, que es para quienes ya "
+            "estuvieron por encima de 6.000 m y llegan aclimatados."
+        )
+        out = apply_video_call_close(reply, "Me interesa la del 5/12", {}, "es", extra_note=note)
+        self.assertEqual(out.count("6.000"), 1)
+        self.assertTrue(out.startswith("La del 5/12 es del 14+2"))
+        self.assertEqual(out.count("14+2"), 1)
 
 
 if __name__ == "__main__":

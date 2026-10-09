@@ -90,10 +90,23 @@ DATE_AVAILABILITY_NOTE = {
 
 
 EXTENDED_ALTERNATIVE = {
-    "es": "Ojo: esa salida es del {program}, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el {alt}.",
-    "en": "Heads up: that departure is the {program}, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on {alt}.",
-    "pt": "Atenção: essa saída é do {program}, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em {alt}.",
+    "es": "La del {picked} es del {program}, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el {alt}.",
+    "en": "The {picked} departure is the {program}, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on {alt}.",
+    "pt": "A saída de {picked} é do {program}, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em {alt}.",
 }
+# With two dates in the reply (picked and the 18+2), "esa fecha" is ambiguous.
+DATE_AVAILABILITY_NOTE_EITHER = {
+    "es": "La disponibilidad de la fecha que elijas te la confirma un asesor.",
+    "en": "An advisor will confirm availability for whichever date you choose.",
+    "pt": "A disponibilidade da data que você escolher um consultor te confirma.",
+}
+# What the note already says: the picked date's program and who it is for.
+_ALTITUDE_REQUIREMENT_RE = re.compile(
+    r"\b1[24]\s*\+\s*2\b|ascenso (?:r[aá]pido|extremo)|(?:fast|extreme) ascent|6[.,\s]?000|experiencia (?:previa )?en altura|altitude experience|experience at altitude|experiência em altitude",
+    re.IGNORECASE,
+)
+
+
 _PICKED_DATE_RE = re.compile(r"\b(\d{1,2})/(\d{1,2})\b")
 
 
@@ -117,7 +130,9 @@ def extended_alternative_note(
     picked = next(d for d in departures[programs[0]] if d.day == day and d.month == month)
     nearest = min(extended, key=lambda d: (abs((d - picked).days), d))
     lang = lang if lang in EXTENDED_ALTERNATIVE else "es"
-    return EXTENDED_ALTERNATIVE[lang].format(program=" / ".join(sorted(programs)), alt=f"{nearest.day}/{nearest.month}")
+    return EXTENDED_ALTERNATIVE[lang].format(
+        picked=f"{day}/{month}", program=" / ".join(sorted(programs)), alt=f"{nearest.day}/{nearest.month}"
+    )
 
 
 def _normalize(text: str) -> str:
@@ -162,11 +177,25 @@ def _drop_trailing_question(reply: str) -> str:
 _ADVISOR_RE = re.compile(r"\b(?:asesor|advisor|consultor)", re.IGNORECASE)
 
 
+def _filter_sentences(reply: str, drop) -> str:
+    """Remove sentences where drop(sentence) is true, keeping the line breaks of the rest."""
+    pieces = re.split(r"((?<=[.!?])\s+)", reply.strip())
+    out = ""
+    for i in range(0, len(pieces), 2):
+        sentence, sep = pieces[i], pieces[i + 1] if i + 1 < len(pieces) else ""
+        if not drop(sentence):
+            out += sentence + sep
+    return out.strip()
+
+
 def _drop_advisor_sentences(reply: str) -> str:
     """Remove the model's own "un asesor te lo ve" sentences; the availability note says it once."""
-    sentences = re.split(r"(?<=[.!?])\s+", reply.strip())
-    kept = [s for s in sentences if not (_ADVISOR_RE.search(s) and not re.search(r"\d", s))]
-    return " ".join(kept).strip() if kept else reply.strip()
+    kept = _filter_sentences(reply, lambda s: bool(_ADVISOR_RE.search(s)) and not re.search(r"\d", s))
+    return kept or reply.strip()
+
+
+def _drop_sentences(reply: str, pattern: re.Pattern[str]) -> str:
+    return _filter_sentences(reply, lambda s: bool(pattern.search(s)))
 
 
 def apply_video_call_close(
@@ -191,9 +220,19 @@ def apply_video_call_close(
     if picked_date:
         # Simulation 2026-10-09: "Eso te lo puede ver un asesor... La disponibilidad
         # de esa fecha te la confirma un asesor." named the advisor twice in a row.
-        parts = [_drop_advisor_sentences(parts[0]), DATE_AVAILABILITY_NOTE[lang]]
+        answer = _drop_advisor_sentences(parts[0])
         if extra_note:
-            parts.insert(1, extra_note)
+            # Simulation 2026-10-09: the model already said "el 5/12 es del 14+2,
+            # para quien superó los 6.000 m" and the note said it again right after.
+            answer = _drop_sentences(answer, _ALTITUDE_REQUIREMENT_RE)
+            parts = [answer, extra_note, DATE_AVAILABILITY_NOTE_EITHER[lang]]
+        else:
+            parts = [answer, DATE_AVAILABILITY_NOTE[lang]]
+        parts = [part for part in parts if part]
+        if len(parts) > 1 and "\n" in parts[0]:
+            # A listing from the model: the notes go in their own paragraph,
+            # not glued to its last line ("Dic 1, 28 Ojo: ...").
+            parts = [parts[0] + "\n\n" + parts[1], *parts[2:]]
     session_vars["video_call_offered"] = True
     # Fernando asks for the email together with the call when we don't have it yet.
     known_email = has_email or any(session_vars.get(k) for k in _EMAIL_KEYS)
