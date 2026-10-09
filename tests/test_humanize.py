@@ -228,6 +228,20 @@ class GenerateReplyMemoryTests(unittest.TestCase):
         self.assertEqual([m["content"] for m in fake.calls[0]["input"][1:-1]], ["u4", "a4"])
         self.assertEqual(len(fake.calls[1]["input"]), 2)
 
+    def test_prompt_cache_key_is_sent_only_when_configured(self):
+        import os
+        from unittest import mock
+
+        msg = {"channel": "whatsapp", "conversation_id": "c1", "text": "?"}
+        fake = _FakeResponses("ok")
+        client = SimpleNamespace(responses=fake)
+        with mock.patch.dict(os.environ, {"OPENAI_PROMPT_CACHE_KEY": ""}):
+            generate_reply(client, "m", "S", msg, [], {})
+        with mock.patch.dict(os.environ, {"OPENAI_PROMPT_CACHE_KEY": "nico-v1"}):
+            generate_reply(client, "m", "S", msg, [], {})
+        self.assertNotIn("prompt_cache_key", fake.calls[0])
+        self.assertEqual(fake.calls[1]["prompt_cache_key"], "nico-v1")
+
     def test_usage_is_logged_for_cost_tracking(self):
         usage = SimpleNamespace(input_tokens=5200, output_tokens=80, input_tokens_details=SimpleNamespace(cached_tokens=2560))
         record = log_llm_usage("c1", "gpt-4.1-mini", usage)

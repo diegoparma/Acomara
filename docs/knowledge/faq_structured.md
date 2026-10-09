@@ -254,12 +254,12 @@ If a person cannot continue ascending, one of the group's guides climbs down wit
 
 ### Cuál es el precio de la expedición?
 
-El precio es USD 6.990, pero ahora hay una promoción por tiempo limitado de solo USD 5.990 para algunas fechas (según disponibilidad). Se puede reservar con un pequeño anticipo. Más allá del precio, lo importante es elegir el programa adecuado para vos (duración, aclimatación, nivel de experiencia, etc.), ya que eso impacta directamente en tus probabilidades de cumbre y en la experiencia general. Si te parece, puedo enviarte toda la información detallada por email. Compartime tu correo. Y si te sirve, agendamos una videollamada corta (15 min) y te explico todo para que elijas la mejor opción. Decime qué día y horario te queda cómodo.
+El precio es USD 7.250, y algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según los lugares libres de cada fecha. Se puede reservar con un pequeño anticipo. Más allá del precio, lo importante es elegir el programa adecuado para vos (duración, aclimatación, nivel de experiencia, etc.), ya que eso impacta directamente en tus probabilidades de cumbre y en la experiencia general. Si te parece, puedo enviarte toda la información detallada por email. Compartime tu correo. Y si te sirve, agendamos una videollamada corta (15 min) y te explico todo para que elijas la mejor opción. Decime qué día y horario te queda cómodo.
 
 
 ### What is the price of the expedition?
 
-The price is USD 6,990, but we currently have a limited-time promotion of only USD 5,990 for some specific dates (subject to availability). You can reserve your spot with a small deposit. Beyond the price, what really matters is choosing the right program for you (duration, acclimatization, level of experience, etc.), as this directly impacts your chances of reaching the summit and your overall experience. If you'd like, I can send you all the detailed information by email. Please share your email address. And if it works for you, we can schedule a short video call (15 min) where I'll explain everything so you can choose the best option. Please tell me a day and time that work for you.
+The price is USD 7,250, and some departures have a promotion between USD 5,990 and USD 6,390 depending on the spots left on each date. You can reserve your spot with a small deposit. Beyond the price, what really matters is choosing the right program for you (duration, acclimatization, level of experience, etc.), as this directly impacts your chances of reaching the summit and your overall experience. If you'd like, I can send you all the detailed information by email. Please share your email address. And if it works for you, we can schedule a short video call (15 min) where I'll explain everything so you can choose the best option. Please tell me a day and time that work for you.
 
 
 ### Cuáles son las fechas de salida?
@@ -274,10 +274,10 @@ If you're planning to climb Aconcagua, these are our confirmed departures for th
 
 ### Tienes info para hacer un Trek a Plaza Francia?
 
-Aquí tienes la información para los treks de Plaza Francia. No tenemos salidas grupales, solo salidas privadas. El precio es de USD 1.399 por persona (mínimo 2 personas). Puedes ver más info en el siguiente link: https://aconcaguaexpeditions.com/espaniol/expediciones/trekkingabiertoplazafrancia.htm
+Aquí tienes la información para los treks de Plaza Francia. No tenemos salidas grupales, solo salidas privadas. El precio es de USD 1.499 por persona (mínimo 2 personas). Puedes ver más info en el siguiente link: https://aconcaguaexpeditions.com/espaniol/expediciones/trekkingabiertoplazafrancia.htm
 
 
 ### Do you have information for a trek to Plaza Francia?
 
-Here is the information for the Plaza Francia treks. We don't have group departures, only private trips. The price is USD 1,399 per person (minimum 2 people). You can find more information at the following link: https://aconcaguaexpeditions.com/ingles/expediciones/trekkingplazafrancia.htm
+Here is the information for the Plaza Francia treks. We don't have group departures, only private trips. The price is USD 1,499 per person (minimum 2 people). You can find more information at the following link: https://aconcaguaexpeditions.com/ingles/expediciones/trekkingplazafrancia.htm
 

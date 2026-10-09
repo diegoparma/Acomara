@@ -37,7 +37,7 @@ class KeyFactsTests(unittest.TestCase):
         self.assertIn("DATOS CLAVE", prompt)
         self.assertIn("NO está incluido", prompt)
         self.assertIn("18+2", prompt)
-        self.assertIn("USD 6.990", prompt)
+        self.assertIn("USD 7.250", prompt)
 
     def test_short_programs_are_not_described_as_extended(self):
         # Regression: the 14+2 was described as having extra acclimatization days.
@@ -50,6 +50,12 @@ class RedactTests(unittest.TestCase):
     def test_emails_and_phones_are_removed(self):
         out = redact("Escribime a ana.p@gmail.com o al +54 9 261 555-1234")
         self.assertEqual(out, "Escribime a [email] o al [telefono]")
+
+    def test_price_ranges_are_not_phone_numbers(self):
+        # Regression: "USD 5990 - 6390" came out as "USD [telefono]".
+        for text in ("La promo va de USD 5990 - 6390", "entre 5.990-6.390 según la fecha", "USD 1.250.000 en total"):
+            with self.subTest(text=text):
+                self.assertEqual(redact(text), text)
 
     def test_prices_dates_and_programs_survive(self):
         text = "Sale USD 6.990, salida 14/11, programa 18+2, 4.200 m"

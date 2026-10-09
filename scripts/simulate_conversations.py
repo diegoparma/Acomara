@@ -77,17 +77,20 @@ SCENARIOS: dict[str, list[str]] = {
 
 # Facts that must hold (from docs/knowledge/datos-clave.md). Keyed by
 # (scenario, turn index): regexes the reply must / must not match.
-_PRICE = r"6[.,]?990|5[.,]?990"
+# Current prices per Fernando (docs/knowledge/datos-clave.md); 6.990 is the old one.
+_PRICE = r"7[.,]?250|5[.,]?990|6[.,]?390"
+_OLD_PRICE = r"6[.,]?990"
 FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
     ("datos", 0): {
         "must": [r"no (est[aá] )?incluid|aparte|not included|por separado"],
         "must_not": [r"(?<!no )(?<!not )\b(est[aá]|is) included\b", r"(?<!no )est[aá] incluido"],
     },
     ("datos", 1): {"must": [r"18\+2"], "must_not": [r"\b1[24]\+2\b[^.]*recomend"]},
-    ("datos", 2): {"must": [_PRICE]},
-    ("memoria", 4): {"must": [_PRICE]},
-    ("pareja", 1): {"must": [_PRICE]},
-    ("ingles", 1): {"must_not": [r"14\+2(?:(?!18\+2)[^.;])*(extra|extended|more|additional)(?:(?!18\+2)[^.;])*acclimati"]},
+    ("datos", 2): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
+    ("memoria", 4): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
+    ("pareja", 1): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
+    ("email_con_pregunta", 1): {"must": [r"hotel|comidas|mulas|porteador|gu[ií]as"]},
+    ("ingles", 1): {"must": [r"18\+2"], "must_not": [r"14\+2(?:(?!18\+2)[^.;])*(extra|extended|more|additional)(?:(?!18\+2)[^.;])*acclimati"]},
     ("fechas_y_temporada", 0): {"must": [r"(?i)nov"]},
     ("fechas_y_temporada", 1): {"must": [r"14\+2"]},
 }

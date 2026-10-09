@@ -1194,7 +1194,12 @@ def generate_reply(
         response_length_instruction=response_length_instruction,
     )
 
+    # Optional: groups calls so the fixed system prompt hits OpenAI's prompt
+    # cache more often. Off unless OPENAI_PROMPT_CACHE_KEY is set.
+    cache_key = _env("OPENAI_PROMPT_CACHE_KEY")
+    extra_args: dict[str, Any] = {"prompt_cache_key": cache_key} if cache_key else {}
     resp = client.responses.create(
+        **extra_args,
         model=chat_model,
         max_output_tokens=220,
         input=[

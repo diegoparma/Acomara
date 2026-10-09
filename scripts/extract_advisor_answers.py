@@ -46,9 +46,26 @@ _EMAIL_RE = re.compile(r"[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}")
 _PHONE_RE = re.compile(r"\+?\d[\d\s().-]{5,}\d")
 
 
+_CURRENCY_BEFORE_RE = re.compile(r"(?:usd|us\$|u\$s|\$|dolares|dólares|dollars)\s*$", re.IGNORECASE)
+# "5990 - 6390", "5.990-6.390": a price range, not a phone number.
+_PRICE_RANGE_RE = re.compile(r"\d{1,2}[.,]?\d{3}\s*[-–]\s*\d{1,2}[.,]?\d{3}")
+
+
 def redact(text: str) -> str:
     text = _EMAIL_RE.sub("[email]", text or "")
-    return _PHONE_RE.sub(lambda m: "[telefono]" if len(re.sub(r"\D", "", m.group(0))) >= 7 else m.group(0), text)
+
+    def phone(match: re.Match[str]) -> str:
+        value = match.group(0)
+        before = text[max(0, match.start() - 12) : match.start()]
+        if (
+            len(re.sub(r"\D", "", value)) < 7
+            or _CURRENCY_BEFORE_RE.search(before)
+            or _PRICE_RANGE_RE.fullmatch(value.strip())
+        ):
+            return value
+        return "[telefono]"
+
+    return _PHONE_RE.sub(phone, text)
 
 
 def _role(message: dict[str, Any], nico_agent_id: str) -> str:
