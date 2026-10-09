@@ -78,6 +78,25 @@ def filter_past_departures(text: str, today: date) -> str:
     return re.sub(r"[ \t]{2,}", " ", filtered)
 
 
+_SEASON_LABEL_RE = re.compile(r"(temporada|season)\s+(20\d{2})\s*/\s*(\d{2})|(20\d{2})\s*/\s*(\d{2})\s+(season)", re.IGNORECASE)
+
+
+def clarify_season_years(text: str) -> str:
+    """Spell out which year each month belongs to.
+
+    Given "temporada 2026/27" the model wrote "para enero 2026/27"
+    (simulation 2026-10-09). With the years spelled out it writes "enero 2027".
+    """
+
+    def explain(match: re.Match[str]) -> str:
+        start = int(match.group(2) or match.group(4))
+        if (match.group(1) or "").lower() == "temporada":
+            return f"{match.group(0)} (noviembre y diciembre de {start}; enero y febrero de {start + 1})"
+        return f"{match.group(0)} (November and December {start}; January and February {start + 1})"
+
+    return _SEASON_LABEL_RE.sub(explain, text or "", count=1)
+
+
 def _is_on_or_after(year: int, month: int, day: int, today: date) -> bool:
     try:
         return date(year, month, day) >= today
@@ -104,3 +123,40 @@ def ensure_departure_hit(
     candidates.sort(key=lambda r: ("departure" in str(r.get("question", "")).lower()) != english)
     best = {"score": 1.0, **{k: v for k, v in candidates[0].items() if k != "embedding"}}
     return [best, *hits][: max(top_k, 1)]
+
+
+_PROGRAM_HEADER_RE = re.compile(r"\b(1[2478])\s*\+\s*2\s+(?:d[ií]as|days)\b", re.IGNORECASE)
+
+
+def departures_by_program(text: str) -> dict[str, list[date]]:
+    """Departure dates per program ("18+2" → [date, ...]) from the season listing."""
+    season = _SEASON_RE.search(text or "")
+    if not season:
+        return {}
+    start_year = int(season.group(1))
+    headers = list(_PROGRAM_HEADER_RE.finditer(text))
+    programs: dict[str, list[date]] = {}
+    for i, header in enumerate(headers):
+        end = headers[i + 1].start() if i + 1 < len(headers) else len(text)
+        dates: list[date] = []
+        for match in _MONTH_DAYS_RE.finditer(text[header.end() : end]):
+            month = _MONTHS[match.group("month").lower()]
+            year = start_year if month >= 7 else start_year + 1
+            for day in re.findall(r"\d{1,2}", match.group("days")):
+                try:
+                    dates.append(date(year, month, int(day)))
+                except ValueError:
+                    continue
+        programs[f"{header.group(1)}+2"] = dates
+    return programs
+
+
+def season_departures(rows: list[dict[str, Any]]) -> dict[str, list[date]]:
+    """Departures per program from the dates FAQ entry in the index."""
+    for row in rows:
+        if is_departure_dates_entry(row):
+            parsed = departures_by_program(str(row.get("answer") or ""))
+            if parsed:
+                return parsed
+    return {}
+

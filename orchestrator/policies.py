@@ -15,6 +15,26 @@ GetSessionLanguageFn = Callable[[dict[str, Any] | None, str], str]
 _EMAIL_WORD_RE = re.compile(r"\b(?:e-?mail|correo|mail)\b", re.IGNORECASE)
 
 
+_EMAIL_ASK_CUE_RE = re.compile(
+    r"\?|\b(?:pasame|pasás|pasas|mandame|dejame|compartime|escribime|send me|share|what'?s your|me passa|me manda)\b",
+    re.IGNORECASE,
+)
+_EMAIL_KNOWN_KEYS = ("email_requested", "email_captured", "captured_email", "verified_email")
+
+
+def drop_repeated_email_ask(reply: str, session_vars: dict[str, Any]) -> str:
+    """Remove the model's own email ask when it was already asked or given.
+
+    Simulation 2026-10-09: the reply closed with "¿Querés que te pase el
+    detalle por email?" two turns after the email had been asked.
+    """
+    if not any(session_vars.get(k) for k in _EMAIL_KNOWN_KEYS):
+        return reply
+    sentences = re.split(r"(?<=[.!?])\s+", (reply or "").strip())
+    kept = [s for s in sentences if not (_EMAIL_WORD_RE.search(s) and _EMAIL_ASK_CUE_RE.search(s))]
+    return " ".join(kept).strip() if kept else reply
+
+
 def _reply_asks_for_email(reply: str) -> bool:
     return bool(_EMAIL_WORD_RE.search(reply or ""))
 

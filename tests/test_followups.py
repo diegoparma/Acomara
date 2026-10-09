@@ -24,12 +24,14 @@ import json  # noqa: E402
 from datetime import date  # noqa: E402
 
 from orchestrator.departures import (  # noqa: E402
+    clarify_season_years,
     ensure_departure_hit,
     filter_past_departures,
     is_departure_dates_entry,
     is_departure_dates_question,
 )
 from orchestrator.humanize import append_recent_turns  # noqa: E402
+from orchestrator.policies import drop_repeated_email_ask  # noqa: E402
 from orchestrator.server import (  # noqa: E402
     OUTBOUND_DUPLICATE_BURST_SECONDS,
     apply_email_ack_or_request_policy,
@@ -197,6 +199,26 @@ class DepartureDatesTests(unittest.TestCase):
         hits_en = ensure_departure_hit(other, FAQ_ROWS, "What dates do you have?", "en", top_k=4)
         self.assertEqual(hits_en[0]["id"], "faq-061")
         self.assertEqual(ensure_departure_hit(other, FAQ_ROWS, "¿Cuánto sale?", "es", top_k=4), other)
+
+
+class SeasonYearTests(unittest.TestCase):
+    def test_years_are_spelled_out(self):
+        # Regression: "para enero 2026/27".
+        out = clarify_season_years(DATES_ES["answer"])
+        self.assertIn("temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)", out)
+        self.assertEqual(clarify_season_years("sin temporada"), "sin temporada")
+
+
+class RepeatedEmailAskTests(unittest.TestCase):
+    def test_model_email_ask_is_dropped_once_asked(self):
+        # Regression: "¿Querés que te pase el detalle por email?" two turns after the ask.
+        reply = "El 18+2 sale USD 7.250. ¿Querés que te pase el detalle por email?"
+        self.assertEqual(drop_repeated_email_ask(reply, {"email_requested": True}), "El 18+2 sale USD 7.250.")
+        self.assertEqual(drop_repeated_email_ask(reply, {}), reply)
+
+    def test_mentions_without_an_ask_stay(self):
+        reply = "Te lo mando al email apenas lo tenga."
+        self.assertEqual(drop_repeated_email_ask(reply, {"captured_email": "a@b.co"}), reply)
 
 
 class SmallTalkTests(unittest.TestCase):

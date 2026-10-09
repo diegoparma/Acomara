@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from datetime import date
 
 _SHORT_PROGRAM_RE = re.compile(r"\b1[24]\s*\+\s*2\b|\bascenso (?:rapido|extremo)\b|\b(?:fast|extreme) ascent\b")
 # "Is it OK for me?", not "what's the difference between the 14+2 and the 18+2?".
@@ -88,6 +89,37 @@ DATE_AVAILABILITY_NOTE = {
 }
 
 
+EXTENDED_ALTERNATIVE = {
+    "es": "Ojo: esa salida es del {program}, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el {alt}.",
+    "en": "Heads up: that departure is the {program}, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on {alt}.",
+    "pt": "Atenção: essa saída é do {program}, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em {alt}.",
+}
+_PICKED_DATE_RE = re.compile(r"\b(\d{1,2})/(\d{1,2})\b")
+
+
+def extended_alternative_note(
+    user_text: str, departures: dict[str, list[date]], today: date, lang: str
+) -> str | None:
+    """Suggest the nearest 18+2 when the picked date only exists in the 12+2 or 14+2.
+
+    Simulation 2026-10-09: the client picked 5/12 (14+2) and was never offered
+    the 18+2 of 4/12.
+    """
+    text = _normalize(user_text)
+    match = _PICKED_DATE_RE.search(text)
+    extended = [d for d in departures.get("18+2", []) if d >= today]
+    if not match or not extended or _ABOVE_6000_RE.search(text):
+        return None
+    day, month = int(match.group(1)), int(match.group(2))
+    programs = [p for p, dates in departures.items() if any(d.day == day and d.month == month for d in dates)]
+    if not programs or "18+2" in programs or not all(p in ("12+2", "14+2") for p in programs):
+        return None
+    picked = next(d for d in departures[programs[0]] if d.day == day and d.month == month)
+    nearest = min(extended, key=lambda d: (abs((d - picked).days), d))
+    lang = lang if lang in EXTENDED_ALTERNATIVE else "es"
+    return EXTENDED_ALTERNATIVE[lang].format(program=" / ".join(sorted(programs)), alt=f"{nearest.day}/{nearest.month}")
+
+
 def _normalize(text: str) -> str:
     folded = unicodedata.normalize("NFKD", (text or "").lower())
     return " ".join(folded.encode("ascii", "ignore").decode("ascii").split())
@@ -137,7 +169,14 @@ def _drop_advisor_sentences(reply: str) -> str:
     return " ".join(kept).strip() if kept else reply.strip()
 
 
-def apply_video_call_close(reply: str, user_text: str, session_vars: dict, lang: str, has_email: bool = False) -> str:
+def apply_video_call_close(
+    reply: str,
+    user_text: str,
+    session_vars: dict,
+    lang: str,
+    has_email: bool = False,
+    extra_note: str | None = None,
+) -> str:
     """Close with Fernando's video call invite on concrete interest, once per conversation."""
     if not reply.strip() or session_vars.get("video_call_offered"):
         return reply
@@ -153,6 +192,8 @@ def apply_video_call_close(reply: str, user_text: str, session_vars: dict, lang:
         # Simulation 2026-10-09: "Eso te lo puede ver un asesor... La disponibilidad
         # de esa fecha te la confirma un asesor." named the advisor twice in a row.
         parts = [_drop_advisor_sentences(parts[0]), DATE_AVAILABILITY_NOTE[lang]]
+        if extra_note:
+            parts.insert(1, extra_note)
     session_vars["video_call_offered"] = True
     # Fernando asks for the email together with the call when we don't have it yet.
     known_email = has_email or any(session_vars.get(k) for k in _EMAIL_KEYS)

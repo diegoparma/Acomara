@@ -47,6 +47,7 @@ from orchestrator.policies import (
     apply_email_ack_or_request_policy as _apply_email_ack_or_request_policy,
     apply_language_commit_policy as _apply_language_commit_policy,
     apply_out_of_season_policy as _apply_out_of_season_policy,
+    drop_repeated_email_ask,
 )
 from orchestrator.observability import (
     build_health_response,
@@ -71,8 +72,13 @@ from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
-from orchestrator.departures import ensure_departure_hit, filter_past_departures
-from orchestrator.sales_rules import apply_video_call_close, short_program_reply
+from orchestrator.departures import (
+    clarify_season_years,
+    ensure_departure_hit,
+    filter_past_departures,
+    season_departures,
+)
+from orchestrator.sales_rules import apply_video_call_close, extended_alternative_note, short_program_reply
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
@@ -1132,7 +1138,7 @@ def generate_reply(
     today = today or today_in_argentina()
     # Past departures are removed here: the small model dropped future ones when asked to.
     context = hits_to_context(
-        [{**h, "answer": filter_past_departures(str(h.get("answer") or ""), today)} for h in hits]
+        [{**h, "answer": clarify_season_years(filter_past_departures(str(h.get("answer") or ""), today))} for h in hits]
     )
     user_lang = get_session_language(session_vars, msg["text"])
 
@@ -2412,8 +2418,16 @@ def process_inbound_message(
                     session_vars,
                     history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
                 )
+                decision.reply = drop_repeated_email_ask(decision.reply, session_vars)
                 decision.reply = apply_video_call_close(
-                    decision.reply, msg.text, session_vars, lang, has_email=bool(context.extracted_email)
+                    decision.reply,
+                    msg.text,
+                    session_vars,
+                    lang,
+                    has_email=bool(context.extracted_email),
+                    extra_note=extended_alternative_note(
+                        msg.text, season_departures(runtime["rows"]), today_in_argentina(), lang
+                    ),
                 )
                 decision.reply = apply_email_ack_or_request_policy(
                     decision.reply, session_vars, context.extracted_email, lang, msg.text

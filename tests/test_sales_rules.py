@@ -13,7 +13,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from orchestrator.sales_rules import apply_video_call_close, short_program_reply  # noqa: E402
+import json  # noqa: E402
+from datetime import date  # noqa: E402
+
+from orchestrator.departures import season_departures  # noqa: E402
+from orchestrator.sales_rules import (  # noqa: E402
+    apply_video_call_close,
+    extended_alternative_note,
+    short_program_reply,
+)
+
+FAQ_ROWS = [json.loads(line) for line in (ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl").open()]
+DEPARTURES = season_departures(FAQ_ROWS)
+TODAY = date(2026, 10, 9)
 
 
 class ShortProgramRuleTests(unittest.TestCase):
@@ -99,6 +111,35 @@ class VideoCallCloseTests(unittest.TestCase):
     def test_english(self):
         out = apply_video_call_close("The 18+2 is USD 7,250.", "I want to book the 18+2", {}, "en")
         self.assertIn("short video call", out)
+
+
+class ExtendedAlternativeTests(unittest.TestCase):
+    def test_departures_are_parsed_per_program(self):
+        self.assertEqual(set(DEPARTURES), {"18+2", "14+2", "12+2", "17+2"})
+        self.assertIn(date(2026, 12, 5), DEPARTURES["14+2"])
+        self.assertIn(date(2027, 1, 31), DEPARTURES["18+2"])
+
+    def test_short_program_date_gets_the_nearest_18_plus_2(self):
+        # Regression: picking 5/12 (14+2) never offered the 18+2 of 4/12.
+        note = extended_alternative_note("Me interesa la del 5/12", DEPARTURES, TODAY, "es")
+        self.assertIn("esa salida es del 14+2", note)
+        self.assertIn("la salida más cercana es el 4/12", note)
+
+    def test_no_note_for_18_plus_2_or_polish_dates_or_experienced_climbers(self):
+        for text in ("Me interesa la del 4/12", "Me interesa la del 1/12", "Estuve a 6.400 m, me interesa la del 5/12", "¿Qué fechas tienen?"):
+            with self.subTest(text=text):
+                self.assertIsNone(extended_alternative_note(text, DEPARTURES, TODAY, "es"))
+
+    def test_past_18_plus_2_departures_are_not_offered(self):
+        # On 5 Dec the 18+2 of 4/12 is gone: the next one is 20/12.
+        note = extended_alternative_note("I'm interested in the 5/12 one", DEPARTURES, date(2026, 12, 5), "en")
+        self.assertIn("closest departure is on 20/12", note)
+
+    def test_note_goes_between_the_answer_and_the_invite(self):
+        note = extended_alternative_note("Me interesa la del 5/12", DEPARTURES, TODAY, "es")
+        out = apply_video_call_close("El 5/12 es del 14+2.", "Me interesa la del 5/12", {}, "es", extra_note=note)
+        self.assertLess(out.index("4/12"), out.index("videollamada"))
+        self.assertIn("La disponibilidad de esa fecha te la confirma un asesor.", out)
 
 
 if __name__ == "__main__":

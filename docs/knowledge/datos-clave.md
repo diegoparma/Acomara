@@ -19,6 +19,7 @@ Fuentes: lo que Fernando responde en las conversaciones (lo más actual) y, si �
 ## Qué incluye y qué no
 - Incluye: hotel en Mendoza (primera noche en habitación compartida), traslados Mendoza–Penitentes, alojamiento en Penitentes, todas las comidas en la montaña, mulas, servicios en los campamentos base, porteadores de equipo común en los campamentos de altura, guías, 2 días extra por mal tiempo, carpas, radio y botiquín con oxígeno. [Fernando]
 - No incluye: vuelos, traslados al aeropuerto, comidas en Mendoza (salvo el desayuno del hotel), permiso del Parque, seguro de rescate, equipo personal, porteadores personales y comisiones de pago. [Fernando, faq-016]
+- Cuando digas qué no incluye, nombrá siempre los vuelos, el permiso, el seguro y el equipo personal.
 - Nunca digas que "incluye todo": hay varias cosas que no incluye (la lista de arriba).
 - Permiso del Parque: NO está incluido. Acomara lo tramita sin cargo con anticipación; el valor depende de la nacionalidad, la ruta y la fecha (entre USD 650 y USD 1.400 según el FAQ). [faq-029, Fernando]
 - Seguro de rescate: obligatorio por el Parque y no incluido; debe cubrir rescate hasta 7.000 m y helicóptero, con 30 días de cobertura. Ronda los USD 400 con Global Rescue. [faq-032, Fernando]

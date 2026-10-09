@@ -91,7 +91,7 @@ FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
     ("email_con_pregunta", 1): {"must": [r"hotel|comidas|mulas|porteador|gu[ií]as"]},
     ("ingles", 1): {"must": [r"18\+2"], "must_not": [r"14\+2[^.]*\b(?:suitable|could suit|can suit|good fit|ok for you)", r"14\+2(?:(?!18\+2)[^.;])*(extra|extended|more|additional)(?:(?!18\+2)[^.;])*acclimati"]},
     ("fechas_y_temporada", 0): {"must": [r"(?i)nov"]},
-    ("fechas_y_temporada", 1): {"must": [r"14\+2", r"videollamada", r"disponibilidad"]},
+    ("fechas_y_temporada", 1): {"must": [r"14\+2", r"18\+2", r"videollamada", r"disponibilidad"], "must_not": [r"20\d{2}/\d{2}"]},
     ("pareja", 1): {"must": [_PRICE, r"videollamada"], "must_not": [_OLD_PRICE]},
 }
 
