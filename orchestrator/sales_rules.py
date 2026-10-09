@@ -23,12 +23,16 @@ _SUITABILITY_RE = re.compile(
     r"|me serve|posso|da para)\b"
 )
 _COMPARISON_RE = re.compile(r"\b(?:diferencia|difference|diferenca|vs|versus|compar\w*)\b")
-# Peaks of 6,000 m or more that clients mention, or an explicit altitude >= 6,000.
+# Peaks of 6,000 m or more that clients mention, an explicit altitude >= 6,000
+# (with or without the unit, but not a price), or a previous Aconcagua climb.
 _ABOVE_6000_RE = re.compile(
     r"\b(?:[6-8][\s.,]?\d{3})\s*(?:m\b|mts|metros|meters|msnm)"
+    r"|(?<!usd )(?<!us\$ )(?<!\$)(?<!\$ )(?<!u\$s )\b[6-8][.,]?\d{3}\b(?!\s*(?:usd|us\$|u\$s|dolares|dollars|pesos))"
+    r"|\b(?:6|seis|7|siete) ?mil\b"
     r"|\b(?:ojos del salado|chimborazo|huascaran|illimani|sajama|parinacota|pissis|mercedario|tupungato"
     r"|denali|mckinley|lenin|everest|lhotse|manaslu|cho oyu|ama dablam|island peak|mera peak|aconcagua antes"
     r"|himalaya|kilimanjaro y (?:el )?(?:chimborazo|huascaran))\b"
+    r"|\b(?:subi|hice|hicimos|subimos|cumbre (?:en|del)|summited|climbed|ya fui al|estuve en la cumbre del) (?:el |the )?aconcagua\b"
 )
 _BELOW_6000_PEAKS = {
     "kilimanjaro": "el Kilimanjaro (5.895 m)",
@@ -46,9 +50,13 @@ _BELOW_6000_PEAKS_EN = {
 }
 
 _DATE_PICK_RE = re.compile(
-    r"\b\d{1,2}/\d{1,2}\b|\b(?:me interesa la (?:del|salida)|i(?:'m| am) interested in the|quiero la (?:del|salida)"
+    r"\b(?:me interesa la (?:del|salida)|i(?:'m| am) interested in the|quiero la (?:del|salida)"
     r"|tengo interes en la)\b"
 )
+# Asking about cancelling or refunds is not booking intent.
+_NOT_BOOKING_RE = re.compile(r"\b(?:cancel\w*|reembols\w*|devolu\w*|refund\w*)\b")
+# "la del 5/12", "the 5/12 one": a numeric date with a cue that it is a departure.
+_DATE_CUE_RE = re.compile(r"\b(?:la del|la de|salida del?|fecha del?|el del|the)\s+\d{1,2}/\d{1,2}\b")
 _BOOKING_RE = re.compile(r"\b(?:reservar|reserva|reservo|book|booking|reserve|reservation)\b")
 _VIDEO_WORD_RE = re.compile(r"videollamada|video ?call|videochamada", re.IGNORECASE)
 
@@ -159,11 +167,27 @@ def short_program_reply(user_text: str, lang: str) -> str | None:
     return SHORT_PROGRAM_REPLY[lang].format(program=program, peak_sentence=peak_sentence)
 
 
-def shows_concrete_interest(user_text: str) -> tuple[bool, bool]:
-    """(interested, picked_a_date): the client picks a date or talks about booking."""
+def _is_departure(day: int, month: int, departures: dict[str, list[date]]) -> bool:
+    return any(d.day == day and d.month == month for dates in departures.values() for d in dates)
+
+
+def shows_concrete_interest(user_text: str, departures: dict[str, list[date]] | None = None) -> tuple[bool, bool]:
+    """(interested, picked_a_date): the client picks a date or talks about booking.
+
+    A bare "4/5" is a date pick only when it is a real departure ("somos 4/5
+    personas" is not); without the departures list, only with a cue ("la del").
+    """
     text = _normalize(user_text)
-    picked_date = bool(_DATE_PICK_RE.search(text))
-    return picked_date or bool(_BOOKING_RE.search(text)), picked_date
+    named_pick = _DATE_PICK_RE.search(text)
+    numeric = _PICKED_DATE_RE.search(text)
+    if numeric and departures:
+        picked_date = _is_departure(int(numeric.group(1)), int(numeric.group(2)), departures)
+    elif numeric:
+        picked_date = bool(_DATE_CUE_RE.search(text))
+    else:
+        picked_date = bool(named_pick)
+    booking = bool(_BOOKING_RE.search(text)) and not _NOT_BOOKING_RE.search(text)
+    return picked_date or booking, picked_date
 
 
 def _drop_trailing_question(reply: str) -> str:
@@ -205,6 +229,7 @@ def apply_video_call_close(
     lang: str,
     has_email: bool = False,
     extra_note: str | None = None,
+    departures: dict[str, list[date]] | None = None,
 ) -> str:
     """Close with Fernando's video call invite on concrete interest, once per conversation."""
     if not reply.strip() or session_vars.get("video_call_offered"):
@@ -212,7 +237,7 @@ def apply_video_call_close(
     if _VIDEO_WORD_RE.search(reply):
         session_vars["video_call_offered"] = True
         return reply
-    interested, picked_date = shows_concrete_interest(user_text)
+    interested, picked_date = shows_concrete_interest(user_text, departures)
     if not interested:
         return reply
     lang = lang if lang in VIDEO_CALL_INVITE else "es"

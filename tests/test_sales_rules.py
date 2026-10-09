@@ -21,6 +21,7 @@ from orchestrator.sales_rules import (  # noqa: E402
     apply_video_call_close,
     extended_alternative_note,
     short_program_reply,
+    shows_concrete_interest,
 )
 
 FAQ_ROWS = [json.loads(line) for line in (ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl").open()]
@@ -45,6 +46,20 @@ class ShortProgramRuleTests(unittest.TestCase):
         for text in ("Subí el Chimborazo, ¿puedo hacer el 14+2?", "Estuve a 6.400 m en Bolivia, ¿me conviene el 12+2?"):
             with self.subTest(text=text):
                 self.assertIsNone(short_program_reply(text, "es"))
+
+    def test_altitude_without_unit_or_previous_aconcagua_is_left_to_the_model(self):
+        # Before the merge review: these got "el 14+2 no es para vos".
+        for text in (
+            "Fui a 6200 en Bolivia, ¿puedo hacer el 14+2?",
+            "Subí el Aconcagua en 2019, ¿puedo hacer el 14+2?",
+            "Hice cumbre en el Aconcagua, ¿me sirve el 12+2?",
+            "Estuve a más de 6 mil, ¿me conviene el 14+2?",
+        ):
+            with self.subTest(text=text):
+                self.assertIsNone(short_program_reply(text, "es"))
+
+    def test_a_price_is_not_an_altitude(self):
+        self.assertIsNotNone(short_program_reply("Si pago USD 6.390, ¿me sirve el 14+2? Hice el Lanín", "es"))
 
     def test_other_questions_about_short_programs_are_not_caught(self):
         for text in ("¿Qué diferencia hay entre el 14+2 y el 18+2?", "ok, y el 14+2 qué incluye?", "¿Cuánto sale el 14+2?", "Quiero el 18+2"):
@@ -111,6 +126,30 @@ class VideoCallCloseTests(unittest.TestCase):
     def test_english(self):
         out = apply_video_call_close("The 18+2 is USD 7,250.", "I want to book the 18+2", {}, "en")
         self.assertIn("short video call", out)
+
+
+class ConcreteInterestTests(unittest.TestCase):
+    def test_numbers_that_are_not_departures_are_not_a_date_pick(self):
+        # Before the merge review: "somos 4/5 personas" got "La disponibilidad de esa fecha...".
+        for text in ("Somos 4/5 personas", "tengo 2/3 dudas", "¿Hay lugar para 3/4 amigos?"):
+            with self.subTest(text=text):
+                self.assertEqual(shows_concrete_interest(text, DEPARTURES), (False, False))
+                self.assertEqual(apply_video_call_close("Dale.", text, {}, "es", departures=DEPARTURES), "Dale.")
+
+    def test_real_departures_are_a_date_pick(self):
+        for text in ("Me interesa la del 5/12", "5/12", "I'm interested in the 5/12 one"):
+            with self.subTest(text=text):
+                self.assertEqual(shows_concrete_interest(text, DEPARTURES), (True, True))
+
+    def test_without_departures_a_cue_is_needed(self):
+        self.assertEqual(shows_concrete_interest("Me interesa la del 5/12"), (True, True))
+        self.assertEqual(shows_concrete_interest("Somos 4/5 personas"), (False, False))
+
+    def test_cancelling_is_not_booking(self):
+        for text in ("¿Se puede cancelar una reserva?", "Si cancelo la reserva, ¿me devuelven?", "What's the refund policy if I cancel my booking?"):
+            with self.subTest(text=text):
+                self.assertEqual(shows_concrete_interest(text, DEPARTURES), (False, False))
+        self.assertEqual(shows_concrete_interest("Quiero reservar el 18+2", DEPARTURES), (True, False))
 
 
 class ExtendedAlternativeTests(unittest.TestCase):

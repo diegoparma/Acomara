@@ -2419,15 +2419,15 @@ def process_inbound_message(
                     history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
                 )
                 decision.reply = drop_repeated_email_ask(decision.reply, session_vars)
+                departures = season_departures(runtime["rows"])
                 decision.reply = apply_video_call_close(
                     decision.reply,
                     msg.text,
                     session_vars,
                     lang,
                     has_email=bool(context.extracted_email),
-                    extra_note=extended_alternative_note(
-                        msg.text, season_departures(runtime["rows"]), today_in_argentina(), lang
-                    ),
+                    extra_note=extended_alternative_note(msg.text, departures, today_in_argentina(), lang),
+                    departures=departures,
                 )
                 decision.reply = apply_email_ack_or_request_policy(
                     decision.reply, session_vars, context.extracted_email, lang, msg.text
