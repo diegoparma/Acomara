@@ -68,6 +68,28 @@ SCENARIOS: dict[str, list[str]] = {
         "Hola, estoy viendo el 18+2",
         "Quiero hablar con mi esposa antes de reservar, ¿me pasás el precio?",
     ],
+    "datos": [
+        "¿El permiso del parque está incluido en el precio?",
+        "Nunca estuve en altura, ¿qué programa me conviene?",
+        "¿Y cuánto sale?",
+    ],
+}
+
+# Facts that must hold (from docs/knowledge/datos-clave.md). Keyed by
+# (scenario, turn index): regexes the reply must / must not match.
+_PRICE = r"6[.,]?990|5[.,]?990"
+FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
+    ("datos", 0): {
+        "must": [r"no (est[aá] )?incluid|aparte|not included|por separado"],
+        "must_not": [r"(?<!no )(?<!not )\b(est[aá]|is) included\b", r"(?<!no )est[aá] incluido"],
+    },
+    ("datos", 1): {"must": [r"18\+2"], "must_not": [r"\b1[24]\+2\b[^.]*recomend"]},
+    ("datos", 2): {"must": [_PRICE]},
+    ("memoria", 4): {"must": [_PRICE]},
+    ("pareja", 1): {"must": [_PRICE]},
+    ("ingles", 1): {"must_not": [r"14\+2(?:(?!18\+2)[^.;])*(extra|extended|more|additional)(?:(?!18\+2)[^.;])*acclimati"]},
+    ("fechas_y_temporada", 0): {"must": [r"(?i)nov"]},
+    ("fechas_y_temporada", 1): {"must": [r"14\+2"]},
 }
 
 # What gives a reply away as a bot, checked on every reply.
@@ -167,6 +189,7 @@ def run(only: str | None) -> dict:
         "empty_replies": 0,
         "email_asked_twice_in_one_message": 0,
         "identical_replies": 0,
+        "fact_checks": {"passed": 0, "failed": []},
     }
     seen_sentences: dict[str, int] = {}
     for name, turns in SCENARIOS.items():
@@ -209,6 +232,15 @@ def run(only: str | None) -> dict:
                     seen_sentences[key] = seen_sentences.get(key, 0) + 1
                     if seen_sentences[key] == 2:
                         results["identical_replies"] += 1
+            check = FACT_CHECKS.get((name, i))
+            if check:
+                problems = [f"falta /{rx}/" for rx in check.get("must", []) if not re.search(rx, reply, re.IGNORECASE)]
+                problems += [f"no debería /{rx}/" for rx in check.get("must_not", []) if re.search(rx, reply, re.IGNORECASE)]
+                if problems:
+                    results["fact_checks"]["failed"].append({"scenario": name, "turn": i, "client": text, "problems": problems})
+                    print(f"         ✗ dato: {'; '.join(problems)}")
+                else:
+                    results["fact_checks"]["passed"] += 1
             transcript.append({"client": text, "nico": reply, "usage": turn_usage})
         results["scenarios"][name] = transcript
 
@@ -228,6 +260,7 @@ def run(only: str | None) -> dict:
     }
     print("\n=== Resumen ===")
     summary_keys = (
+        "fact_checks",
         "tells",
         "repeated_greetings",
         "empty_replies",

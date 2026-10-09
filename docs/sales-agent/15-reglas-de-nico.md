@@ -39,7 +39,7 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 
 ## 3. Reglas del system prompt (lo que la IA puede y no puede decir)
 
-Fuente: `docs/sales-agent/02-system-prompt.md` (v3.4).
+Fuente: `docs/sales-agent/02-system-prompt.md` (v3.4) más la ficha `docs/knowledge/datos-clave.md` (programas, precio, permiso y seguro), que se agrega al final del prompt y vale más que cualquier fragmento del FAQ. Lo que confirme Fernando se suma a esa ficha.
 
 **Nunca:**
 - Confirmar cupo real por fecha, confirmar reservas ni hacer cotizaciones personalizadas.

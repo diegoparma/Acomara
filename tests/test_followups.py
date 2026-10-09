@@ -177,7 +177,13 @@ class DepartureDatesTests(unittest.TestCase):
         self.assertEqual(filter_past_departures(text, date(2027, 1, 1)), text)
 
     def test_date_questions(self):
-        for text in ("¿Qué fechas tienen?", "When are the departures?", "Quais são as datas?", "me interesa la del 5/12"):
+        for text in (
+            "¿Qué fechas tienen?",
+            "When are the departures?",
+            "Quais são as datas?",
+            "me interesa la del 5/12",
+            "Somos 3 amigos de Córdoba y queremos ir en enero",
+        ):
             with self.subTest(text=text):
                 self.assertTrue(is_departure_dates_question(text))
         self.assertFalse(is_departure_dates_question("¿Cuánto sale el 18+2?"))

@@ -34,6 +34,9 @@ _DATES_QUESTION_RE = re.compile(
     r"|departures?|dates?|when do you (?:go|leave|start)"
     r"|datas?|saidas?|quando (?:saem|sai))\b"
     r"|\b\d{1,2}/\d{1,2}\b"  # "la del 5/12"
+    # A season month ("queremos ir en enero") is a dates question too.
+    r"|\b(?:noviembre|diciembre|enero|febrero|marzo|november|december|january|february|march"
+    r"|novembro|dezembro|janeiro|fevereiro|marco)\b"
 )
 
 

@@ -85,6 +85,7 @@ from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_aud
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
 SYSTEM_PROMPT_PATH = ROOT / "docs" / "sales-agent" / "02-system-prompt.md"
+KEY_FACTS_PATH = ROOT / "docs" / "knowledge" / "datos-clave.md"
 
 app = Flask(__name__)
 
@@ -729,7 +730,13 @@ def load_system_prompt() -> str:
             "Eres un asistente comercial de expediciones al Aconcagua. "
             "Responde con precision y no inventes datos."
         )
-    return SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
+    prompt = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
+    # Core facts go in the fixed system prompt (cacheable) so the model cannot
+    # contradict them between runs; the permit was "included" in one run and
+    # "not included" in the next (simulation 2026-10-08).
+    if KEY_FACTS_PATH.exists():
+        prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{KEY_FACTS_PATH.read_text(encoding='utf-8')}"
+    return prompt
 
 
 def cosine(a: list[float], b: list[float]) -> float:
