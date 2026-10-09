@@ -11,3 +11,6 @@ GitIgnore/
 # Test fixtures captured from Supabase contain real customer PII.
 # Regenerate locally with: python3 scripts/capture_fixtures.py
 tests/fixtures/conversations/
+
+# Real customer conversations extracted locally (scripts/extract_advisor_answers.py).
+private/

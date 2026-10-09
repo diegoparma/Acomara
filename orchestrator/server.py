@@ -13,6 +13,7 @@ MVP flow:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta, timezone
 import json
 import math
 import os
@@ -46,6 +47,7 @@ from orchestrator.policies import (
     apply_email_ack_or_request_policy as _apply_email_ack_or_request_policy,
     apply_language_commit_policy as _apply_language_commit_policy,
     apply_out_of_season_policy as _apply_out_of_season_policy,
+    drop_repeated_email_ask,
 )
 from orchestrator.observability import (
     build_health_response,
@@ -70,12 +72,27 @@ from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
+from orchestrator.departures import (
+    clarify_season_years,
+    ensure_departure_hit,
+    filter_past_departures,
+    season_departures,
+)
+from orchestrator.sales_rules import apply_video_call_close, extended_alternative_note, short_program_reply
+from orchestrator.humanize import (
+    append_recent_turns,
+    assistant_already_spoke,
+    history_to_messages,
+    humanize_reply,
+    trim_to_last_sentence,
+)
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
 SYSTEM_PROMPT_PATH = ROOT / "docs" / "sales-agent" / "02-system-prompt.md"
+KEY_FACTS_PATH = ROOT / "docs" / "knowledge" / "datos-clave.md"
 
 app = Flask(__name__)
 
@@ -148,51 +165,66 @@ class ReplyDecision:
 I18N_PHRASES = {
     "es": {
         "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
-        "handoff_ask_email": "Para conectarte con un asesor, primero necesito tu correo electrónico para poder derivarte correctamente. ¿Cuál es tu correo?",
-        "handoff_executed": "Perfecto, ya derivé tu solicitud a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
-        "handoff_pending": "Todavía necesito tu correo electrónico para derivarte con el asesor. ¿Cuál es tu correo?",
-        "proactive_email_request": "Si te parece, compartime tu correo electrónico ahora y lo verifico para dejar lista una posible derivación con un asesor.",
-        "proactive_email_saved": "Gracias. Ya verifiqué tu correo y quedó registrado. Si después querés que te conecte con un asesor, ya lo tengo listo.",
-        "proactive_email_check_failed": "Gracias. Ya recibí tu correo, pero no pude validarlo en este momento. Igual quedó registrado por si necesitás derivación con un asesor.",
-        "paused_handoff": "Tu solicitud ya fue derivada a un asesor humano. En breve te va a contactar un miembro del equipo por este medio.",
-        "paused_suspicious": "Excelente, te vamos a estar contactando en breve.",
-        "paused_proactive_email": "Estoy esperando tu correo electrónico para poder verificarlo y continuar la conversación de forma segura.",
-        "paused_loop_final": "Ya registramos tu solicitud y un asesor humano va a continuar por este medio. Para evitar mensajes repetitivos, cierro este hilo automático hasta que el equipo te contacte.",
-        "email_received_ack": "¡Gracias! Ya tengo tu correo ({email}) registrado. Un asesor humano va a revisar tu consulta y te contacta en breve por este medio. Mientras tanto, si querés agregar más detalles (fechas, número de personas, experiencia previa), escribilos y los sumamos a la derivación.",
-        "out_of_season": "Importante: las expediciones al Aconcagua se realizan únicamente entre noviembre y marzo (temporada del hemisferio sur). Para la fecha que mencionás no tenemos salidas. Si querés, te paso el calendario disponible de la próxima temporada.",
-        "opening_welcome": "Hola! Gracias por contactarnos. ¿En qué te puedo ayudar?\n\nPara orientarte mejor, además de responder tus preguntas, si te parece te envío más información por email: precios, fechas, servicios, lista de equipo, referencias y recomendaciones.",
+        "handoff_ask_email": "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?",
+        "handoff_executed": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
+        "handoff_pending": "Me falta tu email para pasarte con el asesor. ¿Cuál es?",
+        "proactive_email_request": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+        "proactive_email_saved": "Genial, ya me quedó tu email. Si después querés hablar con un asesor, avisame y te paso.",
+        "proactive_email_check_failed": "Gracias, ya me quedó tu email. Si en algún momento querés hablar con un asesor, avisame.",
+        "paused_handoff": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
+        "paused_suspicious": "Perfecto, te escribimos en breve.",
+        "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
+        "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+        "repeat_prefix": "Como te decía,",
+        "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
+        "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy.",
+        "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
+        "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
+        "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
+        "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
+        "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
     },
     "en": {
         "reset_acknowledge": "Conversation restarted. How can I help you?",
-        "handoff_ask_email": "To connect you with an advisor, I first need your email address. What is your email?",
-        "handoff_executed": "Perfect, I've forwarded your request to a human advisor. A team member will contact you shortly.",
-        "handoff_pending": "I still need your email address to connect you with an advisor. What is your email?",
-        "proactive_email_request": "If you'd like, share your email now and I'll verify it so a possible handoff to an advisor is ready.",
-        "proactive_email_saved": "Thanks. I already verified your email and saved it. If you want me to connect you with an advisor later, it's ready.",
-        "proactive_email_check_failed": "Thanks. I received your email, but I couldn't validate it right now. It was still saved in case you need a handoff to an advisor.",
-        "paused_handoff": "Your request has been forwarded to a human advisor. A team member will contact you shortly.",
+        "handoff_ask_email": "Sure, I'll put you in touch with one of our advisors. What's your email so they can reach you?",
+        "handoff_executed": "Done, I've passed your request to one of our advisors. They'll message you here shortly 🙌",
+        "handoff_pending": "I just need your email to pass you to the advisor. What is it?",
+        "proactive_email_request": "If you'd like, send me your email and I'll share the full details with prices and dates.",
+        "proactive_email_saved": "Great, got your email. If you want to talk to an advisor later, just let me know.",
+        "proactive_email_check_failed": "Thanks, got your email. If you'd like to talk to an advisor at some point, just let me know.",
+        "paused_handoff": "I've passed your request to an advisor, they'll message you here shortly.",
         "paused_suspicious": "Great! We'll be in touch shortly.",
-        "paused_proactive_email": "I'm waiting for your email address to verify it and continue the conversation securely.",
-        "paused_loop_final": "We have already registered your request and a human advisor will continue through this channel. To avoid repetitive messages, I'm now closing this automated thread until the team contacts you.",
-        "email_received_ack": "Thanks! I've saved your email ({email}). A human advisor will review your request and contact you shortly through this channel. In the meantime, feel free to add any extra details (dates, number of people, previous experience) and I'll include them in the handoff.",
-        "out_of_season": "Heads up: Aconcagua expeditions run only between November and March (Southern Hemisphere season). We don't have departures on the date you mentioned. If you'd like, I can share the available calendar for the next season.",
-        "opening_welcome": "Hi! Thanks for reaching out. How can I help you?\n\nTo guide you better, besides answering your questions here, if you'd like I can send you more info by email: prices, dates, services, gear list, references and recommendations.",
+        "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
+        "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
+        "repeat_prefix": "As I mentioned,",
+        "thanks_reply_1": "You're welcome! Message me here anytime.",
+        "thanks_reply_2": "My pleasure! If anything else comes up, I'm here.",
+        "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
+        "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
+        "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
+        "out_of_season": "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.",
+        "opening_welcome": "Hi! Thanks for reaching out. How can I help?\n\nIf it's useful, besides answering here I can email you all the info: prices, dates, services, gear list and recommendations.",
     },
     "pt": {
-        "reset_acknowledge": "Conversa reiniciada. Como posso ajudá-lo?",
-        "handoff_ask_email": "Para conectá-lo com um consultor, primeiro preciso do seu endereço de email. Qual é o seu email?",
-        "handoff_executed": "Perfeito, encaminhei sua solicitação para um consultor humano. Um membro da equipe o contatará em breve.",
-        "handoff_pending": "Ainda preciso do seu endereço de email para conectá-lo com um consultor. Qual é o seu email?",
-        "proactive_email_request": "Se você quiser, compartilhe seu email agora e eu o verifico para deixar pronta uma possível transferência para um consultor.",
-        "proactive_email_saved": "Obrigado. Já verifiquei seu email e ele ficou registrado. Se depois você quiser falar com um consultor, já está pronto.",
-        "proactive_email_check_failed": "Obrigado. Recebi seu email, mas não consegui validá-lo agora. Mesmo assim ele ficou registrado caso você precise de transferência para um consultor.",
-        "paused_handoff": "Sua solicitação foi encaminhada para um consultor humano. Um membro da equipe o contatará em breve.",
-        "paused_suspicious": "Excelente, vamos estar em contato em breve.",
-        "paused_proactive_email": "Estou esperando seu endereço de email para verificá-lo e continuar a conversa com segurança.",
-        "paused_loop_final": "Sua solicitação já foi registrada e um consultor humano continuará por este canal. Para evitar mensagens repetitivas, vou encerrar este fluxo automático até que a equipe entre em contato.",
-        "email_received_ack": "Obrigado! Já registrei seu email ({email}). Um consultor humano vai revisar sua consulta e entrar em contato em breve por este canal. Enquanto isso, se quiser adicionar mais detalhes (datas, número de pessoas, experiência prévia), me envie e os incluo na transferência.",
-        "out_of_season": "Atenção: as expedições ao Aconcágua acontecem somente entre novembro e março (temporada do hemisfério sul). Para a data que você mencionou não temos saídas. Se quiser, posso te passar o calendário disponível da próxima temporada.",
-        "opening_welcome": "Olá! Obrigado por entrar em contato. Como posso te ajudar?\n\nPara te orientar melhor, além de responder suas perguntas aqui, se quiser te envio mais informações por email: preços, datas, serviços, lista de equipamentos, referências e recomendações.",
+        "reset_acknowledge": "Conversa reiniciada. Como posso te ajudar?",
+        "handoff_ask_email": "Claro, vou te passar para um consultor da equipe. Qual é o seu email para ele entrar em contato?",
+        "handoff_executed": "Pronto, já passei sua consulta para um consultor da equipe. Ele te escreve por aqui em breve 🙌",
+        "handoff_pending": "Só falta seu email para te passar para o consultor. Qual é?",
+        "proactive_email_request": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+        "proactive_email_saved": "Ótimo, já anotei seu email. Se depois quiser falar com um consultor, é só me avisar.",
+        "proactive_email_check_failed": "Obrigado, já anotei seu email. Se em algum momento quiser falar com um consultor, é só me avisar.",
+        "paused_handoff": "Já passei sua consulta para um consultor, ele te escreve por aqui em breve.",
+        "paused_suspicious": "Perfeito, vamos te escrever em breve.",
+        "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
+        "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
+        "repeat_prefix": "Como te falei,",
+        "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
+        "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui.",
+        "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
+        "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
+        "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
+        "out_of_season": "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.",
+        "opening_welcome": "Olá! Obrigado por escrever. Como posso te ajudar?\n\nSe for útil, além de responder por aqui te mando por email todas as informações: preços, datas, serviços, lista de equipamentos e recomendações.",
     },
 }
 
@@ -478,18 +510,41 @@ def detect_explicit_language_preference(text: str) -> str | None:
 
 # Months treated as out-of-Aconcagua-season (April-October).
 OUT_OF_SEASON_MONTH_TOKENS = (
-    # English
-    "april", "may", "june", "july", "august", "september", "october",
+    # English ("may" is handled separately: it is also a modal verb)
+    "april", "june", "july", "august", "september", "october",
     # Spanish (normalized: no accents)
     "abril", "mayo", "junio", "julio", "agosto", "septiembre", "setiembre", "octubre",
     # Portuguese
     "maio", "junho", "julho", "agosto", "setembro", "outubro",
 )
-# Numeric date patterns indicating month 04-10 in DD/MM or MM/DD form.
-_OUT_OF_SEASON_DATE_PATTERNS = (
-    re.compile(r"\b\d{1,2}[/-](0?[4-9]|10)\b"),  # 27/05, 03-09
-    re.compile(r"\b(0?[4-9]|10)[/-]\d{1,2}\b"),  # 05/27, 09-03
+_OUT_OF_SEASON_MONTHS = range(4, 11)
+# English "may" only counts as the month next to a date-like context
+# ("in May", "May 12", "12th of May"), never as the modal verb ("May I...").
+_MAY_MONTH_RE = re.compile(
+    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until)\s+may\b"
+    r"|\bmay\s+\d"
+    r"|\d(?:st|nd|rd|th)?\s+(?:of\s+)?may\b"
 )
+# Numeric day/month pairs (27/05, 05-27, 15/05/2027). Ranges followed by a
+# unit ("4-6 personas", "5-7 dias") are quantities, not dates.
+_NUMERIC_DATE_RE = re.compile(
+    r"\b(\d{1,2})[/-](\d{1,2})\b(?!\s*(?:personas?|pessoas?|people|persons?|pax|dias?|days?"
+    r"|noches?|noites?|nights?|semanas?|weeks?|horas?|hours?|km|kg|anos?|years?))"
+)
+
+
+def _numeric_date_is_out_of_season(first: int, second: int) -> bool:
+    """True only when every valid reading (DD/MM and MM/DD) lands in Apr-Oct.
+
+    "5/12" is 5 December for a Spanish/Portuguese speaker, a real departure,
+    so an ambiguous pair must not trigger the out-of-season warning.
+    """
+    months = []
+    if 1 <= second <= 12 and 1 <= first <= 31:
+        months.append(second)  # DD/MM
+    if 1 <= first <= 12 and 1 <= second <= 31:
+        months.append(first)  # MM/DD
+    return bool(months) and all(m in _OUT_OF_SEASON_MONTHS for m in months)
 _TRIP_INTENT_TOKENS = (
     "tour", "expedicion", "expedición", "expedition", "trek", "trekking",
     "ascen", "subir", "climb", "summit", "viaje", "viagem", "paseo",
@@ -514,8 +569,10 @@ def mentions_out_of_season(text: str) -> bool:
     for tok in OUT_OF_SEASON_MONTH_TOKENS:
         if re.search(r"\b" + re.escape(tok) + r"\b", normalized):
             return True
-    for pattern in _OUT_OF_SEASON_DATE_PATTERNS:
-        if pattern.search(normalized):
+    if _MAY_MONTH_RE.search(normalized):
+        return True
+    for match in _NUMERIC_DATE_RE.finditer(normalized):
+        if _numeric_date_is_out_of_season(int(match.group(1)), int(match.group(2))):
             return True
     return False
 
@@ -680,7 +737,13 @@ def load_system_prompt() -> str:
             "Eres un asistente comercial de expediciones al Aconcagua. "
             "Responde con precision y no inventes datos."
         )
-    return SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
+    prompt = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
+    # Core facts go in the fixed system prompt (cacheable) so the model cannot
+    # contradict them between runs; the permit was "included" in one run and
+    # "not included" in the next (simulation 2026-10-08).
+    if KEY_FACTS_PATH.exists():
+        prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{KEY_FACTS_PATH.read_text(encoding='utf-8')}"
+    return prompt
 
 
 def cosine(a: list[float], b: list[float]) -> float:
@@ -858,6 +921,8 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "last_user_message": "",
         "last_assistant_reply": "",
         "last_assistant_reply_ts": None,
+        "recent_turns": [],
+        "video_call_offered": False,
         "handoff_requested": False,
         "handoff_pending_confirmation": False,
         "proactive_email_capture_pending": False,
@@ -934,6 +999,51 @@ def retrieve_top_k(
     return scored[:top_k]
 
 
+def build_contextual_query(query_text: str, recent_turns: Any, max_chars: int = 700) -> str:
+    """Current message plus what was just talked about, for retrieval.
+
+    "¿Y cuánto sale?" finds nothing alone; with the previous turns ("el 18+2
+    es ideal para ustedes") it finds the 18+2 price.
+    """
+    turns = recent_turns if isinstance(recent_turns, list) else []
+    previous = [
+        str(t.get("text") or "")
+        for t in turns[-3:]
+        if isinstance(t, dict) and t.get("role") in ("user", "assistant")
+    ]
+    context = " ".join(p for p in previous if p).strip()
+    if not context:
+        return query_text
+    return f"{query_text}\n{context[-max_chars:]}"
+
+
+def retrieve_with_context(
+    client: OpenAI,
+    embed_model: str,
+    rows: list[dict[str, Any]],
+    query_text: str,
+    recent_turns: Any,
+    top_k: int,
+) -> list[dict[str, Any]]:
+    """Retrieve with the message alone and with recent context, keep the best of both.
+
+    One embeddings call with two inputs. The plain query keeps a new topic from
+    being pulled back to the old one; the contextual query resolves follow-ups.
+    """
+    contextual = build_contextual_query(query_text, recent_turns)
+    if contextual == query_text:
+        return retrieve_top_k(client, embed_model, rows, query_text, top_k)
+    data = client.embeddings.create(model=embed_model, input=[query_text, contextual]).data
+    best: dict[Any, dict[str, Any]] = {}
+    for item in data:
+        for row in rows:
+            score = cosine(item.embedding, row["embedding"])
+            key = row.get("id", id(row))
+            if key not in best or score > best[key]["score"]:
+                best[key] = {"score": score, **row}
+    return sorted(best.values(), key=lambda x: x["score"], reverse=True)[:top_k]
+
+
 def hits_to_context(hits: list[dict[str, Any]]) -> str:
     parts = []
     for h in hits:
@@ -976,6 +1086,45 @@ def build_crm_client_context(session_vars: dict[str, Any]) -> str:
     return crm_client_context
 
 
+# The only session variables the model gets. The rest (timestamps, alert
+# status, pause bookkeeping) cost ~400 tokens per reply and add nothing; the
+# transcript goes as chat history and the CRM data has its own block.
+_SESSION_KEYS_FOR_LLM = (
+    "conversation_turn_count",
+    "email_requested",
+    "email_captured",
+    "out_of_season_warned",
+)
+
+
+# How many past messages the model sees (env NICO_HISTORY_TURNS; 0 disables).
+DEFAULT_HISTORY_TURNS = 10
+
+
+def log_llm_usage(conversation_id: str, model: str, usage: Any) -> dict[str, Any]:
+    """Print one [LLM_USAGE] line per model call so spend can be tracked in the logs."""
+    if usage is None:
+        return {}
+    details = getattr(usage, "input_tokens_details", None)
+    record = {
+        "conversation_id": conversation_id,
+        "model": model,
+        "input_tokens": int(getattr(usage, "input_tokens", 0) or 0),
+        "cached_input_tokens": int(getattr(details, "cached_tokens", 0) or 0),
+        "output_tokens": int(getattr(usage, "output_tokens", 0) or 0),
+    }
+    print("[LLM_USAGE] " + json.dumps(record), flush=True)
+    return record
+
+
+# Argentina has no DST: Mendoza is UTC-3 all year.
+ARGENTINA_TZ = timezone(timedelta(hours=-3), "ART")
+
+
+def today_in_argentina(now: datetime | None = None) -> date:
+    return (now or datetime.now(timezone.utc)).astimezone(ARGENTINA_TZ).date()
+
+
 def generate_reply(
     client: OpenAI,
     chat_model: str,
@@ -983,8 +1132,14 @@ def generate_reply(
     msg: dict[str, str],
     hits: list[dict[str, Any]],
     session_vars: dict[str, Any],
+    today: date | None = None,
+    history_turns: int = DEFAULT_HISTORY_TURNS,
 ) -> str:
-    context = hits_to_context(hits)
+    today = today or today_in_argentina()
+    # Past departures are removed here: the small model dropped future ones when asked to.
+    context = hits_to_context(
+        [{**h, "answer": clarify_season_years(filter_past_departures(str(h.get("answer") or ""), today))} for h in hits]
+    )
     user_lang = get_session_language(session_vars, msg["text"])
 
     lang_instruction = {
@@ -997,7 +1152,9 @@ def generate_reply(
 
     # Override conversation_language in the dumped state so the LLM does not
     # see a stale/contradictory signal vs the explicit lang_instruction.
-    session_vars_for_llm = {**session_vars, "conversation_language": user_lang}
+    session_vars_for_llm = {key: session_vars[key] for key in _SESSION_KEYS_FOR_LLM if key in session_vars}
+    session_vars_for_llm["conversation_language"] = user_lang
+    recent_turns = session_vars.get("recent_turns")
 
     is_whatsapp = str(msg.get("channel", "")).strip().lower() == "whatsapp"
     response_length_instruction = (
@@ -1007,6 +1164,7 @@ def generate_reply(
     )
 
     user_prompt = (
+        "Fecha de hoy (Argentina): {today}\n"
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
         "Cliente pregunta:\n{question}\n\n"
@@ -1015,15 +1173,25 @@ def generate_reply(
         "\n\nEvidencia interna recuperada:\n{context}\n\n"
         "Instrucciones CRÍTICAS:\n"
         "- {lang_instruction}\n"
-        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada.\n"
+        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación "
+        "(si ya le diste un precio o una fecha, podés repetirlo).\n"
+        "- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. "
+        "Decir que no lo tenés es el último recurso.\n"
         "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
         "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
         "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
         "- {response_length_instruction}\n"
         "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
+        "- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n"
+        "- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, "
+        "no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n"
         "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
-        "- Si no hay evidencia suficiente, di claramente que esa información no está en la documentación."
+        "- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. "
+        "Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n"
+        "- No pidas el email si ya lo pediste en esta conversación.\n"
+        "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
     ).format(
+        today=today.isoformat(),
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],
@@ -1034,15 +1202,29 @@ def generate_reply(
         response_length_instruction=response_length_instruction,
     )
 
+    # Optional: groups calls so the fixed system prompt hits OpenAI's prompt
+    # cache more often. Off unless OPENAI_PROMPT_CACHE_KEY is set.
+    cache_key = _env("OPENAI_PROMPT_CACHE_KEY")
+    extra_args: dict[str, Any] = {"prompt_cache_key": cache_key} if cache_key else {}
     resp = client.responses.create(
+        **extra_args,
         model=chat_model,
         max_output_tokens=220,
         input=[
             {"role": "system", "content": system_prompt},
+            *(history_to_messages(recent_turns)[-history_turns:] if history_turns > 0 else []),
             {"role": "user", "content": user_prompt},
         ],
     )
-    return resp.output_text.strip()
+    log_llm_usage(msg.get("conversation_id", ""), chat_model, getattr(resp, "usage", None))
+    reply = (resp.output_text or "").strip()
+    if getattr(resp, "status", None) == "incomplete":
+        reply = trim_to_last_sentence(reply)
+    return humanize_reply(
+        reply,
+        channel="whatsapp" if is_whatsapp else "other",
+        already_spoke=assistant_already_spoke(recent_turns),
+    )
 
 
 def supports_respond_tool(tools_payload: Any) -> bool:
@@ -1068,6 +1250,23 @@ def split_reply_into_messages(reply_text: str) -> list[str]:
         return []
     parts = [p.strip() for p in re.split(r"\n\s*\n+", reply_text) if p.strip()]
     return parts
+
+
+MAX_REPLY_BUBBLES = 3
+
+
+def choose_reply_bubbles(reply: str, can_emit_multi: bool, is_opening: bool) -> list[str]:
+    """Split a reply into WhatsApp bubbles the way a person types.
+
+    People send "Gracias!" and the answer as two messages. Paragraphs become
+    bubbles when there are 2-3 of them; a longer list stays in one message.
+    """
+    if not can_emit_multi or not (reply or "").strip():
+        return []
+    parts = split_reply_into_messages(reply)
+    if is_opening or 2 <= len(parts) <= MAX_REPLY_BUBBLES:
+        return parts
+    return []
 
 
 def build_respond_tool_call_message(reply_parts: list[str]) -> dict[str, Any]:
@@ -1277,7 +1476,51 @@ def _is_pure_greeting(text: str) -> bool:
     return bool(tokens & _PURE_GREETING_TOKENS) and tokens <= _PURE_GREETING_TOKENS
 
 
+_THANKS_TOKENS: frozenset[str] = frozenset({"gracias", "thanks", "thank", "thx", "ty", "obrigado", "obrigada", "valeu"})
+_THANKS_FILLER_TOKENS: frozenset[str] = frozenset({
+    "muchas", "muchisimas", "mil", "por", "todo", "la", "info", "informacion", "genial", "perfecto",
+    "dale", "ok", "buenisimo", "barbaro", "joya", "you", "so", "much", "very", "a", "lot", "for", "the",
+    "great", "info", "muito", "pela", "informacao", "otimo", "perfeito", "show", "de", "nuevo", "again",
+})
+
+
+def is_thanks_only(text: str) -> bool:
+    """A bare "gracias" / "thanks!": nothing to look up, just acknowledge.
+
+    Retrieval on "Thanks!" returned unrelated FAQ entries and the model
+    answered about gear rental (simulation 2026-10-08).
+    """
+    cleaned = re.sub(r"[^\w\s]", " ", normalize_for_intent(text)).split()
+    if not cleaned or len(cleaned) > 8:
+        return False
+    tokens = set(cleaned)
+    return bool(tokens & _THANKS_TOKENS) and tokens <= (_THANKS_TOKENS | _THANKS_FILLER_TOKENS)
+
+
+_INTEREST_RE = re.compile(
+    r"\b(?:interesad[oa]s?|interested|interessad[oa]s?|quiero info|quisiera info|me gustaria (?:saber|tener|recibir)"
+    r"|(?:mas )?informacion|info\b|would like (?:some |more )?info|i want (?:some |more )?info|gostaria de (?:saber|receber)"
+    r"|informac(?:ao|oes))"
+)
+
+
+def is_generic_opening(text: str) -> bool:
+    """First message that only shows interest ("Hi, I'm interested in climbing Aconcagua").
+
+    Answering it with a random FAQ entry (the guides) read like a bot; a
+    person greets and asks what they want to know.
+    """
+    normalized = normalize_for_intent(text)
+    if "?" in normalized or re.search(r"\d", normalized) or len(normalized.split()) > 14:
+        return False
+    return bool(_INTEREST_RE.search(normalized))
+
+
 OUTBOUND_DUPLICATE_WINDOW_SECONDS = 180
+# Same reply this soon after the last one means a burst of client messages
+# answered in parallel: drop it. Later, the client asked again and must get
+# an answer.
+OUTBOUND_DUPLICATE_BURST_SECONDS = 30
 
 
 def is_recent_duplicate_reply(reply: str, session_vars: dict[str, Any] | None, now_ts: int) -> bool:
@@ -1295,6 +1538,22 @@ def is_recent_duplicate_reply(reply: str, session_vars: dict[str, Any] | None, n
         and (now_ts - last_ts) <= OUTBOUND_DUPLICATE_WINDOW_SECONDS
         and normalize_for_intent(reply) == normalize_for_intent(last_reply)
     )
+
+
+def resolve_duplicate_reply(reply: str, session_vars: dict[str, Any], now_ts: int, lang: str) -> str:
+    """What to send when the reply repeats the previous one.
+
+    Within a burst, nothing (the client already has it). Otherwise the client
+    asked again: say it again the way a person does instead of going silent.
+    """
+    try:
+        last_ts = int(session_vars.get("last_assistant_reply_ts") or 0)
+    except (TypeError, ValueError):
+        last_ts = 0
+    if now_ts - last_ts <= OUTBOUND_DUPLICATE_BURST_SECONDS:
+        return ""
+    text = reply.strip()
+    return f"{get_phrase('repeat_prefix', lang)} {text[:1].lower()}{text[1:]}"
 
 
 def build_inbound_signature(msg: dict[str, str]) -> str:
@@ -1349,39 +1608,65 @@ def extract_command(text: str) -> str | None:
     return parts[0].lower()
 
 
+_HANDOFF_VERB = (
+    r"(?:hablar|hablarlo|charlar|comunicarme|contactar(?:me)?|pas(?:a|as|ás|ame|arme)|comunicame"
+    r"|falar|conversar|speak|talk|chat|connect me|put me through)"
+)
+_HANDOFF_TARGET = (
+    r"(?:asesor(?:a|es)?|persona|humano|alguien|agente|vendedor(?:a)?|representante|operador(?:a)?"
+    r"|atendente|consultor(?:a)?|pessoa|alguem"
+    r"|human|person|someone|somebody|agent|representative|advisor|adviser|sales ?rep|real person)"
+)
+# "<verb> con/com/to/with [un/una/a/...] <human target>". The target is
+# required: "quiero hablar con mi esposa" is not a handoff request.
+_HANDOFF_REQUEST_RE = re.compile(
+    rf"\b{_HANDOFF_VERB}\s+(?:con|com|to|with|a)?\s*"
+    r"(?:(?:un|una|um|uma|a|an|the|el|la|o|algun|alguna|algum|alguma)\s+)?"
+    r"(?:real\s+|de\s+verdad\s+)?"
+    rf"{_HANDOFF_TARGET}\b"
+)
+
+
+_BOT_QUESTION_RE = re.compile(
+    r"\b(?:sos|eres|es|sera|será|are you|is this|r u|voce e|você é|vc e|vc é)\s+(?:un|una|a|an|um|uma)?\s*"
+    r"(?:bot|robot|robo|robô|ia|ai|inteligencia artificial|inteligência artificial|chatbot|maquina|máquina|machine)\b"
+    r"|\b(?:sos|eres|are you|voce e|você é)\s+(?:una?\s+)?(?:persona|humano|human|real person|pessoa)\b"
+    r"|\b(?:hablo|estoy hablando|am i talking|am i chatting|estou falando)\s+(?:con|with|com|to)\s+(?:un|una|a|an|um|uma)\s+"
+    r"(?:real\s+|de\s+verdad\s+)?(?:bot|robot|robo|robô|ia|ai|maquina|máquina|machine|persona|humano|human|person|pessoa)\b",
+    re.IGNORECASE,
+)
+
+
+def asks_if_bot(text: str) -> bool:
+    """True when the client asks whether they are talking to a bot or a person."""
+    return bool(_BOT_QUESTION_RE.search(normalize_for_intent(text)))
+
+
 def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -> bool:
     """Return True only when the user *explicitly* requests a human agent.
 
     Affirmative detection ("si", "ok", etc.) was deliberately removed because
     the LLM often mentions "asesor" in normal replies, which caused every
-    short affirmative to be misdetected as a handoff request.
+    short affirmative to be misdetected as a handoff request. Generic phrases
+    like "quiero hablar con" also need a human target: users often say they
+    want to talk it over with their partner before booking.
     """
     normalized = normalize_for_intent(text)
     triggers = (
-        "contactar con un asesor",
-        "contactar asesor",
-        "hablar con un asesor",
-        "hablar con una persona",
-        "hablar con alguien",
-        "hablar con un humano",
-        "pasame con un asesor",
-        "pasame con un humano",
-        "pasame con alguien",
-        "quiero hablar con",
         "quiero un asesor",
         "quiero un humano",
         "necesito un asesor",
-        "necesito hablar",
         "agente humano",
         "representante humano",
         "operador humano",
-        "speak to human",
-        "talk to a human",
-        "talk to someone",
         "human agent",
-        "connect me with",
+        "speak to human",
+        "quero um atendente",
+        "quero um consultor",
     )
-    return any(trigger in normalized for trigger in triggers)
+    if any(trigger in normalized for trigger in triggers):
+        return True
+    return bool(_HANDOFF_REQUEST_RE.search(normalized))
 
 
 def _contains_known_program_duration(normalized_text: str) -> bool:
@@ -1445,7 +1730,7 @@ def _first_program_options_reply(lang: str) -> str:
         "Para empezar, te recomiendo estas dos opciones:\n"
         "1. 18+2 (muy recomendada)\n"
         "2. 12+2 (recomendada)\n\n"
-        "También hay otras alternativas. Si quieres, te las listo en detalle."
+        "También hay otras alternativas. Si querés, te las paso en detalle."
     )
 
 
@@ -1574,6 +1859,7 @@ def ensure_runtime() -> dict[str, Any]:
         in ("1", "true", "yes", "on"),
         "allowed_chat_models": parse_csv_set(_env("OPENAI_ALLOWED_CHAT_MODELS", "") or ""),
         "top_k": int(_env("TOP_K", "4") or "4"),
+        "history_turns": int(_env("NICO_HISTORY_TURNS", str(DEFAULT_HISTORY_TURNS)) or DEFAULT_HISTORY_TURNS),
         "session_base_url": _env("SESSION_AGENT_BASE_URL"),
         "session_agent_id": _env("SESSION_AGENT_ID", "sales-agent-v1")
         or "sales-agent-v1",
@@ -1819,6 +2105,7 @@ def apply_email_ack_or_request_policy(
     session_vars: dict[str, Any],
     extracted_email: str | None,
     lang: str,
+    user_text: str = "",
 ) -> str:
     """Fix #6 + proactive email request.
 
@@ -1834,6 +2121,7 @@ def apply_email_ack_or_request_policy(
         lang,
         get_phrase=get_phrase,
         should_request_email=lambda sv: should_request_email(sv or {}),
+        user_text=user_text,
     )
 
 
@@ -2090,19 +2378,36 @@ def process_inbound_message(
         lang = get_session_language(session_vars, msg.text)
         # On the very first turn, respond with a hardcoded opening welcome for
         # pure greetings (e.g. "Hi", "Hola") instead of calling the LLM.
-        if session_vars.get("conversation_turn_count") == 1 and _is_pure_greeting(msg.text):
+        if session_vars.get("conversation_turn_count") == 1 and (
+            _is_pure_greeting(msg.text) or is_generic_opening(msg.text)
+        ):
             decision.reply = get_phrase("opening_welcome", lang)
+        elif is_thanks_only(msg.text):
+            thanks_count = int(session_vars.get("thanks_reply_count") or 0)
+            decision.reply = get_phrase(f"thanks_reply_{thanks_count % 2 + 1}", lang)
+            session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
-            if guided_reply is not None:
+            short_program = short_program_reply(msg.text, lang)
+            if asks_if_bot(msg.text):
+                # Honest and fixed: the model tended to dodge it with "no lo tengo a mano".
+                decision.reply = get_phrase("bot_question", lang)
+            elif short_program is not None:
+                # Fernando's 6,000 m rule; the model got it backwards for Kilimanjaro.
+                decision.reply = short_program
+            elif guided_reply is not None:
                 decision.reply = guided_reply
             else:
-                decision.hits = retrieve_top_k(
+                decision.hits = retrieve_with_context(
                     client,
                     runtime["embed_model"],
                     runtime["rows"],
                     msg.text,
+                    session_vars.get("recent_turns"),
                     runtime["top_k"],
+                )
+                decision.hits = ensure_departure_hit(
+                    decision.hits, runtime["rows"], msg.text, lang, runtime["top_k"]
                 )
                 decision.reply = generate_reply(
                     client,
@@ -2111,9 +2416,21 @@ def process_inbound_message(
                     msg_dict,
                     decision.hits,
                     session_vars,
+                    history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
+                )
+                decision.reply = drop_repeated_email_ask(decision.reply, session_vars)
+                departures = season_departures(runtime["rows"])
+                decision.reply = apply_video_call_close(
+                    decision.reply,
+                    msg.text,
+                    session_vars,
+                    lang,
+                    has_email=bool(context.extracted_email),
+                    extra_note=extended_alternative_note(msg.text, departures, today_in_argentina(), lang),
+                    departures=departures,
                 )
                 decision.reply = apply_email_ack_or_request_policy(
-                    decision.reply, session_vars, context.extracted_email, lang
+                    decision.reply, session_vars, context.extracted_email, lang, msg.text
                 )
                 decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
@@ -2127,8 +2444,8 @@ def process_inbound_message(
 
     # Short-window anti-duplicate guard for same assistant reply bursts.
     if is_recent_duplicate_reply(decision.reply, session_vars, context.now_ts):
-        decision.reply = ""
-        decision.outbound_suppressed = True
+        decision.reply = resolve_duplicate_reply(decision.reply, session_vars, context.now_ts, effective_lang)
+        decision.outbound_suppressed = not decision.reply
 
     apply_language_commit_policy(msg.text, session_vars)
 
@@ -2144,6 +2461,9 @@ def process_inbound_message(
     if decision.reply.strip():
         updated_vars["last_assistant_reply"] = decision.reply
         updated_vars["last_assistant_reply_ts"] = context.now_ts
+    updated_vars["recent_turns"] = append_recent_turns(
+        session_vars.get("recent_turns"), msg.text, decision.reply
+    )
 
     if decision.handoff_sent:
         updated_vars["handoff_email_last_sent_ts"] = context.now_ts
@@ -2192,20 +2512,6 @@ def chat_completions_compatible() -> Any:
     # Compatibility: some providers always send stream=true.
     # We currently return a non-streaming completion payload.
     _ = bool(stream)
-
-    # Temporary: learn whether OpenBSP sends conversation history (roles only,
-    # never content) to decide if the Supabase lookup can be replaced.
-    print(
-        "[OPENBSP_SHAPE] "
-        + json.dumps(
-            {
-                "messages": len(messages),
-                "roles": [m.get("role") for m in messages if isinstance(m, dict)][-12:],
-                "has_tools": bool(tools_payload),
-            }
-        ),
-        flush=True,
-    )
 
     user_text = extract_last_user_text(messages)
     if not user_text:
@@ -2415,6 +2721,7 @@ def chat_completions_compatible() -> Any:
                     "last_inbound_signature": inbound_signature,
                     "last_inbound_signature_ts": now_ts,
                     "human_active_last_seen": human_info.get("last_human_message_at"),
+                    "recent_turns": append_recent_turns(session_vars.get("recent_turns"), msg["text"], ""),
                 },
             )
             return jsonify(
@@ -2467,13 +2774,8 @@ def chat_completions_compatible() -> Any:
 
         multi_message_enabled = is_multi_message_enabled()
         can_emit_multi = multi_message_enabled and supports_respond_tool(tools_payload)
-        should_split_opening = (
-            can_emit_multi
-            and session_vars.get("conversation_turn_count") == 1
-            and _is_pure_greeting(msg["text"])
-            and decision.reply.strip()
-        )
-        split_parts = split_reply_into_messages(decision.reply) if should_split_opening else []
+        is_opening = session_vars.get("conversation_turn_count") == 1 and _is_pure_greeting(msg["text"])
+        split_parts = choose_reply_bubbles(decision.reply, can_emit_multi, is_opening)
 
         # Two client messages sent seconds apart are processed in parallel and
         # both read the session before either saved its reply, so both sent
@@ -2487,6 +2789,11 @@ def chat_completions_compatible() -> Any:
             split_parts = []
             updated_vars["last_assistant_reply"] = latest_vars.get("last_assistant_reply")
             updated_vars["last_assistant_reply_ts"] = latest_vars.get("last_assistant_reply_ts")
+        if isinstance(latest_vars, dict) and "recent_turns" in latest_vars:
+            # Build on the freshest transcript so a parallel request's turn is kept.
+            updated_vars["recent_turns"] = append_recent_turns(
+                latest_vars.get("recent_turns"), msg["text"], decision.reply
+            )
 
         try_session_upsert(
             session_base_url,

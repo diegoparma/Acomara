@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Callable
 
 
@@ -11,6 +12,38 @@ DetectLanguageConfidentFn = Callable[[str], str | None]
 GetSessionLanguageFn = Callable[[dict[str, Any] | None, str], str]
 
 
+_EMAIL_WORD_RE = re.compile(r"\b(?:e-?mail|correo|mail)\b", re.IGNORECASE)
+
+
+_EMAIL_ASK_CUE_RE = re.compile(
+    r"\?|\b(?:pasame|pasás|pasas|mandame|dejame|compartime|escribime|send me|share|what'?s your|me passa|me manda)\b",
+    re.IGNORECASE,
+)
+_EMAIL_KNOWN_KEYS = ("email_requested", "email_captured", "captured_email", "verified_email")
+
+
+def drop_repeated_email_ask(reply: str, session_vars: dict[str, Any]) -> str:
+    """Remove the model's own email ask when it was already asked or given.
+
+    Simulation 2026-10-09: the reply closed with "¿Querés que te pase el
+    detalle por email?" two turns after the email had been asked.
+    """
+    if not any(session_vars.get(k) for k in _EMAIL_KNOWN_KEYS):
+        return reply
+    sentences = re.split(r"(?<=[.!?])\s+", (reply or "").strip())
+    kept = [s for s in sentences if not (_EMAIL_WORD_RE.search(s) and _EMAIL_ASK_CUE_RE.search(s))]
+    return " ".join(kept).strip() if kept else reply
+
+
+def _reply_asks_for_email(reply: str) -> bool:
+    return bool(_EMAIL_WORD_RE.search(reply or ""))
+
+
+def _asks_more_than_email(user_text: str, email: str) -> bool:
+    rest = (user_text or "").replace(email, " ").strip(" \t\n.,;:!-")
+    return "?" in rest or len(rest.split()) >= 6
+
+
 def apply_email_ack_or_request_policy(
     reply: str,
     session_vars: dict[str, Any],
@@ -19,17 +52,25 @@ def apply_email_ack_or_request_policy(
     *,
     get_phrase: GetPhraseFn,
     should_request_email: ShouldRequestEmailFn,
+    user_text: str = "",
 ) -> str:
     """Apply deterministic email ack/request policy without side effects outside session_vars."""
     if extracted_email and not session_vars.get("email_received_acked"):
-        reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
+        if _asks_more_than_email(user_text, extracted_email) and reply.strip():
+            # "mi mail es x, cuanto sale el 18+2?": thank briefly and still
+            # answer, instead of replacing the answer with the ack.
+            reply = f"{get_phrase('email_received_short', lang)}\n\n{reply}"
+        else:
+            reply = get_phrase("email_received_ack", lang).format(email=extracted_email)
         session_vars["email_received_acked"] = True
         session_vars["email_captured"] = True
         session_vars["captured_email"] = extracted_email
         session_vars["email_requested"] = True
         session_vars["proactive_email_capture_pending"] = False
     elif should_request_email(session_vars):
-        reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
+        if not _reply_asks_for_email(reply):
+            # The model often asks for it itself; asking twice in one message reads as a bot.
+            reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
         session_vars["email_requested"] = True
         session_vars["proactive_email_capture_pending"] = True
     return reply
