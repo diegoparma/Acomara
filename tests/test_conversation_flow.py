@@ -147,5 +147,18 @@ class ConversationFlowTests(unittest.TestCase):
         self.assertEqual(self._text(self._send("Gracias de nuevo")), "¡Un placer! Si te surge otra duda, acá estoy.")
 
 
+    def test_fernando_rules_in_the_real_flow(self):
+        self.store["conv-flow"] = {"conversation_turn_count": 5, "conversation_language": "en", "email_requested": True}
+        kili = self._text(self._send("I have climbed Kilimanjaro, is the 14+2 ok for me?"))
+        self.assertIn("I'd recommend the 18+2", kili)
+        self.assertEqual(self.model.calls, [], "the 6,000 m rule answers without the model")
+
+        self.model.replies = ["The 5/12 departure is the 14+2. Do you want to know more about it?"]
+        date_pick = self._text(self._send("I'm interested in the 5/12 one"))
+        self.assertIn("An advisor will confirm availability for that date.", date_pick)
+        self.assertIn("short video call", date_pick)
+        self.assertNotIn("know more", date_pick)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

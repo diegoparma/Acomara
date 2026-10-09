@@ -72,6 +72,7 @@ from orchestrator.inbound import (
 )
 from orchestrator.crm_client_status import check_client_status
 from orchestrator.departures import ensure_departure_hit, filter_past_departures
+from orchestrator.sales_rules import apply_video_call_close, short_program_reply
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
@@ -915,6 +916,7 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "last_assistant_reply": "",
         "last_assistant_reply_ts": None,
         "recent_turns": [],
+        "video_call_offered": False,
         "handoff_requested": False,
         "handoff_pending_confirmation": False,
         "proactive_email_capture_pending": False,
@@ -2380,9 +2382,13 @@ def process_inbound_message(
             session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
+            short_program = short_program_reply(msg.text, lang)
             if asks_if_bot(msg.text):
                 # Honest and fixed: the model tended to dodge it with "no lo tengo a mano".
                 decision.reply = get_phrase("bot_question", lang)
+            elif short_program is not None:
+                # Fernando's 6,000 m rule; the model got it backwards for Kilimanjaro.
+                decision.reply = short_program
             elif guided_reply is not None:
                 decision.reply = guided_reply
             else:
@@ -2405,6 +2411,9 @@ def process_inbound_message(
                     decision.hits,
                     session_vars,
                     history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
+                )
+                decision.reply = apply_video_call_close(
+                    decision.reply, msg.text, session_vars, lang, has_email=bool(context.extracted_email)
                 )
                 decision.reply = apply_email_ack_or_request_policy(
                     decision.reply, session_vars, context.extracted_email, lang, msg.text

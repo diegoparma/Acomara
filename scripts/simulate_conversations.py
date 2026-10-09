@@ -88,11 +88,11 @@ FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
     ("datos", 1): {"must": [r"18\+2"], "must_not": [r"\b1[24]\+2\b[^.]*recomend"]},
     ("datos", 2): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
     ("memoria", 4): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
-    ("pareja", 1): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
     ("email_con_pregunta", 1): {"must": [r"hotel|comidas|mulas|porteador|gu[ií]as"]},
-    ("ingles", 1): {"must": [r"18\+2"], "must_not": [r"14\+2(?:(?!18\+2)[^.;])*(extra|extended|more|additional)(?:(?!18\+2)[^.;])*acclimati"]},
+    ("ingles", 1): {"must": [r"18\+2"], "must_not": [r"14\+2[^.]*\b(?:suitable|could suit|can suit|good fit|ok for you)", r"14\+2(?:(?!18\+2)[^.;])*(extra|extended|more|additional)(?:(?!18\+2)[^.;])*acclimati"]},
     ("fechas_y_temporada", 0): {"must": [r"(?i)nov"]},
-    ("fechas_y_temporada", 1): {"must": [r"14\+2"]},
+    ("fechas_y_temporada", 1): {"must": [r"14\+2", r"videollamada", r"disponibilidad"]},
+    ("pareja", 1): {"must": [_PRICE, r"videollamada"], "must_not": [_OLD_PRICE]},
 }
 
 # What gives a reply away as a bot, checked on every reply.
