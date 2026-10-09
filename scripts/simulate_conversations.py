@@ -106,6 +106,12 @@ TELLS = {
     "mentions_docs": re.compile(r"\bFAQ\b|documentaci[oó]n|base de (datos|conocimiento)", re.IGNORECASE),
     "asesor_humano": re.compile(r"asesor humano|human advisor", re.IGNORECASE),
 }
+# Claims the client already gave an email; checked only while they haven't.
+PHANTOM_EMAIL = re.compile(
+    r"(?:e-?mail|mail|correo) que me (?:pasaste|diste|compartiste|mandaste)|the email you (?:sent|gave|shared)",
+    re.IGNORECASE,
+)
+CLIENT_EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
 EMAIL_WORD = re.compile(r"\b(e-?mail|correo)\b", re.IGNORECASE)
 GREETING = re.compile(r"^\s*(¡\s*)?(hola|hi|hello|ol[aá])\b", re.IGNORECASE)
 
@@ -192,6 +198,7 @@ def run(only: str | None) -> dict:
         "empty_replies": 0,
         "email_asked_twice_in_one_message": 0,
         "identical_replies": 0,
+        "phantom_email": 0,
         "fact_checks": {"passed": 0, "failed": []},
     }
     seen_sentences: dict[str, int] = {}
@@ -201,7 +208,9 @@ def run(only: str | None) -> dict:
         print(f"\n=== {name} ===")
         conversation_id = f"sim-{name}"
         transcript = []
+        client_gave_email = False
         for i, text in enumerate(turns):
+            client_gave_email = client_gave_email or bool(CLIENT_EMAIL.search(text))
             before = len(usage)
             resp = client.post(
                 "/v1/chat/completions",
@@ -226,6 +235,9 @@ def run(only: str | None) -> dict:
                 results["repeated_greetings"] += 1
             if not reply.strip():
                 results["empty_replies"] += 1
+            if not client_gave_email and PHANTOM_EMAIL.search(reply):
+                results["phantom_email"] += 1
+                print("         ✗ menciona un email que el cliente no dio")
             if len(EMAIL_WORD.findall(reply)) >= 2:
                 results["email_asked_twice_in_one_message"] += 1
             # The same long sentence word for word across replies reads as canned.
@@ -269,6 +281,7 @@ def run(only: str | None) -> dict:
         "empty_replies",
         "email_asked_twice_in_one_message",
         "identical_replies",
+        "phantom_email",
         "usage",
     )
     print(json.dumps({k: results[k] for k in summary_keys}, indent=2, ensure_ascii=False))

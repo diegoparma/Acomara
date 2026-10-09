@@ -53,6 +53,26 @@ class VideoCallCloseTests(unittest.TestCase):
         self.assertIn("pasame tu email", out)
         self.assertTrue(session["video_call_offered"])
 
+    def test_availability_note_replaces_the_models_advisor_sentence(self):
+        # Regression: the advisor was named twice in a row before the invite.
+        reply = (
+            "La salida del 5/12 es para el 14+2, para quienes ya estuvieron arriba de 6.000 m. "
+            "Eso te lo puede ver un asesor del equipo y te guía con la mejor opción."
+        )
+        out = apply_video_call_close(reply, "Me interesa la del 5/12", {}, "es")
+        self.assertEqual(out.count("asesor"), 1)
+        self.assertIn("La salida del 5/12 es para el 14+2", out)
+
+    def test_invite_with_email_counts_as_the_email_ask(self):
+        # Regression: the next turn appended "pasame tu email" again.
+        session: dict = {}
+        apply_video_call_close("El 18+2 sale USD 7.250.", "quiero reservar", session, "es")
+        self.assertTrue(session["email_requested"])
+        from orchestrator.security import should_request_email
+
+        session["conversation_turn_count"] = 3
+        self.assertFalse(should_request_email(session))
+
     def test_talking_about_booking_gets_the_invite(self):
         out = apply_video_call_close("El 18+2 sale USD 7.250.", "Quiero hablar con mi esposa antes de reservar, ¿me pasás el precio?", {}, "es")
         self.assertTrue(out.startswith("El 18+2 sale USD 7.250.\n\nSi querés, armamos una videollamada"))

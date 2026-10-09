@@ -127,6 +127,16 @@ def _drop_trailing_question(reply: str) -> str:
     return reply.strip()
 
 
+_ADVISOR_RE = re.compile(r"\b(?:asesor|advisor|consultor)", re.IGNORECASE)
+
+
+def _drop_advisor_sentences(reply: str) -> str:
+    """Remove the model's own "un asesor te lo ve" sentences; the availability note says it once."""
+    sentences = re.split(r"(?<=[.!?])\s+", reply.strip())
+    kept = [s for s in sentences if not (_ADVISOR_RE.search(s) and not re.search(r"\d", s))]
+    return " ".join(kept).strip() if kept else reply.strip()
+
+
 def apply_video_call_close(reply: str, user_text: str, session_vars: dict, lang: str, has_email: bool = False) -> str:
     """Close with Fernando's video call invite on concrete interest, once per conversation."""
     if not reply.strip() or session_vars.get("video_call_offered"):
@@ -140,9 +150,16 @@ def apply_video_call_close(reply: str, user_text: str, session_vars: dict, lang:
     lang = lang if lang in VIDEO_CALL_INVITE else "es"
     parts = [_drop_trailing_question(reply)]
     if picked_date:
-        parts.append(DATE_AVAILABILITY_NOTE[lang])
+        # Simulation 2026-10-09: "Eso te lo puede ver un asesor... La disponibilidad
+        # de esa fecha te la confirma un asesor." named the advisor twice in a row.
+        parts = [_drop_advisor_sentences(parts[0]), DATE_AVAILABILITY_NOTE[lang]]
     session_vars["video_call_offered"] = True
     # Fernando asks for the email together with the call when we don't have it yet.
     known_email = has_email or any(session_vars.get(k) for k in _EMAIL_KEYS)
     invite = VIDEO_CALL_INVITE if known_email else VIDEO_CALL_INVITE_WITH_EMAIL
+    if not known_email:
+        # The invite asks for the email: count it as the single ask, or the
+        # proactive policy asks again on the next turn (simulation 2026-10-09).
+        session_vars["email_requested"] = True
+        session_vars["proactive_email_capture_pending"] = True
     return " ".join(parts) + "\n\n" + invite[lang]
