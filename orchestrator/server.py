@@ -88,6 +88,7 @@ from orchestrator.humanize import (
 )
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
+from orchestrator.caja_interno import internal_reply
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
@@ -2530,6 +2531,28 @@ def chat_completions_compatible() -> Any:
     headers_dict = validate_and_normalize_headers(request.headers)
     inbound_msg = InboundMessage.from_headers(user_text, headers_dict)
     load_local_env()
+
+    # Team phones go to the internal cash-flow agent before anything of sales runs:
+    # no session, CRM or RAG for them. Everyone else continues below unchanged.
+    caja_reply = internal_reply(inbound_msg.contact_address, user_text)
+    if caja_reply is not None:
+        return jsonify(
+            {
+                "id": f"chatcmpl-{uuid4().hex[:24]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": {"role": "assistant", "content": caja_reply},
+                        "finish_reason": "stop",
+                        "logprobs": None,
+                    }
+                ],
+                "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+            }
+        )
     lightweight_model_runtime = {
         "chat_model": _env("OPENAI_CHAT_MODEL", "gpt-5.4"),
         "chat_model_from_request": str(_env("OPENAI_CHAT_MODEL_FROM_REQUEST", "false") or "false")
