@@ -330,7 +330,7 @@ class EmailAckOrRequestPolicyTests(unittest.TestCase):
         sv: dict = {"conversation_turn_count": 3}
         out = apply_email_ack_or_request_policy("Info útil", sv, None, "es")
         self.assertIn("Info útil", out)
-        self.assertIn("correo", out.lower())
+        self.assertIn("email", out.lower())
         self.assertTrue(sv["email_requested"])
         self.assertTrue(sv["proactive_email_capture_pending"])
 
@@ -359,7 +359,7 @@ class OutOfSeasonPolicyTests(unittest.TestCase):
             sv,
             "es",
         )
-        self.assertTrue(out.startswith("Importante"))
+        self.assertTrue(out.startswith("Ojo:"))
         self.assertIn("Detalle de la expedición", out)
         self.assertTrue(sv["out_of_season_warned"])
 
@@ -446,7 +446,7 @@ class PausedAntiLoopGuardTests(unittest.TestCase):
         second = apply_paused_anti_loop_guard(session, msg, runtime, 1010)[0]
         third = apply_paused_anti_loop_guard(session, msg, runtime, 1020)[0]
         self.assertEqual(first, "Great! We'll be in touch shortly.")
-        self.assertIn("closing this automated thread", second)
+        self.assertIn("no need to send anything else", second)
         self.assertEqual(third, "")
 
 
