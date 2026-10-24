@@ -6,7 +6,50 @@ Searches by phone number (primary) or email (fallback).
 
 import os
 import mysql.connector
+import requests
 from typing import Optional
+
+
+NOT_FOUND = {
+    "found": False,
+    "contacted": False,
+    "client_id": None,
+    "consultation_count": 0,
+    "last_consultation_date": None,
+    "client_name": None,
+    "search_by": None,
+}
+
+
+def check_client_status_http(url: str, token: str, phone: str = None, email: str = None) -> dict:
+    """Ask the SGI endpoint (sgi_endpoint/nico_cliente_status.php) about a client."""
+    try:
+        response = requests.post(
+            url,
+            json={"phone": phone or "", "email": email or ""},
+            headers={"X-Nico-Token": token},
+            timeout=int(os.getenv("CRM_STATUS_TIMEOUT", "5")),
+        )
+        if response.status_code == 400:
+            return dict(NOT_FOUND)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as e:
+        print(f"[CRM_DEBUG] ❌ Endpoint error: {e}")
+        return {**NOT_FOUND, "error": str(e)}
+
+    if not data.get("found"):
+        return dict(NOT_FOUND)
+    count = int(data.get("consultation_count") or 0)
+    return {
+        "found": True,
+        "contacted": count > 0,
+        "client_id": data.get("client_id"),
+        "consultation_count": count,
+        "last_consultation_date": data.get("last_consultation_date"),
+        "client_name": data.get("client_name"),
+        "search_by": data.get("search_by"),
+    }
 
 
 def get_db_connection():
@@ -35,6 +78,11 @@ def check_client_status(phone: str = None, email: str = None) -> dict:
     - search_by: str - 'phone' or 'email' indicating how we found them
     """
     print(f"[CRM_DEBUG] check_client_status called with phone={phone}, email={email}")
+
+    url = os.getenv("CRM_STATUS_URL")
+    token = os.getenv("CRM_STATUS_TOKEN")
+    if url and token and (phone or email):
+        return check_client_status_http(url, token, phone=phone, email=email)
 
     if not phone and not email:
         print("[CRM_DEBUG] No phone or email provided")
