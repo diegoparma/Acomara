@@ -7,6 +7,7 @@ Agente de ventas por WhatsApp/email para expediciones al Aconcagua. Diseño y op
 Este repo es parte del mismo negocio que:
 
 - **`~/Documents/Aconcagua Service Provider`**: licitación y concesión del Parque Provincial Aconcagua vía Zurbriggen 6962 SAS, infraestructura de campamentos, permisos, admin/investor room. Si una tarea toca precios, programas, temporada o permisos, revisar también ese repo para mantener los datos consistentes.
+- **`~/Documents/aconcagua-basecamp-web`** (github diegoparma/aconcagua-basecamp-web): web de **Aconcagua Basecamp**, la marca hermana que vende servicios de campamento base sueltos (www.aconcaguabasecamp.com). Reparto de búsquedas: Acomara = expediciones guiadas; ABC = servicios de campamento, logística sin guía y agencias. No copiar textos entre los dos sitios; si Nico menciona servicios sueltos o precios de campamento, que coincidan con los de esa web.
 
 ## Dependencias
 
