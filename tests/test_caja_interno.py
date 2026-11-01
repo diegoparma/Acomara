@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import threading
+import time
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -68,7 +69,7 @@ class CajaInternoTest(unittest.TestCase):
     def setUp(self):
         StubAgent.calls = []
         StubAgent.down = False
-        caja_interno._team_cache.update(at=0.0, phones=frozenset())
+        caja_interno._team_cache.update(at=0.0, tried=0.0, phones=frozenset())
         os.environ["CAJA_AGENTE_URL"] = self.url
         os.environ["CAJA_AGENT_KEY"] = KEY
 
@@ -93,6 +94,43 @@ class CajaInternoTest(unittest.TestCase):
         caja_interno.internal_reply("5491100000000", "a")
         caja_interno.internal_reply("5491100000001", "b")
         self.assertEqual(sum(c["path"].endswith("a=equipo") for c in StubAgent.calls), 1)
+
+    def _team_list_requests(self) -> int:
+        return sum(c["path"].endswith("a=equipo") for c in StubAgent.calls)
+
+    def test_just_added_phone_reaches_agent_with_fresh_cache(self):
+        # The cached list is recent and doesn't have them yet; the agent's does.
+        now = time.time()
+        caja_interno._team_cache.update(at=now - 60, tried=now - 60, phones=frozenset())
+        self.assertEqual(caja_interno.internal_reply(TEAM, "gasté 100"), "eco: gasté 100")
+        self.assertEqual(self._team_list_requests(), 1)
+
+    def test_clients_refresh_the_list_at_most_once_per_interval(self):
+        now = time.time()
+        caja_interno._team_cache.update(at=now - 60, tried=now - 60, phones=frozenset())
+        for i in range(5):
+            self.assertIsNone(caja_interno.internal_reply(f"549110000000{i}", "hola"))
+        self.assertEqual(self._team_list_requests(), 1)
+
+        caja_interno._team_cache["tried"] = time.time() - caja_interno.TEAM_MIN_INTERVAL_SECONDS
+        self.assertIsNone(caja_interno.internal_reply("5491100000009", "hola"))
+        self.assertEqual(self._team_list_requests(), 2)
+
+    def test_listed_phone_does_not_refresh(self):
+        now = time.time()
+        caja_interno._team_cache.update(at=now - 60, tried=now - 60, phones=frozenset({TEAM}))
+        caja_interno.internal_reply(TEAM, "ok")
+        self.assertEqual(self._team_list_requests(), 0)
+
+    def test_agent_down_is_tried_once_per_interval_and_keeps_the_list(self):
+        now = time.time()
+        known = frozenset({"5492619990000"})
+        caja_interno._team_cache.update(at=now - 60, tried=now - 60, phones=known)
+        StubAgent.down = True
+        for i in range(5):
+            self.assertIsNone(caja_interno.internal_reply(f"549110000000{i}", "hola"))
+        self.assertEqual(self._team_list_requests(), 1)
+        self.assertEqual(caja_interno._team_cache["phones"], known)
 
     def test_agent_down_does_not_touch_clients(self):
         StubAgent.down = True

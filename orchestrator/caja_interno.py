@@ -6,9 +6,10 @@ point: when the sender is on the team list, the message goes to that agent and
 its reply is returned as the completion; everyone else keeps going to sales.
 
 The decision is made here by comparing phone numbers, never by a model. The
-team list comes from the agent itself and is cached, so adding someone in the
-caja dashboard is enough. If the agent can't be reached, clients are
-unaffected: an unknown list means "nobody is team".
+team list comes from the agent itself and is cached, and a number that isn't
+listed triggers a rate-limited refresh, so adding someone in the caja dashboard
+is enough. If the agent can't be reached, clients are unaffected: an unknown
+list means "nobody is team".
 
 Env: CAJA_AGENTE_URL (e.g. https://aconcagua-plan-admin.vercel.app/api/agente)
 and CAJA_AGENT_KEY. Without both, the route is off and nothing changes.
@@ -25,12 +26,13 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 TEAM_TTL_SECONDS = 300
+TEAM_MIN_INTERVAL_SECONDS = 30  # per instance, whether the last try worked or not
 TEAM_TIMEOUT_SECONDS = 3
 AGENT_TIMEOUT_SECONDS = 50
 UNAVAILABLE_REPLY = "Ahora no puedo llegar a la caja. Probá de nuevo en unos minutos."
 
 _team_lock = threading.Lock()
-_team_cache: dict[str, Any] = {"at": 0.0, "phones": frozenset()}
+_team_cache: dict[str, Any] = {"at": 0.0, "tried": 0.0, "phones": frozenset()}
 
 
 def _config() -> tuple[str, str] | None:
@@ -58,20 +60,21 @@ def _call(url: str, key: str, method: str, body: dict[str, Any] | None, timeout:
         return json.loads(resp.read().decode() or "{}")
 
 
-def _team_phones(url: str, key: str) -> frozenset[str]:
+def _team_phones(url: str, key: str, refresh: bool = False) -> frozenset[str]:
     now = time.time()
     with _team_lock:
-        if now - _team_cache["at"] < TEAM_TTL_SECONDS:
+        if not refresh and now - _team_cache["at"] < TEAM_TTL_SECONDS:
             return _team_cache["phones"]
+        if now - _team_cache["tried"] < TEAM_MIN_INTERVAL_SECONDS:
+            return _team_cache["phones"]
+        _team_cache["tried"] = now
     try:
         data = _call(f"{url}?a=equipo", key, "GET", None, TEAM_TIMEOUT_SECONDS)
         phones = frozenset(_digits(p) for p in data.get("telefonos", []) if len(_digits(p)) >= 8)
     except (HTTPError, URLError, TimeoutError, ValueError, OSError) as exc:
         print(f"[CAJA_INTERNO] team list unavailable: {exc}", flush=True)
         with _team_lock:
-            phones = _team_cache["phones"]  # keep the last known list
-            _team_cache["at"] = now - TEAM_TTL_SECONDS + 30  # retry in 30 s
-        return phones
+            return _team_cache["phones"]  # keep the last known list
     with _team_lock:
         _team_cache.update(at=now, phones=phones)
     return phones
@@ -82,7 +85,12 @@ def is_team_phone(contact_address: str) -> bool:
     if not cfg:
         return False
     d = _digits(contact_address)
-    return any(_same_phone(d, p) for p in _team_phones(*cfg))
+    if any(_same_phone(d, p) for p in _team_phones(*cfg)):
+        return True
+    # Not listed: may have been added moments ago, so look again before calling
+    # them a client. TEAM_MIN_INTERVAL_SECONDS keeps client traffic from
+    # turning this into a request per message.
+    return any(_same_phone(d, p) for p in _team_phones(*cfg, refresh=True))
 
 
 def internal_reply(contact_address: str, user_text: str) -> str | None:
