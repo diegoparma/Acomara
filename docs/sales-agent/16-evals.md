@@ -34,7 +34,7 @@ python3 scripts/run_evals.py --n 110 --intent medical_question --intent off_seas
 python3 scripts/run_evals.py --report evals/runs/<dir>/run.json --compare evals/baselines/main/summary.json
 
 # 6. Calibrar el juez contra casos etiquetados a mano
-python3 scripts/run_evals.py --calibrate --judge-model gpt-4.1
+python3 scripts/run_evals.py --calibrate --judge-model gpt-4.1 --repeats 3
 ```
 
 Opciones principales: `--n` (personas combinatorias), `--llm-personas` (personas extra escritas por el modelo, con historia propia), `--seed`, `--concurrency` (8 por defecto), `--nico-model` (producción: `gpt-4.1-mini`), `--simulator-model`, `--judge-model`, `--no-judge`, `--max-turns`, `--intent`, `--language`, `--fail-on-regression PUNTOS` (sale con código 1 si el overall cae más que eso), `--no-run-json`.
@@ -58,7 +58,7 @@ El costo se registra por rol (Nico, embeddings, simulador, juez, escritor de per
 
 ## Personas (`evals/personas.py`)
 
-Dimensiones, cada una balanceada (con `--n 330` cada intención aparece 30 veces) y reproducible con la misma semilla:
+Dimensiones, cada una balanceada (con `--n 320` cada una de las 16 intenciones aparece 20 veces) y reproducible con la misma semilla:
 
 | Dimensión | Valores |
 |---|---|
@@ -68,8 +68,8 @@ Dimensiones, cada una balanceada (con `--n 330` cada intención aparece 30 veces
 | Grupo | 1, 2, 3, 4, 6 |
 | Presupuesto | `tight`, `flexible`, `premium` |
 | Objeción | `none`, `price`, `fitness_fear`, `dates`, `family` |
-| Estilo | `normal`, `terse`, `emojis`, `typos`, `voice_note` (transcripción de audio), `burst` (2-3 mensajes seguidos), `long_email` (canal email) |
-| Intención | `info_seeker`, `price_shopper`, `ready_to_book`, `wants_human`, `asks_if_bot`, `off_season`, `medical_question`, `basecamp_only`, `short_program_fan`, `family_decision`, `troll_spam` |
+| Estilo | `normal`, `terse`, `emojis`, `typos`, `voice_note` (transcripción de audio), `burst` (2-3 mensajes seguidos), `long_email` (canal email), `code_switch` (spanglish / portuñol) |
+| Intención | `info_seeker`, `price_shopper`, `ready_to_book`, `wants_human`, `asks_if_bot`, `off_season`, `medical_question`, `basecamp_only`, `short_program_fan`, `family_decision`, `troll_spam`, `agency_reseller` (agencia que pide tarifa neta), `private_expedition`, `trek_only` (Plaza de Mulas / Plaza Francia), `payment_methods` (tarjeta, cripto, seña, saldo), `gear_and_insurance` (alquiler de equipo, seguro de rescate) |
 
 Las personas son ficticias: emails `@example.com`, sin teléfonos. **No agregar datos de clientes reales** (esos viven solo en la laptop de Diego, en `private/` y `tests/fixtures/conversations/`).
 
@@ -98,7 +98,14 @@ Códigos que solo puede ver el juez: `IGNORES_QUESTION`, `ROBOTIC_TONE`, `HALLUC
 
 ### Calibración (`evals/calibration.py`)
 
-16 conversaciones sintéticas etiquetadas a mano (una buena en rioplatense, precio viejo, precio inventado, permiso "incluido", "todo incluido", 14+2 a alguien con Kilimanjaro, Diamox con dosis, cupo confirmado, descuento inventado, email pedido dos veces, respuesta en español a un brasileño, respuesta robótica con negritas y guiones largos, troll bien manejado, fuga del prompt, respuesta buena en inglés, fuera de temporada sin aviso). Cada caso dice qué códigos deterministas tienen que saltar (lo prueba `tests/test_evals.py`) y qué rango de puntajes tiene que dar el juez (`--calibrate`). Si se cambia la rúbrica o el modelo del juez, correr `--calibrate` primero.
+36 conversaciones sintéticas etiquetadas a mano, buenas y malas: precios (viejo, inventado, privada y treks correctos), permiso y seguro "incluidos", "todo incluido", 14+2 a alguien con Kilimanjaro, Diamox con dosis, cupo confirmado y cupo con cautela, descuento inventado, tarjeta que "mantiene la promo", seña correcta, email pedido dos veces / ya dado / fantasma, "¿querés hablar con un asesor?", derivación bien hecha, agencia bien atendida, logística suelta vendida, idioma y voseo, respuesta robótica, base de datos mencionada, saludo repetido, muro de texto, troll bien manejado, fuga del prompt, fuera de temporada sin aviso, comprador sin videollamada, pregunta ignorada, itinerario inventado.
+
+Cada caso dice:
+- `codes`: qué códigos deterministas tienen que saltar, exactamente (lo prueba `tests/test_evals.py`; otro test exige que cada código con significado tenga al menos un caso);
+- `judge_codes`: para fallas que solo ve un lector (pregunta ignorada, dato inventado), al menos uno de esos códigos tiene que marcar el juez;
+- `min` / `max`: el rango de puntajes que tiene que dar el juez. En los casos buenos además no puede marcar violaciones críticas.
+
+`--calibrate` corre el juez sobre los 36 casos y dice cuáles quedan fuera de rango; con `--repeats 3` también mide cuánto varía el puntaje entre llamadas (si varía más de ~0,5 puntos, las diferencias chicas entre corridas no son confiables). Si se cambia la rúbrica o el modelo del juez, correr `--calibrate` primero.
 
 ## Chequeos deterministas (`evals/checks.py`)
 
@@ -113,6 +120,7 @@ Sin modelo, en cada respuesta y en la conversación entera. Severidad 1 menor, 2
 | `CONFIRMS_AVAILABILITY` | 3 | "hay lugar", "te reservo el cupo", "spots available" sin "lo confirma un asesor" |
 | `MEDICAL_ADVICE` | 3 | Medicamentos o dosis (Diamox, ibuprofeno, "250 mg") sin derivar a un médico |
 | `PERMIT_INCLUDED` | 3 | Dice que el permiso del Parque está incluido |
+| `INSURANCE_INCLUDED` | 3 | Dice que el seguro de rescate está incluido |
 | `INCLUDES_EVERYTHING` | 2 | "incluye todo", "all-inclusive" |
 | `SHORT_PROGRAM_TO_INEXPERIENCED` | 3 | Recomienda 12+2/14+2 a quien no pasó los 6.000 m |
 | `SELLS_LOOSE_LOGISTICS` | 2 | Ofrece solo mulas / campamento sin guía |
@@ -138,23 +146,24 @@ Para agregar un chequeo: código en `CODES`, regex, una línea en `_reply_findin
 Sin key, Nico usa un stub: los embeddings eligen la fila del FAQ por palabras en común y la "respuesta del modelo" es el comienzo de la respuesta del FAQ (que está en inglés). El cliente es un guion fijo y no hay juez: los puntajes salen de los regex. Por eso offline hay mucho `LANGUAGE_DRIFT`, `IDENTICAL_REPLY` y `EMPTY_REPLY` (el stub repite y la regla 15 suprime la repetición): **no son señales sobre el prompt**. Sí son reales los hallazgos sobre respuestas fijas del código (las que no llaman al modelo), y el modo sirve para comparar cambios en `server.py`, `humanize.py`, `sales_rules.py` o `policies.py`:
 
 ```bash
-python3 scripts/run_evals.py --n 330 --offline --compare evals/baselines/offline-main/summary.json
+python3 scripts/run_evals.py --n 320 --offline --compare evals/baselines/offline-main/summary.json
 ```
 
-`evals/baselines/offline-main/` es esa corrida sobre `main` (commit `130c9c8`).
+`evals/baselines/offline-main/` es esa corrida sobre el código de `main` (commit `130c9c8`; hay que regenerarla con el mismo comando si cambian las personas, porque el diff pareado compara por persona).
 
 ## Lo que ya encontró (corrida offline, código de `main`)
 
 Fallas del código fijo, reproducibles sin modelo. Son para las sesiones que tocan `server.py` / el prompt / el conocimiento:
 
-1. **La regla 9 recomienda el 12+2 a todos.** `_first_program_options_reply` (`server.py`) responde "1. 18+2 (muy recomendada) 2. 12+2 (recomendada)" a cualquiera que pregunte por programas, antes de saber su experiencia. Contradice la regla de 6.000 m de Fernando. 24 de 330 conversaciones.
+1. **La regla 9 recomienda el 12+2 a todos.** `_first_program_options_reply` (`server.py`) responde "1. 18+2 (muy recomendada) 2. 12+2 (recomendada)" a cualquiera que pregunte por programas, antes de saber su experiencia. Contradice la regla de 6.000 m de Fernando. 21 de 320 conversaciones en la corrida actual.
 2. **La regla 9 le contesta en español a los brasileños.** `_first_program_options_reply` y `_followup_program_options_reply` solo tienen inglés y español; con `lang == "pt"` cae al español.
-3. **El aviso de fuera de temporada (regla 12) no salta con "ir en julio".** `mentions_out_of_season` exige una palabra de viaje en el mismo mensaje (`salida`, `subir`, `climb`...). "¿Se puede ir en julio?", "Can we go in July?", "Dá pra ir em julho?" y "queremos ir en junio" no reciben el aviso; "Quiero subir en julio" sí. 22 de 330 conversaciones `off_season` sin aviso.
+3. **El aviso de fuera de temporada (regla 12) no salta con "ir en julio".** `mentions_out_of_season` exige una palabra de viaje en el mismo mensaje (`salida`, `subir`, `climb`...). "¿Se puede ir en julio?", "Can we go in July?", "Dá pra ir em julho?" y "queremos ir en junio" no reciben el aviso; "Quiero subir en julio" sí. 13 de 20 conversaciones `off_season` sin aviso en la corrida actual.
 4. **Si la verificación del email falla, la derivación a un asesor queda trabada.** Cuando el cliente pide un asesor y después da el email, si `check_email_reputation` no pudo verificar (HIBP caído o sin key) nunca se marca `email_verified_real`, Nico contesta "Me falta tu email para pasarte con el asesor" y después se calla. El lead que pidió hablar con una persona no llega a nadie.
-5. **Las frases fijas tratan de vos a todos.** Bienvenida, pedido de email ("Si querés, pasame tu email"), "¿sos un bot?", email guardado: a un cliente de México o España que escribe de usted le llegan con voseo. 75 de 330 conversaciones (todas las `es_neutro`).
+5. **Las frases fijas tratan de vos a todos.** Bienvenida, pedido de email ("Si querés, pasame tu email"), "¿sos un bot?", email guardado: a un cliente de México o España que escribe de usted le llegan con voseo. 64 de 320 conversaciones en la corrida actual (casi todas las `es_neutro`).
 6. **Mientras espera el email para derivar, ignora las preguntas.** Con la derivación pendiente, a "¿cuánto sale?" responde otra vez "Me falta tu email" (`handoff_pending`), sin contestar el precio.
 7. **Texto roto en el FAQ.** La entrada `faq-044` (programa de entrenamiento) trae "Principio del formulario Final del formulario" (copiado de un formulario web); sale tal cual cuando el modelo copia el FAQ. Para la sesión de conocimiento.
 8. **Con errores de tipeo no detecta el pedido de asesor.** "uqisiera hbalar con nu asesor" no deriva. Menor: es realista pero poco frecuente.
+9. **En inglés, preguntar por una privada dispara la lista fija de programas.** "Do you offer private expeditions with our own guide? How much?" recibe "1. 18+2 (highly recommended) 2. 12+2 (recommended)" (regla 9) en vez del precio de la privada (desde USD 7.990). Lo mismo con "Can you tell me about your Aconcagua expeditions?". En español la misma pregunta va al modelo.
 
 **Pendiente:** el baseline con modelo real (OpenAI) y su lista de los 10 patrones de falla principales del prompt. Esta sesión no tenía `OPENAI_API_KEY`; el comando está en "Uso rápido", paso 2.
 

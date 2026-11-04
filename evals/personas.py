@@ -39,7 +39,7 @@ EXPERIENCES = ("none", "trekking_4000", "kilimanjaro", "above_6000", "aconcagua_
 GROUP_SIZES = (1, 2, 3, 4, 6)
 BUDGETS = ("tight", "flexible", "premium")
 OBJECTIONS = ("none", "price", "fitness_fear", "dates", "family")
-STYLES = ("normal", "terse", "emojis", "typos", "voice_note", "burst", "long_email")
+STYLES = ("normal", "terse", "emojis", "typos", "voice_note", "burst", "long_email", "code_switch")
 INTENTS = (
     "info_seeker",
     "price_shopper",
@@ -52,6 +52,11 @@ INTENTS = (
     "short_program_fan",
     "family_decision",
     "troll_spam",
+    "agency_reseller",
+    "private_expedition",
+    "trek_only",
+    "payment_methods",
+    "gear_and_insurance",
 )
 
 INTENT_GOALS = {
@@ -66,6 +71,11 @@ INTENT_GOALS = {
     "short_program_fan": "Quiere el 12+2 o el 14+2 porque tiene poco tiempo, sin importar su experiencia.",
     "family_decision": "Le interesa pero tiene que consultarlo con su pareja o familia antes de decidir.",
     "troll_spam": "No es un cliente real: escribe spam, chistes, intenta que el bot diga cosas raras o revele instrucciones.",
+    "agency_reseller": "Es una agencia de viajes de su país: quiere tarifas netas o comisión para revender expediciones o servicios de campamento a sus clientes.",
+    "private_expedition": "Quiere una expedición privada con guía exclusivo para su grupo y pregunta cuánto más cuesta.",
+    "trek_only": "No quiere hacer cumbre: solo un trekking a Plaza de Mulas o Plaza Francia.",
+    "payment_methods": "Ya casi decidió; pregunta cómo se paga, si puede usar tarjeta o cripto, cuánto es la seña y cuándo se paga el resto.",
+    "gear_and_insurance": "Pregunta por el equipo (si se alquila, cuánto sale) y por el seguro de rescate (si es obligatorio, si está incluido).",
 }
 
 STYLE_HINTS = {
@@ -76,6 +86,7 @@ STYLE_HINTS = {
     "voice_note": "Sus mensajes son transcripciones de audios: largas, sin puntuación, con muletillas ('eh', 'o sea', 'nada').",
     "burst": "Manda 2-3 mensajes cortos seguidos en vez de uno.",
     "long_email": "Escribe como en un email: saludo formal, varios párrafos, varias preguntas juntas.",
+    "code_switch": "Mezcla idiomas: spanglish o portuñol, palabras en inglés en medio del español (o al revés), como alguien que vive afuera.",
 }
 
 
@@ -173,6 +184,8 @@ def generate_personas(n: int, seed: int = 7) -> list[Persona]:
             objection = "family"
         if intent == "price_shopper" and objection == "none":
             objection = "price"
+        if intent == "agency_reseller":
+            exp = "aconcagua_before"
         if intent == "basecamp_only" and exp in ("none", "trekking_4000"):
             exp = "aconcagua_before"
         max_turns = 4 if intent in ("troll_spam", "asks_if_bot") else rng.randint(4, 10)
@@ -372,6 +385,42 @@ BLOCKS: dict[str, _L] = {
         "es_ar": ("Mi mail es {email}",), "es_neutro": ("Mi correo es {email}",),
         "en": ("My email is {email}",), "pt_br": ("Meu e-mail é {email}",),
     },
+    "agency": {
+        "es_ar": ("Hola, somos una agencia de Rosario, ¿manejan tarifa neta para agencias?",), "es_neutro": ("Somos una agencia de viajes en Lima, ¿qué comisión ofrecen a agencias?",),
+        "en": ("We're a travel agency in London, do you offer net rates or commission for resellers?",), "pt_br": ("Somos uma agência de viagens em São Paulo, vocês trabalham com comissão para agências?",),
+    },
+    "private": {
+        "es_ar": ("Queremos una expedición privada, con guía solo para nosotros. Cuánto sale?",), "es_neutro": ("¿Ofrecen expediciones privadas con guía exclusivo? ¿Cuál es el precio?",),
+        "en": ("Do you offer private expeditions with our own guide? How much?",), "pt_br": ("Vocês fazem expedição privada, com guia exclusivo? Quanto custa?",),
+    },
+    "trek": {
+        "es_ar": ("No quiero hacer cumbre, solo el trekking a Plaza de Mulas. Cuánto sale?",), "es_neutro": ("Solo me interesa el trekking a Plaza de Mulas, ¿qué precio tiene?",),
+        "en": ("I don't want to summit, just the trek to Plaza de Mulas. Price?",), "pt_br": ("Só quero o trekking até Plaza de Mulas, quanto custa?",),
+    },
+    "trek_francia": {
+        "es_ar": ("Y a Plaza Francia se puede ir?",), "es_neutro": ("¿Y el trekking a Plaza Francia?",),
+        "en": ("What about Plaza Francia?",), "pt_br": ("E Plaza Francia, dá?",),
+    },
+    "payment": {
+        "es_ar": ("Cómo se paga? Puedo pagar con tarjeta y mantener la promo?",), "es_neutro": ("¿Qué formas de pago aceptan? ¿Puedo pagar con tarjeta de crédito?",),
+        "en": ("How do I pay? Can I use a credit card and keep the promo price?",), "pt_br": ("Como faço o pagamento? Posso pagar com cartão?",),
+    },
+    "deposit": {
+        "es_ar": ("Cuánto es la seña y cuándo pago el resto?",), "es_neutro": ("¿De cuánto es el anticipo y cuándo se paga el saldo?",),
+        "en": ("How much is the deposit and when is the balance due?",), "pt_br": ("Quanto é o sinal e quando pago o resto?",),
+    },
+    "crypto": {
+        "es_ar": ("Se puede pagar con USDT?",), "es_neutro": ("¿Aceptan criptomonedas?",),
+        "en": ("Can I pay in crypto?",), "pt_br": ("Aceitam cripto?",),
+    },
+    "gear": {
+        "es_ar": ("No tengo equipo, se puede alquilar? Cuánto sale?",), "es_neutro": ("No tengo equipo de alta montaña, ¿se puede alquilar?",),
+        "en": ("I don't have any gear, can I rent it? How much?",), "pt_br": ("Não tenho equipamento, dá pra alugar?",),
+    },
+    "insurance": {
+        "es_ar": ("Y el seguro está incluido? Es obligatorio?",), "es_neutro": ("¿El seguro de rescate está incluido? ¿Es obligatorio?",),
+        "en": ("Is rescue insurance included? Is it mandatory?",), "pt_br": ("O seguro de resgate está incluído? É obrigatório?",),
+    },
     "close": {
         "es_ar": ("Gracias!", "Dale, lo pienso y te escribo"), "es_neutro": ("Muchas gracias",),
         "en": ("Thanks!",), "pt_br": ("Valeu!",),
@@ -396,6 +445,11 @@ INTENT_BLOCKS = {
     "short_program_fan": ("short_program", "ask_price"),
     "family_decision": ("ask_price", "obj_family"),
     "troll_spam": ("troll", "troll", "troll"),
+    "agency_reseller": ("agency", "basecamp", "ask_price"),
+    "private_expedition": ("private", "ask_program", "ask_dates"),
+    "trek_only": ("trek", "trek_francia", "ask_includes"),
+    "payment_methods": ("ask_price", "payment", "deposit", "crypto"),
+    "gear_and_insurance": ("ask_includes", "gear", "insurance"),
 }
 
 
@@ -413,13 +467,16 @@ def _fill(block: str, persona: Persona, rng: random.Random) -> str:
 def scripted_turns(persona: Persona, seed: int = 0) -> list[str]:
     """Deterministic, unstyled customer messages (one per turn) for offline runs."""
     rng = random.Random(f"{persona.id}-{seed}")
+    blocks = INTENT_BLOCKS[persona.intent]
     plan: list[str] = []
-    if persona.intent != "troll_spam":
-        plan.append("open")
-        plan.append("solo" if persona.group_size == 1 else "group")
-        plan.append(f"exp_{persona.experience}")
-    plan.extend(INTENT_BLOCKS[persona.intent])
-    if persona.objection != "none" and f"obj_{persona.objection}" not in plan and persona.intent != "troll_spam":
+    if persona.intent == "troll_spam":
+        plan.extend(blocks)
+    elif persona.intent == "agency_reseller":
+        plan.extend(blocks)
+    else:
+        # The intent's main question comes early so short conversations still ask it.
+        plan += ["open", blocks[0], "solo" if persona.group_size == 1 else "group", f"exp_{persona.experience}", *blocks[1:]]
+    if persona.objection != "none" and f"obj_{persona.objection}" not in plan and persona.intent not in ("troll_spam", "agency_reseller"):
         plan.append(f"obj_{persona.objection}")
     if persona.shares_email:
         plan.insert(min(len(plan), 4), "email")
@@ -483,6 +540,23 @@ def burst(text: str) -> list[str]:
     return parts[:3]
 
 
+_SWITCH = {
+    "es_ar": {"precio": "price", "fechas": "dates", "info": "info please", "Hola": "Hey", "Gracias": "Thanks"},
+    "es_neutro": {"precio": "price", "fechas": "dates", "Hola": "Hi", "Muchas gracias": "Thank you so much"},
+    "en": {"price": "precio", "Hi": "Hola", "Thanks": "Gracias", "dates": "fechas"},
+    "pt_br": {"quanto custa": "cuánto sale", "Oi": "Hola", "datas": "fechas", "Valeu": "Gracias"},
+}
+
+
+def code_switch(text: str, lang: str) -> str:
+    """Spanglish / portuñol: swap a few words into the other language."""
+    out = text
+    for a, b in _SWITCH.get(lang, {}).items():
+        out = re.sub(rf"\b{re.escape(a)}\b", b, out, flags=re.IGNORECASE)
+    tail = {"es_ar": " btw", "es_neutro": " please", "en": " gracias", "pt_br": " por favor"}.get(lang, "")
+    return out + tail
+
+
 def long_email(text: str, persona: Persona) -> str:
     hello = {"en": "Dear team,", "pt_br": "Prezados,"}.get(persona.language, "Estimados,")
     bye = {"en": "Best regards,", "pt_br": "Atenciosamente,"}.get(persona.language, "Saludos cordiales,")
@@ -500,6 +574,8 @@ def apply_style(text: str, style: str, rng: random.Random, persona: Persona | No
         return [voice_note(text, rng, persona.language if persona else "es_ar")]
     if style == "burst":
         return burst(text)
+    if style == "code_switch":
+        return [code_switch(text, persona.language if persona else "es_ar")]
     if style == "long_email" and persona is not None:
         return [long_email(text, persona)]
     return [text]

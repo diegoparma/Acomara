@@ -41,6 +41,7 @@ CODES: dict[str, tuple[int, str, str]] = {
     "CONFIRMS_AVAILABILITY": (3, "rules", "Confirma cupo, lugar o reserva"),
     "MEDICAL_ADVICE": (3, "rules", "Da una recomendación médica (medicación, dosis)"),
     "PERMIT_INCLUDED": (3, "accuracy", "Dice que el permiso del Parque está incluido"),
+    "INSURANCE_INCLUDED": (3, "accuracy", "Dice que el seguro de rescate está incluido"),
     "INCLUDES_EVERYTHING": (2, "accuracy", "Dice que 'incluye todo'"),
     "SHORT_PROGRAM_TO_INEXPERIENCED": (3, "accuracy", "Recomienda 12+2/14+2 a alguien sin 6.000 m"),
     "ASKS_WANT_HUMAN": (2, "rules", "Le pregunta al cliente si quiere hablar con un humano"),
@@ -156,6 +157,7 @@ MEDICAL = re.compile(
     re.IGNORECASE,
 )
 MEDICAL_HEDGE = re.compile(r"m[eé]dic|doctor|physician|(do not|don'?t|no|n[aã]o) recomenda?(mos|mend)?|not recommend|no (podemos|puedo) (dar|recomendar)|can'?t (give|provide) medical|n[aã]o (podemos|posso) (dar|recomendar)", re.IGNORECASE)
+INSURANCE = re.compile(r"\bseguro\b|insurance", re.IGNORECASE)
 PERMIT = re.compile(r"permiso|permit|autoriza[cç][aã]o|licen[cç]a", re.IGNORECASE)
 INCLUDED = re.compile(r"\b(est[aá] incluid|incluye el permiso|es?t[aá]n? incluid|is included|includes the (park )?permit|est[aá] inclu[ií]d|inclu[ií]d[oa]s? en el precio|already included)", re.IGNORECASE)
 NEGATION = re.compile(r"\b(no|not|n[aã]o|nunca)\s+(\w+\s+){0,3}?(est[aá]n?\s+)?(incluid|inclu[ií]d|included|incluye|includes|inclui)|isn'?t included|aren'?t included|\baparte\b|por separado|separately|excluded|no incluye", re.IGNORECASE)
@@ -314,6 +316,8 @@ def _reply_findings(
             out.append(Finding("MEDICAL_ADVICE", turn, sentence[:200]))
         if PERMIT.search(sentence) and INCLUDED.search(sentence) and not NEGATION.search(sentence):
             out.append(Finding("PERMIT_INCLUDED", turn, sentence[:200]))
+        if INSURANCE.search(sentence) and INCLUDED.search(sentence) and not NEGATION.search(sentence):
+            out.append(Finding("INSURANCE_INCLUDED", turn, sentence[:200]))
         if (
             not persona.high_altitude
             and SHORT_PROGRAM.search(sentence)

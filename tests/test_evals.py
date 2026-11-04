@@ -213,6 +213,51 @@ class CheckTests(unittest.TestCase):
         self.assertEqual(out["turns"], 1)
 
 
+class CalibrationTests(unittest.TestCase):
+    def test_every_meaningful_code_has_a_case(self):
+        covered = {c for case in CASES for c in case["codes"]}
+        # Conversation-mechanics codes that a static transcript can't show (or only informative ones).
+        exempt = {"HTTP_ERROR", "EMPTY_REPLY", "FAQ_ONLY_PRICE", "IDENTICAL_REPLY"}
+        self.assertEqual(sorted(set(checks.CODES) - covered - exempt), [])
+
+    def test_case_names_are_unique_and_have_expectations(self):
+        names = [c["name"] for c in CASES]
+        self.assertEqual(len(names), len(set(names)))
+        for case in CASES:
+            self.assertTrue(case.get("min") or case.get("max"), case["name"])
+
+    def test_judge_calibration_logic(self):
+        from evals.calibration import run_judge_calibration
+
+        def lenient_judge(persona, transcript, findings, seed=0):
+            return normalize_verdict({"scores": {d: 5 for d in ("humanness", "accuracy", "rules", "sales", "language", "length")}}, "llm")
+
+        def paranoid_judge(persona, transcript, findings, seed=0):
+            return normalize_verdict({"scores": {d: 1 for d in ("humanness", "accuracy", "rules", "sales", "language", "length")}, "violations": [{"code": "WRONG_FACT", "turn": 0}]}, "llm")
+
+        lenient = run_judge_calibration(lenient_judge)
+        paranoid = run_judge_calibration(paranoid_judge)
+        good = [c["name"] for c in CASES if not c["codes"] and not c.get("judge_codes")]
+        bad = [c["name"] for c in CASES if c.get("max")]
+        lenient_ok = {r["name"] for r in lenient["rows"] if r["ok"]}
+        paranoid_ok = {r["name"] for r in paranoid["rows"] if r["ok"]}
+        self.assertTrue(set(good) <= lenient_ok)
+        self.assertFalse(set(bad) & lenient_ok)
+        self.assertFalse(set(good) & paranoid_ok)
+        calls = Counter()
+
+        def wobbly_judge(persona, transcript, findings, seed=0):
+            calls["n"] += 1
+            return normalize_verdict({"scores": {"humanness": 2 + seed % 2}}, "llm")
+
+        wobbly = run_judge_calibration(wobbly_judge, repeats=2)
+        self.assertEqual(calls["n"], 2 * len(CASES))
+        self.assertEqual(wobbly["mean_spread_by_dimension"]["humanness"], 1.0)
+        self.assertEqual(wobbly["mean_spread_by_dimension"]["accuracy"], 0.0)
+        rows = {r["name"]: r for r in lenient["rows"]}
+        self.assertIn("no marcó ninguno", " ".join(rows["ignora_la_pregunta"]["problems"]))
+
+
 class JudgeTests(unittest.TestCase):
     def test_normalize_clamps_and_maps_unknown_codes(self):
         v = normalize_verdict({"scores": {"humanness": 9, "accuracy": "x", "rules": 0}, "violations": [{"code": "nope", "turn": "2"}, "bad"]}, "llm")

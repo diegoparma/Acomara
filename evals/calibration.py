@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from evals.checks import check_conversation
+from evals.judge import JUDGE_CODES
 from evals.personas import Persona
 
 _BASE = {
@@ -172,6 +173,163 @@ CASES: list[dict[str, Any]] = [
         "codes": ["OFF_SEASON_NOT_EXPLAINED"],
         "max": {"accuracy": 3},
     },
+    # --- added 2026-11-04 (second batch): prices, payments, scope, judge-only failures ---
+    {
+        "name": "privada_precio_correcto",
+        "persona": {"intent": "private_expedition", "group_size": 4},
+        "transcript": _t(("Cuánto sale una privada para 4?", "Las privadas arrancan en USD 7.990 por persona, con guía solo para ustedes. ¿Para qué fecha la piensan?")),
+        "codes": [],
+        "min": {"accuracy": 4, "sales": 3},
+    },
+    {
+        "name": "trek_precio_correcto",
+        "persona": {"intent": "trek_only", "language": "en", "country": "USA, Denver"},
+        "transcript": _t(("Just the trek to Plaza de Mulas, price?", "The Plaza de Mulas trek is USD 4,890, and some dates have a promo at USD 3,690. Plaza Francia is only private, from 2 people, USD 1,499 each.")),
+        "codes": [],
+        "min": {"accuracy": 4, "language": 4},
+    },
+    {
+        "name": "tarjeta_mantiene_promo",
+        "persona": {"intent": "payment_methods"},
+        "transcript": _t(("Si pago con tarjeta mantengo la promo?", "Sí, con tarjeta se mantiene el precio promocional, no hay problema.")),
+        "codes": [],
+        "judge_codes": ["WRONG_FACT", "HALLUCINATED_FACT"],
+        "max": {"accuracy": 2},
+    },
+    {
+        "name": "sena_correcta",
+        "persona": {"intent": "payment_methods"},
+        "transcript": _t(("Cuánto es la seña y cuándo pago el resto?", "Se reserva con un anticipo de USD 699 en www.aconcaguaexpeditions.com/booking. El plazo del saldo te lo confirma un asesor.")),
+        "codes": [],
+        "min": {"accuracy": 4, "rules": 4},
+    },
+    {
+        "name": "seguro_incluido",
+        "persona": {"intent": "gear_and_insurance"},
+        "transcript": _t(("El seguro está incluido?", "Sí, el seguro de rescate está incluido en el precio de la expedición.")),
+        "codes": ["INSURANCE_INCLUDED"],
+        "max": {"accuracy": 2},
+    },
+    {
+        "name": "seguro_bien",
+        "persona": {"intent": "gear_and_insurance", "language": "pt_br", "country": "Brasil, Curitiba"},
+        "transcript": _t(("O seguro está incluído?", "O seguro de resgate não está incluído e é obrigatório pelo Parque: precisa cobrir resgate até 7.000 m e helicóptero. Fica em torno de USD 400.")),
+        "codes": [],
+        "min": {"accuracy": 4, "language": 4},
+    },
+    {
+        "name": "voseo_a_cliente_de_usted",
+        "persona": {"language": "es_neutro", "country": "México, CDMX"},
+        "transcript": _t(("Buenas tardes, ¿me podría indicar las fechas?", "Dale, contame cuántos son y te paso las fechas.")),
+        "codes": ["VOSEO_WITH_USTED"],
+        "max": {"language": 4},
+    },
+    {
+        "name": "pregunta_si_quiere_humano",
+        "persona": {},
+        "transcript": _t(("Qué incluye?", "Incluye hotel en Mendoza, comidas en la montaña, mulas y guías. ¿Querés hablar con un asesor?")),
+        "codes": ["ASKS_WANT_HUMAN"],
+        "max": {"rules": 4},
+    },
+    {
+        "name": "email_fantasma",
+        "persona": {},
+        "transcript": _t(("Me mandás las fechas?", "Te las mando al mail que me pasaste.")),
+        "codes": ["PHANTOM_EMAIL"],
+        "max": {"accuracy": 3},
+    },
+    {
+        "name": "vende_logistica_suelta",
+        "persona": {"intent": "basecamp_only", "experience": "aconcagua_before"},
+        "transcript": _t(("Solo necesito mulas, sin guía", "Sí, te podemos ofrecer solo las mulas hasta Plaza de Mulas, sin problema.")),
+        "codes": ["SELLS_LOOSE_LOGISTICS"],
+        "max": {"accuracy": 2},
+    },
+    {
+        "name": "ignora_la_pregunta",
+        "persona": {"intent": "price_shopper"},
+        "transcript": _t(
+            ("Cuánto sale el 18+2?", "El 18+2 tiene caminatas de aclimatación a Plaza Francia y al cerro Bonete."),
+            ("Pero cuánto sale??", "Es el programa que más recomendamos para quien no estuvo arriba de los 6.000 m."),
+        ),
+        "codes": [],
+        "judge_codes": ["IGNORES_QUESTION"],
+        "max": {"sales": 2},
+    },
+    {
+        "name": "itinerario_inventado",
+        "persona": {},
+        "transcript": _t(("Qué tiene de especial el 18+2?", "Incluye un día de spa en Mendoza y un vuelo en helicóptero hasta Plaza de Mulas para ahorrar caminata.")),
+        "codes": [],
+        "judge_codes": ["HALLUCINATED_FACT", "WRONG_FACT"],
+        "max": {"accuracy": 2},
+    },
+    {
+        "name": "derivacion_bien",
+        "persona": {"intent": "wants_human"},
+        "transcript": _t(
+            ("Quiero hablar con una persona", "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?"),
+            ("ana@example.com", "Listo, ya se lo pasé. Te escribe un asesor por acá."),
+        ),
+        "codes": [],
+        "min": {"rules": 4},
+    },
+    {
+        "name": "agencia_bien",
+        "persona": {"intent": "agency_reseller", "experience": "aconcagua_before"},
+        "transcript": _t(("Somos una agencia, manejan tarifa neta?", "Esta temporada no vendemos logística suelta. Lo de tarifas para agencias lo ve un asesor: pasame tu email y te escribe.")),
+        "codes": [],
+        "min": {"rules": 4, "accuracy": 4},
+    },
+    {
+        "name": "saludo_repetido",
+        "persona": {},
+        "transcript": _t(("Hola", "¡Hola! ¿En qué te ayudo?"), ("Qué fechas hay?", "¡Hola! Hay salidas en diciembre y enero.")),
+        "codes": ["REPEATED_GREETING"],
+        "max": {"humanness": 4},
+    },
+    {
+        "name": "muro_de_texto",
+        "persona": {},
+        "transcript": _t(("Qué incluye?", "Incluye " + ", ".join(["hotel en Mendoza con habitación compartida la primera noche"] * 8) + ".")),
+        "codes": ["TOO_LONG"],
+        "max": {"length": 2},
+    },
+    {
+        "name": "menciona_la_base_de_datos",
+        "persona": {},
+        "transcript": _t(("Tienen salidas en marzo?", "Según nuestra base de datos no hay salidas en marzo. Te paso con un asesor humano.")),
+        "codes": ["MENTIONS_DOCS", "ASESOR_HUMANO"],
+        "max": {"humanness": 3},
+    },
+    {
+        "name": "pide_email_ya_dado",
+        "persona": {},
+        "transcript": _t(
+            ("Soy Ana, ana@example.com, quiero info", "¡Gracias Ana! Contame cuántos son y cuándo quieren ir."),
+            ("Somos 2, en enero", "Genial. Pasame tu email y te mando todo."),
+        ),
+        "codes": ["EMAIL_ASKED_AFTER_GIVEN"],
+        "max": {"rules": 3},
+    },
+    {
+        "name": "comprador_sin_videollamada",
+        "persona": {"intent": "ready_to_book"},
+        "transcript": _t(
+            ("Quiero reservar la del 4/12", "Buenísimo, la disponibilidad te la confirma un asesor."),
+            ("Cómo pago?", "Se reserva con un anticipo de USD 699 en www.aconcaguaexpeditions.com/booking."),
+            ("Ok, y después?", "Después un asesor te confirma la fecha."),
+        ),
+        "codes": ["NO_VIDEOCALL_FOR_BUYER"],
+        "max": {"sales": 4},
+    },
+    {
+        "name": "cupo_con_cautela",
+        "persona": {"intent": "ready_to_book"},
+        "transcript": _t(("Hay lugar en diciembre?", "Hay salidas el 4/12 y el 20/12. La disponibilidad exacta te la confirma un asesor.")),
+        "codes": [],
+        "min": {"rules": 4},
+    },
 ]
 
 
@@ -189,12 +347,19 @@ def regex_results() -> list[dict[str, Any]]:
     return out
 
 
-def run_judge_calibration(judge: Any) -> dict[str, Any]:
+def run_judge_calibration(judge: Any, repeats: int = 1) -> dict[str, Any]:
+    """Score every case; with repeats > 1 also report how much the judge moves between calls."""
     rows = []
+    spreads: dict[str, list[float]] = {}
     for case in CASES:
         persona = case_persona(case)
         findings = check_conversation(case["transcript"], persona)
-        verdict = judge(persona, case["transcript"], findings, seed=1)
+        verdicts = [judge(persona, case["transcript"], findings, seed=1 + r) for r in range(max(1, repeats))]
+        verdict = verdicts[0]
+        if len(verdicts) > 1:
+            for dim in verdict["scores"]:
+                values = [v["scores"][dim] for v in verdicts]
+                spreads.setdefault(dim, []).append(max(values) - min(values))
         problems = []
         for dim, lo in case.get("min", {}).items():
             if verdict["scores"][dim] < lo:
@@ -204,6 +369,15 @@ def run_judge_calibration(judge: Any) -> dict[str, Any]:
                 problems.append(f"{dim}={verdict['scores'][dim]} > {hi}")
         judge_codes = {v["code"] for v in verdict["violations"]}
         missed = sorted(set(case["codes"]) - judge_codes - {"EM_DASH", "MARKDOWN_BOLD"})
+        # Judge-only failures: any one of the listed codes is enough.
+        if case.get("judge_codes") and not judge_codes & set(case["judge_codes"]):
+            problems.append(f"no marcó ninguno de {case['judge_codes']}")
+        # A good conversation should not collect critical violations.
+        if not case["codes"] and not case.get("judge_codes"):
+            critical = sorted(c for c in judge_codes if JUDGE_CODES.get(c, (1,))[0] >= 3)
+            if critical:
+                problems.append(f"falsos positivos críticos {critical}")
         rows.append({"name": case["name"], "ok": not problems, "problems": problems, "codes_missed_by_judge": missed, "scores": verdict["scores"], "summary": verdict["summary"]})
     passed = sum(1 for r in rows if r["ok"])
-    return {"passed": passed, "total": len(rows), "rows": rows}
+    stability = {dim: round(sum(v) / len(v), 3) for dim, v in spreads.items()} if spreads else {}
+    return {"passed": passed, "total": len(rows), "rows": rows, "mean_spread_by_dimension": stability}

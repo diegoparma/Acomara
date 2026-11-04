@@ -52,11 +52,13 @@ def calibrate(args: argparse.Namespace) -> int:
 
     tracker = UsageTracker()
     judge = LLMJudge(ChatJSON(make_openai_client(key), args.judge_model, tracker, "judge", temperature=0.0))
-    result = run_judge_calibration(judge)
+    result = run_judge_calibration(judge, repeats=args.repeats)
     print(f"Juez {args.judge_model}: {result['passed']}/{result['total']} casos dentro de lo esperado · USD {tracker.summary()['total_cost_usd']:.3f}")
     for r in result["rows"]:
         if not r["ok"] or r["codes_missed_by_judge"]:
             print(f"  {r['name']}: {'; '.join(r['problems'])} {'· no marcó ' + ', '.join(r['codes_missed_by_judge']) if r['codes_missed_by_judge'] else ''}")
+    if result["mean_spread_by_dimension"]:
+        print("Variación media entre repeticiones (puntos 1-5): " + ", ".join(f"{d} {v}" for d, v in result["mean_spread_by_dimension"].items()))
     if args.out:
         Path(args.out).write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     return 0
@@ -83,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--fail-on-regression", type=float, default=None, metavar="POINTS", help="exit 1 if overall drops more than POINTS vs --compare")
     ap.add_argument("--report", default=None, help="only re-render outputs from an existing run.json")
     ap.add_argument("--calibrate", action="store_true", help="score the hand-labelled calibration cases with the judge (needs a key) and exit")
+    ap.add_argument("--repeats", type=int, default=1, help="with --calibrate: judge each case N times to measure its stability")
     ap.add_argument("--no-run-json", action="store_true", help="don't write run.json (all transcripts)")
     args = ap.parse_args(argv)
 
