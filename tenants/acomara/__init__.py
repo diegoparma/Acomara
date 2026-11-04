@@ -3,6 +3,7 @@
 Every value here was moved out of orchestrator/ unchanged; the golden test
 (tests/test_acomara_golden.py) proves Acomara's replies are identical.
 """
+from nico_core.season import SeasonConfig
 from nico_core.tenant import KnowledgeConfig, LocaleConfig, TenantConfig
 from tenants.acomara.phrases import I18N_PHRASES
 
@@ -23,4 +24,15 @@ TENANT = TenantConfig(
     ),
     # Argentina has no DST: Mendoza is UTC-3 all year.
     locale=LocaleConfig(utc_offset_hours=-3, tz_abbreviation="ART", label="Argentina"),
+    # Southern Hemisphere season: expeditions November to March.
+    season=SeasonConfig(
+        months=frozenset({11, 12, 1, 2, 3}),
+        trip_intent_tokens=(
+            "tour", "expedicion", "expedición", "expedition", "trek", "trekking",
+            "ascen", "subir", "climb", "summit", "viaje", "viagem", "paseo",
+            "passeio", "passei", "passe", "salida", "departure", "saida", "saída",
+            "aconcagua", "montaña", "montanha", "mountain", "alta montaña",
+            "alta montanha", "fecha", "data", "date",
+        ),
+    ),
 )

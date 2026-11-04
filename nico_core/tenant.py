@@ -15,6 +15,8 @@ from datetime import timedelta, timezone, tzinfo
 from pathlib import Path
 from typing import Mapping
 
+from nico_core.season import SeasonConfig
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_TENANT = "acomara"
@@ -88,6 +90,8 @@ class TenantConfig:
     knowledge: KnowledgeConfig
     languages: tuple[str, ...] = ("es", "en", "pt")
     locale: LocaleConfig = field(default_factory=LocaleConfig)
+    # None: the business sells all year and never warns about dates.
+    season: SeasonConfig | None = None
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)

@@ -55,5 +55,23 @@ class TenantCompletenessTests(unittest.TestCase):
         self.assertFalse(load_tenant("acomara").placeholder)
 
 
+class SeasonConfigTests(unittest.TestCase):
+    def test_no_season_never_warns(self) -> None:
+        from nico_core.season import mentions_off_season
+
+        self.assertFalse(mentions_off_season("Queremos ir en julio de viaje", None))
+
+    def test_another_season_shape(self) -> None:
+        # A northern-hemisphere business operating June-September.
+        from nico_core.season import SeasonConfig, mentions_off_season
+
+        summer = SeasonConfig(months=frozenset({6, 7, 8, 9}), trip_intent_tokens=("viaje", "trip"))
+        self.assertFalse(mentions_off_season("Queremos ir en julio de viaje", summer))
+        self.assertTrue(mentions_off_season("A trip in December", summer))
+        self.assertTrue(mentions_off_season("Trip in May", summer))
+        self.assertFalse(mentions_off_season("May I book a trip in July?", summer))
+        self.assertTrue(mentions_off_season("viaje el 15/12", summer))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -90,6 +90,7 @@ from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_rec
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
 from nico_core import get_tenant
+from nico_core.season import mentions_off_season, numeric_date_is_off_season
 
 ROOT = Path(__file__).resolve().parents[1]
 TENANT = get_tenant()
@@ -447,73 +448,21 @@ def detect_explicit_language_preference(text: str) -> str | None:
     return None
 
 
-# Months treated as out-of-Aconcagua-season (April-October).
-OUT_OF_SEASON_MONTH_TOKENS = (
-    # English ("may" is handled separately: it is also a modal verb)
-    "april", "june", "july", "august", "september", "october",
-    # Spanish (normalized: no accents)
-    "abril", "mayo", "junio", "julio", "agosto", "septiembre", "setiembre", "octubre",
-    # Portuguese
-    "maio", "junho", "julho", "agosto", "setembro", "outubro",
-)
-_OUT_OF_SEASON_MONTHS = range(4, 11)
-# English "may" only counts as the month next to a date-like context
-# ("in May", "May 12", "12th of May"), never as the modal verb ("May I...").
-_MAY_MONTH_RE = re.compile(
-    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until)\s+may\b"
-    r"|\bmay\s+\d"
-    r"|\d(?:st|nd|rd|th)?\s+(?:of\s+)?may\b"
-)
-# Numeric day/month pairs (27/05, 05-27, 15/05/2027). Ranges followed by a
-# unit ("4-6 personas", "5-7 dias") are quantities, not dates.
-_NUMERIC_DATE_RE = re.compile(
-    r"\b(\d{1,2})[/-](\d{1,2})\b(?!\s*(?:personas?|pessoas?|people|persons?|pax|dias?|days?"
-    r"|noches?|noites?|nights?|semanas?|weeks?|horas?|hours?|km|kg|anos?|years?))"
-)
+# Out-of-season detection lives in nico_core.season; the tenant says which
+# months it operates (Acomara: November-March). Names kept for callers.
+_OUT_OF_SEASON_MONTHS = TENANT.season.off_months if TENANT.season else frozenset()
+OUT_OF_SEASON_MONTH_TOKENS = TENANT.season.off_month_tokens if TENANT.season else ()
+_TRIP_INTENT_TOKENS = TENANT.season.trip_intent_tokens if TENANT.season else ()
 
 
 def _numeric_date_is_out_of_season(first: int, second: int) -> bool:
-    """True only when every valid reading (DD/MM and MM/DD) lands in Apr-Oct.
-
-    "5/12" is 5 December for a Spanish/Portuguese speaker, a real departure,
-    so an ambiguous pair must not trigger the out-of-season warning.
-    """
-    months = []
-    if 1 <= second <= 12 and 1 <= first <= 31:
-        months.append(second)  # DD/MM
-    if 1 <= first <= 12 and 1 <= second <= 31:
-        months.append(first)  # MM/DD
-    return bool(months) and all(m in _OUT_OF_SEASON_MONTHS for m in months)
-_TRIP_INTENT_TOKENS = (
-    "tour", "expedicion", "expedición", "expedition", "trek", "trekking",
-    "ascen", "subir", "climb", "summit", "viaje", "viagem", "paseo",
-    "passeio", "passei", "passe", "salida", "departure", "saida", "saída",
-    "aconcagua", "montaña", "montanha", "mountain", "alta montaña",
-    "alta montanha", "fecha", "data", "date",
-)
+    return numeric_date_is_off_season(first, second, _OUT_OF_SEASON_MONTHS)
 
 
 def mentions_out_of_season(text: str) -> bool:
     """Return True if the user message references an out-of-season month
     together with an expedition/trip intent. Conservative on purpose."""
-    if not text:
-        return False
-    lowered = text.lower()
-    normalized = unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
-
-    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS)
-    if not has_intent:
-        return False
-
-    for tok in OUT_OF_SEASON_MONTH_TOKENS:
-        if re.search(r"\b" + re.escape(tok) + r"\b", normalized):
-            return True
-    if _MAY_MONTH_RE.search(normalized):
-        return True
-    for match in _NUMERIC_DATE_RE.finditer(normalized):
-        if _numeric_date_is_out_of_season(int(match.group(1)), int(match.group(2))):
-            return True
-    return False
+    return mentions_off_season(text, TENANT.season)
 
 
 def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str = "") -> str:
