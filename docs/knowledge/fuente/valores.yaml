@@ -1,0 +1,142 @@
+# VALORES — cada precio, porcentaje, fecha o link se escribe UNA sola vez acá.
+#
+# Los textos de datos-clave.yaml y faq.yaml los usan con {nombre}, por ejemplo
+# "El precio es {precio_regular}". Al correr
+#     python3 scripts/build_knowledge.py
+# se regeneran datos-clave.md, faq_structured.md y faq_rag_chunks.jsonl con el
+# valor nuevo en los tres idiomas (USD 7.250 en es/pt, USD 7,250 en en).
+#
+# Campos:
+#   usd / percent / text   el valor (text puede ser uno solo o uno por idioma)
+#   source        quién lo dijo y cuándo (Fernando por WhatsApp, web, FAQ...)
+#   confidence    confirmed (lo confirmó Fernando) | web (FAQ/web, puede estar viejo) | pending (falta confirmar)
+#   valid_from / valid_until   vigencia; pasado valid_until el build falla y avisa
+#   check_with    repo hermano donde el mismo dato tiene que coincidir
+
+season:
+  text: "2026/27"
+  source: Fernando (fechas de salida programadas)
+  confidence: confirmed
+  valid_from: 2026-07-01
+  valid_until: 2027-03-31
+
+season_months:
+  text:
+    es: noviembre a febrero
+    en: November to February
+    pt: novembro a fevereiro
+  source: Fernando (oct 2026); la última salida (13 feb) termina a fines de febrero
+  confidence: confirmed
+  valid_from: 2026-07-01
+  valid_until: 2027-03-31
+  check_with: [aconcagua-plan-admin]
+
+# --- Expediciones -----------------------------------------------------------
+price_regular:
+  usd: 7250
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+  check_with: [aconcagua-plan-admin]
+
+price_promo_min:
+  usd: 5990
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+
+price_promo_max:
+  usd: 6390
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+
+price_private_from:
+  usd: 7990
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+
+deposit:
+  usd: 699
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+
+booking_url:
+  text: www.aconcaguaexpeditions.com/booking
+  source: Fernando
+  confidence: confirmed
+
+paypal_fee:
+  percent: 5.5
+  source: Fernando
+  confidence: confirmed
+
+bank_transfer_tax:
+  percent: 3.8
+  source: Fernando
+  confidence: confirmed
+
+# --- Treks ------------------------------------------------------------------
+trek_mulas_regular:
+  usd: 4890
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+  check_with: [aconcagua-basecamp-web]
+
+trek_mulas_promo:
+  usd: 3690
+  source: Fernando (WhatsApp, oct 2026)
+  confidence: confirmed
+  valid_from: 2026-10-01
+  valid_until: 2027-03-31
+  check_with: [aconcagua-basecamp-web]
+
+trek_francia_private:
+  usd: 1499
+  source: Fernando; FAQ may 2026 (un hilo de mayo citó USD 1.399 por error)
+  confidence: confirmed
+  valid_from: 2026-05-01
+  valid_until: 2027-03-31
+  check_with: [aconcagua-basecamp-web]
+
+# --- Lo que paga aparte el cliente ----------------------------------------------
+permit_min:
+  usd: 650
+  source: FAQ web (comprado por Acomara)
+  confidence: web
+  check_with: [aconcagua-plan-admin]
+
+permit_max:
+  usd: 1400
+  source: FAQ web (comprado por Acomara)
+  confidence: web
+  check_with: [aconcagua-plan-admin]
+
+permit_own_min:
+  usd: 1100
+  source: FAQ web (comprado por cuenta propia)
+  confidence: web
+
+permit_own_max:
+  usd: 1800
+  source: FAQ web (comprado por cuenta propia)
+  confidence: web
+
+insurance_approx:
+  usd: 400
+  source: Fernando (Global Rescue)
+  confidence: confirmed
+
+gear_rental_all:
+  usd: 1000
+  source: Fernando (si hay que alquilar todo)
+  confidence: confirmed

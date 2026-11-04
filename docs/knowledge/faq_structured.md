@@ -1,283 +1,1657 @@
-# Acomara FAQ - Structured (v1)
+# Preguntas frecuentes de Acomara
+
+> Generado por `scripts/build_knowledge.py` desde `docs/knowledge/fuente/`. No editar a mano:
+> los textos se cambian en `fuente/faq.yaml` y los precios y fechas en `fuente/valores.yaml` y `fuente/salidas.yaml`.
+
+## Valores vigentes
+
+| Valor | es | Fuente | Confianza | Vigente hasta | Revisar en |
+|---|---|---|---|---|---|
+| `season` | 2026/27 | Fernando (fechas de salida programadas) | confirmed | 2027-03-31 |  |
+| `season_months` | noviembre a febrero | Fernando (oct 2026); la última salida (13 feb) termina a fines de febrero | confirmed | 2027-03-31 | aconcagua-plan-admin |
+| `price_regular` | USD 7.250 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 | aconcagua-plan-admin |
+| `price_promo_min` | USD 5.990 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 |  |
+| `price_promo_max` | USD 6.390 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 |  |
+| `price_private_from` | USD 7.990 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 |  |
+| `deposit` | USD 699 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 |  |
+| `booking_url` | www.aconcaguaexpeditions.com/booking | Fernando | confirmed |  |  |
+| `paypal_fee` | 5,5% | Fernando | confirmed |  |  |
+| `bank_transfer_tax` | 3,8% | Fernando | confirmed |  |  |
+| `trek_mulas_regular` | USD 4.890 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 | aconcagua-basecamp-web |
+| `trek_mulas_promo` | USD 3.690 | Fernando (WhatsApp, oct 2026) | confirmed | 2027-03-31 | aconcagua-basecamp-web |
+| `trek_francia_private` | USD 1.499 | Fernando; FAQ may 2026 (un hilo de mayo citó USD 1.399 por error) | confirmed | 2027-03-31 | aconcagua-basecamp-web |
+| `permit_min` | USD 650 | FAQ web (comprado por Acomara) | web |  | aconcagua-plan-admin |
+| `permit_max` | USD 1.400 | FAQ web (comprado por Acomara) | web |  | aconcagua-plan-admin |
+| `permit_own_min` | USD 1.100 | FAQ web (comprado por cuenta propia) | web |  |  |
+| `permit_own_max` | USD 1.800 | FAQ web (comprado por cuenta propia) | web |  |  |
+| `insurance_approx` | USD 400 | Fernando (Global Rescue) | confirmed |  |  |
+| `gear_rental_all` | USD 1.000 | Fernando (si hay que alquilar todo) | confirmed |  |  |
+
+## Índice
+
+- [Programas e itinerarios](#programas) (12)
+- [Precios, reserva y pago](#precios) (3)
+- [Fechas de salida](#fechas) (1)
+- [Temporada y clima](#temporada) (2)
+- [Qué incluye y qué no](#incluye) (3)
+- [Servicios opcionales](#opcionales) (3)
+- [Treks](#treks) (2)
+- [Logística (vuelos, hotel, equipaje, comunicación)](#logistica) (6)
+- [Permiso del Parque y seguro](#permiso-y-seguro) (4)
+- [Requisitos (experiencia, edad, documentos)](#requisitos) (4)
+- [Equipo](#equipo) (10)
+- [Comida y menús](#comida) (6)
+- [Guías, porteadores y grupo](#guias-y-porteadores) (9)
+- [Preparación (entrenamiento, nutrición, salud)](#preparacion) (4)
+- [Políticas (abandono, descenso, propinas)](#politicas) (4)
+
+<a id="programas"></a>
+## Programas e itinerarios
+
+### ¿Cuál es el itinerario del 18+2 días, Ruta Normal Extendido?
+
+`itinerario-18-2` · en: faq-001 · fuente: faq-web · confianza: web
+
+También preguntan: Programa día a día del extendido · Cronograma de la expedición de 20 días · Roteiro dia a dia do programa de 18+2
+
+Day 1: Mendoza 760m 2508ft  
+Day 2: Mendoza / Penitentes 2725m 9000ft  
+Day 3: Penitentes / Confluencia 3300m 10900ft  
+Day 4: Confluencia / Plaza Francia 4000m 13200ft / Confluencia  
+Day 5: Confluencia / Plaza de Mulas  
+Day 6: Plaza de Mulas 4250m 14000ft  
+Day 7: Plaza de Mulas / Mt. Bonete Summit 5091m 16702ft  / Plaza de Mulas  
+Day 8: Plaza de Mulas / Camp 1 Canadá 5000m 16400ft / Plaza de Mulas  
+Day 9: Plaza de Mulas  
+Day 10: Plaza de Mulas / Camp 1 Canadá 5000m 16400  
+Day 11: Camp 1 Canadá / Camp 2 Nido de Cóndores 5500m 18000ft  
+Day 12: Camp 2 Nido de Cóndores  
+Day 13: Camp 2 / Camp 3 Cólera / Camp 2  
+Day 14: Camp 2 / Camp 3 6000m 19700ft  
+Day 15: Camp 3 / SUMMIT  6962m 22834ft / Camp 3  
+Day 16: Camp 3 / Plaza de Mulas 4250m 14000ft  
+Day 17: Plaza de Mulas / Penitentes  
+Day 18: Penitentes / Mendoza  
+Day 19: Extra day  
+Day 20: Extra day  
+Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may be shorter or longer, subject to weather conditions, unforeseen events, or guide criteria according to the group characteristics, 20-day maximum. Extra days are included on the mountain only.  
+
+### ¿Cuál es el itinerario del 17+2 días, Glaciar Polaco 360°?
+
+`itinerario-polaco-17-2` · en: faq-064 · fuente: faq-web · confianza: web
+
+También preguntan: Itinerario de la travesía por Plaza Argentina · Day by day of the Polish Glacier traverse · Roteiro da rota polonesa
+
+Day 1: Mendoza [760m 2500ft]  
+Day 2: Mendoza / Penitentes [2735m 9000ft]  
+Day 3: Penitentes / Pampa de Leñas [2860m 9400ft]  
+Day 4: Pampa de Leñas / Casa de Piedra [3240m 10600ft]  
+Day 5: Casa de Piedra / Plaza Argentina base camp  
+Day 6: Plaza Argentina Base Camp [4200m 13800ft]  
+Day 7: Plaza Argentina / Camp 1 [5000m 16400ft] / Plaza Argentina  
+Day 8: Plaza Argentina base camp  
+Day 9: Plaza Argentina / Camp 1  
+Day 10: Camp 1 / Camp 2 Upper Guanacos / Camp 1  
+Day 11: Camp 1 / Camp 2 Upper Guanacos [5500m 18000ft]  
+Day 12: Camp 2  
+Day 13: Camp 2 / Camp 3 [6000m 19700ft]  
+Day 14: Camp 3 / SUMMIT [6962m 22841ft] / Camp 3  
+Day 15: Camp 3 / Plaza de Mulas base camp (Normal Route)  
+Day 16: Plaza de Mulas / Penitentes  
+Day 17: Penitentes / Mendoza  
+Day 18: Extra day  
+Day 19: Extra day  
+Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may vary according to the weather conditions, unforeseen events, or guides criteria according to the group characteristics. Extra days 18 and 19 are included on the mountain only.  
 
-## Itinerarios y Programas
+### ¿Cuál es el itinerario del 14+2 días, Ascenso Rápido?
 
-- Se conservaron los itinerarios operativos del documento original en el archivo crudo.
-- Esta version prioriza formato Pregunta/Respuesta para atencion comercial.
+`itinerario-14-2` · en: faq-065 · fuente: faq-web · confianza: web
 
-### What is the itinerary for the Normal Route Extended 18+2 days?
+También preguntan: Programa día a día del ascenso rápido · Fast ascent schedule · Roteiro da ascensão rápida 14+2
 
-Day 1: Mendoza 760m 2508ft Day 2: Mendoza / Penitentes 2725m 9000ft Day 3: Penitentes / Confluencia 3300m 10900ft Day 4: Confluencia / Plaza Francia 4000m 13200ft / Confluencia Day 5: Confluencia / Plaza de Mulas Day 6: Plaza de Mulas 4250m 14000ft Day 7: Plaza de Mulas / Mt. Bonete Summit 5091m 16702ft  / Plaza de Mulas Day 8: Plaza de Mulas / Camp 1 Canadá 5000m 16400ft / Plaza de Mulas Day 9: Plaza de Mulas Day 10: Plaza de Mulas / Camp 1 Canadá 5000m 16400 Day 11: Camp 1 Canadá / Camp 2 Nido de Cóndores 5500m 18000ft Day 12: Camp 2 Nido de Cóndores Day 13: Camp 2 / Camp 3 Cólera / Camp 2 Day 14: Camp 2 / Camp 3 6000m 19700ft Day 15: Camp 3 / SUMMIT  6962m 22834ft / Camp 3 Day 16: Camp 3 / Plaza de Mulas 4250m 14000ft Day 17: Plaza de Mulas / Penitentes Day 18: Penitentes / Mendoza Day 19: Extra day Day 20: Extra day Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may be shorter or longer, subject to weather conditions, unforeseen events, or guide criteria according to the group characteristics, 20-day maximum. Extra days are included on the mountain only. What is the itinerary for 360 Polish Glacier Route 17+2 days Day 1: Mendoza [760m 2500ft] Day 2: Mendoza / Penitentes [2735m 9000ft] Day 3: Penitentes / Pampa de Leñas [2860m 9400ft] Day 4: Pampa de Leñas / Casa de Piedra [3240m 10600ft] Day 5: Casa de Piedra / Plaza Argentina base camp Day 6: Plaza Argentina Base Camp [4200m 13800ft] Day 7: Plaza Argentina / Camp 1 [5000m 16400ft] / Plaza Argentina Day 8: Plaza Argentina base camp Day 9: Plaza Argentina / Camp 1 Day 10: Camp 1 / Camp 2 Upper Guanacos / Camp 1 Day 11: Camp 1 / Camp 2 Upper Guanacos [5500m 18000ft] Day 12: Camp 2 Day 13: Camp 2 / Camp 3 [6000m 19700ft] Day 14: Camp 3 / SUMMIT [6962m 22841ft] / Camp 3 Day 15: Camp 3 / Plaza de Mulas base camp (Normal Route) Day 16: Plaza de Mulas / Penitentes Day 17: Penitentes / Mendoza Day 18: Extra day Day 19: Extra day Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may vary according to the weather conditions, unforeseen events, or guides criteria according to the group characteristics. Extra days 18 and 19 are included on the mountain only. What is the itinerary for Normal Route 14+2 days Day 1: Mendoza / Penitentes 2725m 9000ft Day 2: Penitentes / Mt Cruz de Caña 3700m 12150ft Day 3: Penitentes / Confluencia 3300m 10900ft Day 4: Confluencia / Plaza de Mulas Day 5: Plaza de Mulas 4250m 14000ft Day 6: Plaza de Mulas / Camp 1 Canadá 5000m 16400ft Day 7: Camp 1 Canadá / Camp 2 Nido de Cóndores Day 8: Camp 2 Nido de Cóndores 5500m 18000ft Day 9: Camp 2 / Camp 3 Cólera / Camp 2 Day 10: Camp 2 / Camp 3 6000m 19700ft Day 11: Camp 3 / SUMMIT 6962m 22834ft / Camp 3 Day 12: Camp 3 / Plaza de Mulas Day 13: Plaza de Mulas / Penitentes Day 14: Penitentes / Mendoza Day 15: Extra day Day 16: Extra day Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may be shorter or longer, subject to weather conditions, unforeseen events, or guide criteria according to the group characteristics, 16-day maximum. Extra days are included on the mountain only.
+Day 1: Mendoza / Penitentes 2725m 9000ft  
+Day 2: Penitentes / Mt Cruz de Caña 3700m 12150ft  
+Day 3: Penitentes / Confluencia 3300m 10900ft  
+Day 4: Confluencia / Plaza de Mulas  
+Day 5: Plaza de Mulas 4250m 14000ft  
+Day 6: Plaza de Mulas / Camp 1 Canadá 5000m 16400ft  
+Day 7: Camp 1 Canadá / Camp 2 Nido de Cóndores  
+Day 8: Camp 2 Nido de Cóndores 5500m 18000ft  
+Day 9: Camp 2 / Camp 3 Cólera / Camp 2  
+Day 10: Camp 2 / Camp 3 6000m 19700ft  
+Day 11: Camp 3 / SUMMIT 6962m 22834ft / Camp 3  
+Day 12: Camp 3 / Plaza de Mulas  
+Day 13: Plaza de Mulas / Penitentes  
+Day 14: Penitentes / Mendoza  
+Day 15: Extra day  
+Day 16: Extra day  
+Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may be shorter or longer, subject to weather conditions, unforeseen events, or guide criteria according to the group characteristics, 16-day maximum. Extra days are included on the mountain only.  
 
-### What is the itinerary for Normal Route 12+2 days ?
+### ¿Cuál es el itinerario del 12+2 días, Ascenso Extremo?
 
-Day 1: Mendoza / Confluencia 3300m 10900ft Day 2: Confluencia / Plaza de Mulas Day 3: Plaza de Mulas 4250m 14000ft Day 4: Plaza de Mulas / Camp 1 Canadá 5000m 16400ft Day 5: Camp 1 Canadá / Camp 2 Nido de Cóndores Day 6: Camp 2 Nido de Cóndores 5500m 18000ft Day 7: Camp 2 / Camp 3 Cólera / Camp 2 Day 8: Camp 2 / Camp 3 6000m 19700ft Day 9: Camp 3 / SUMMIT 6962m 22834ft / Camp 3 Day 10: Camp 3 / Plaza de Mulas Day 11: Plaza de Mulas / Penitentes Day 12: Penitentes / Mendoza Day 13: Extra day Day 14: Extra day Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may be shorter or longer, subject to weather conditions, unforeseen events, or guide criteria according to the group characteristics, 14-day maximum. Extra days are included on the mountain only.
+`itinerario-12-2` · en: faq-002 · fuente: faq-web · confianza: web
 
-### What's the difference between Normal and Polish routes?
+También preguntan: Cronograma del programa más corto · Extreme ascent schedule day by day · Roteiro do programa de 12 dias
 
-The Normal Route (typically 11–20 days) is slightly easier and, in general, offers better chances of reaching the summit. This is mainly because it is shorter and usually benefits from more stable weather conditions—especially on the Extended itinerary (18+2 days), which allows for better acclimatization. This route also offers the unique opportunity to summit two peaks: Mt. Bonete (16,702 ft / 5,091 m) and Mt. Aconcagua (22,834 ft / 6,962 m). In addition, the Normal Route provides options for a Fast Ascent (14+2 days) or an Extreme Ascent (12+2 days), designed for well-trained and properly acclimatized climbers seeking a more demanding challenge. On the other hand, the 360° Polish Glacier Traverse route (17+2 days), also known as the “Two Faces” or “False Polish” route, is less traveled and more demanding. It involves longer distances, colder conditions, and greater exposure to severe weather—particularly the strong “white winds.” Reaching Base Camp (Plaza Argentina) requires more time and energy, making this route a more committing and physically demanding experience.
+Day 1: Mendoza / Confluencia 3300m 10900ft  
+Day 2: Confluencia / Plaza de Mulas  
+Day 3: Plaza de Mulas 4250m 14000ft  
+Day 4: Plaza de Mulas / Camp 1 Canadá 5000m 16400ft  
+Day 5: Camp 1 Canadá / Camp 2 Nido de Cóndores  
+Day 6: Camp 2 Nido de Cóndores 5500m 18000ft  
+Day 7: Camp 2 / Camp 3 Cólera / Camp 2  
+Day 8: Camp 2 / Camp 3 6000m 19700ft  
+Day 9: Camp 3 / SUMMIT 6962m 22834ft / Camp 3  
+Day 10: Camp 3 / Plaza de Mulas  
+Day 11: Plaza de Mulas / Penitentes  
+Day 12: Penitentes / Mendoza  
+Day 13: Extra day  
+Day 14: Extra day  
+Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the mountain. The above itinerary is intended as a guideline only; it may be shorter or longer, subject to weather conditions, unforeseen events, or guide criteria according to the group characteristics, 14-day maximum. Extra days are included on the mountain only.  
 
-### What difference between open and private expeditions?
+### ¿Qué diferencia hay entre la Ruta Normal y la del Glaciar Polaco?
 
-Open and Private expeditions are very similar and include almost the same core services. The main advantages of a Private expedition are flexibility and personalization. You can choose your departure date, and you will have your own dedicated guides—ensuring better communication, enhanced safety, and a well-paced ascent tailored to your rhythm. You will also benefit from a more flexible itinerary, allowing you to move faster or slower depending on your acclimatization and overall condition. In addition, Private expeditions can include extra services such as a private toilet, hot showers, MSR MiniWorks EX water filters, solar panels for charging devices, and other customized options.
+`ruta-normal-vs-polaco` · en: faq-003 · fuente: faq-web · confianza: web
 
-### What's the difference between extended and short itineraries?
+También preguntan: ¿Qué ruta es más fácil? · Ruta normal o 360, ¿cuál me conviene? · Diferença entre a via normal e a do glaciar polonês
 
-We always recommend extended itineraries, as the additional days for rest and acclimatization significantly increase your chances of reaching the Summit. The 12+2 days Extreme Ascent and 14+2 days Fast Ascent programs on the Normal Route are designed for experienced climbers who are well-trained, properly acclimatized, and have limited time. These options offer a more demanding, faster-paced challenge. By choosing a Fast or Extreme Ascent, you will skip key acclimatization hikes such as the trek to Plaza Francia (4,200 m) and the ascent of Mt. Bonete (5,100 m).
+The Normal Route (typically 11–20 days) is slightly easier and, in general, offers better chances of reaching the summit. This is mainly because it is shorter and usually benefits from more stable weather conditions—especially on the Extended itinerary (18+2 days), which allows for better acclimatization.  
+This route also offers the unique opportunity to summit two peaks: Mt. Bonete (16,702 ft / 5,091 m) and Mt. Aconcagua (22,834 ft / 6,962 m).  
+In addition, the Normal Route provides options for a Fast Ascent (14+2 days) or an Extreme Ascent (12+2 days), designed for well-trained and properly acclimatized climbers seeking a more demanding challenge.  
+On the other hand, the 360° Polish Glacier Traverse route (17+2 days), also known as the “Two Faces” or “False Polish” route, is less traveled and more demanding. It involves longer distances, colder conditions, and greater exposure to severe weather—particularly the strong “white winds.” Reaching Base Camp (Plaza Argentina) requires more time and energy, making this route a more committing and physically demanding experience.  
 
-### What itinerary has the best chances to reach the summit?
+### ¿Qué diferencia hay entre una expedición abierta y una privada?
 
-The Normal Route 18+2 days program offers the best chances of reaching the summit, especially as a Private expedition, where everything is tailored to your pace and needs. If you arrive already acclimatized from climbing another peak above 5,000 m.a.s.l. and are in strong physical condition, you may consider a Fast Ascent (14+2 days). However, to maximize success and safety, the extended itinerary on the Normal Route remains the most recommended option.
-
-### What's the best time to climb Aconcagua?
-
-The best time to climb depends on the type of experience you are looking for. Low Season: fewer people, a more peaceful and immersive nature experience, and slightly colder temperatures. High Season: a more social atmosphere, with more climbers in all camps and on summit day, and slightly warmer temperatures. The weather conditions that truly matter are those on summit day, and they are highly unpredictable—even 10–15 days in advance. For this reason, no specific period of the season can be consistently defined as having better summit conditions. Over the past 12 seasons, 91% of our expeditions reached the summit during High Season, compared to 88% in Low Season. However, High Season is also significantly busier, with up to seven times more climbers in the Park. Notably, in the 2021/22 and 2023/24 seasons, we achieved a 100% summit success rate—becoming the only company in the Park to accomplish this in two consecutive seasons, with all 42 of our open expeditions reaching the summit. Season dates: Low Season: Nov 19 – Dec 14 High Season: Dec 15 – Jan 31 Low Season: Feb 1 – Feb 20 Note: The Polish Route opens on December 1st. Aconcagua Provincial Park regulations and dates may change without prior notice.
-
-### When do we start hiking?
-
-The trekking begins upon entering the Park, with the hike from the Park Entrance to Confluencia Camp by Normal Route (approximately 4 hours). The exact day depends on the chosen program.
-
-### When should I fly in / out?
-
-FLY IN You may arrive in Mendoza (MDZ Airport): until Day 1 at 11 AM for Extended programs of 17-18 + 2 extra days until Day 1 at 8 AM for Fast or Extreme itineraries of 12-14 + 2 extra days We recommend coming 1-2 days before Day 1 if you need to Rent Gear. This is also to have backup time in case of any flight cancellation or missing luggage that may prevent you from joining the expedition group. You may book the extra nights with us in the same Hotel as your expedition (subject to availability; reservations until 30 days in advance only). On Day 1 of the extended itineraries, at 1 PM, the group transfer leaves MDZ Airport for the Hotel. No other airport transfer is included; however, it can be reserved in advance as a private service with an extra charge. FLY OUT You can take your flight back from the last itinerary day from 5 PM onwards. For example: On Day 20 in the Normal Route Extended itinerary (18+2 extra days). On Day 19 in the 360 Polish Route (17+2 extra days). On Day 16 in the Normal Route Fast itinerary (14+2 extra days) On Day 14 in the Normal Route Extreme itinerary (12+2 extra days). Note: If your expedition has good weather conditions and doesn't take extra days on the mountain, you will be ready to leave 1-2 days before the last itinerary day. Since weather conditions are unpredictable, knowing this in advance is impossible.
-
-### How many days I'll be at the base camp?
-
-In the extended itineraries (17+2 days and 18+2 days), we usually sleep between 5 and 7 nights at the base camp. The number of days may vary depending on weather conditions and guides criteria; the leader guide will decide according to each group. The fast itinerary (12+2 days) usually takes 3-4 nights only
-
-### What days & distances do we hike?
-
-Normal Route distances Horcones / Confluencia estimated max altitude 3300m 10890ft estimated distance 7.5 km estimated trekking hours 4 hrs Confluencia / Plaza Francia / Confluencia estimated max altitude 4000m 13200ft estimated distance 20 km estimated trekking hours 8 hrs Confluencia / Plaza de Mulas estimated max altitude 4260m 14058ft estimated distance 9 km Confluencia / Playa Ancha estimated distance 8 km Playa Ancha / Plaza de Mulas estimated trekking hours 8 hrs Plaza de Mulas / Horcones Glacier estimated max altitude 4300m 14150ft estimated distance 1 km estimated trekking hours 3 hrs Crampon hike on the glacier Plaza de Mulas / Mt. Bonete Summit / Plaza de Mulas estimated max altitude 5091m 16732ft estimated distance 7 km estimated trekking hours 7 hrs
-Start high altitude trek Plaza de Mulas / Camp 1 Plaza Canada / Plaza de Mulas Acclimatization day
-estimated max altitude 4910m 16203ft estimated distance 7 km estimated trekking hours 5-6 hrs Plaza de Mulas / Camp 1 Plaza Canada Moving day
-estimated max altitude 4910m 16203ft estimated distance 1 km Plaza de Mulas / Piedras Conway estimated distance 2 km Piedras Conway / Plaza Canada estimated trekking hours 3-4 hrs Camp 1 Plaza Canada / Camp 2 Nido de Condores Moving day
-estimated max altitude 5250m 17325ft estimated distance 2 km Plaza Canada / Cambio de pendiente estimated distance 1 km Cambio / Nido de Condores estimated trekking hours 4-5 hrs Camp 2 Nido de Condores / Camp 3 Colera / Camp 2 Acclimatization day estimated max altitude 6000m 20000ft estimated distance 4 km estimated trekking hours 4 hrs
-Camp 2 Nido de Condores / Camp 3 Colera Moving day estimated max altitude 6000m 20000ft estimated distance 2 km estimated trekking hours 2-3 hrs Camp 3 Colera / SUMMIT / Camp 3 Colera Summit day 6962m 22834ft SUMMIT 6830m Filo del guanaco 6650m La Cueva 6500m Travesia 6380m Independencia 6180m Piedras Blancas 6000m Colera estimated distance 3.5 km estimated trekking hours 7-10 hrs Camp 3 Colera / Plaza de Mulas estimated distance 7 km estimated trekking hours 6 hrs Plaza de Mulas / Penitentes / Mendoza Not physically demanding estimated distance 24 km estimated trekking hours 7-8 hrs
-360 Polish Route distances Estimated max altitudes Estimated distances Estimated trekking hours Penitentes / Pampa de Leñas 9,383ft – 2860m estimated distance 12 Km estimated trekking hours 6 hours Pampa de Leñas / Casa de Piedra 10,630ft – 3240m estimated distance 12km estimated trekking hours 6 hours Casa de Piedra / Plaza Argentina Base camp 13200ft – 4200m estimated distance 10 Km estimated trekking hours 6 hours Plaza Argentina Base camp 13200ft – 4200m Start high altitude trek. Plaza Argentina / Camp 1 / Plaza Argentina 16335ft – 4950m estimated distance 8 Km estimated trekking hours 7 hours Plaza Argentina Base camp 13200ft – 4200m Plaza Argentina / Camp 1 16335ft – 4950m estimated distance 4 Km estimated trekking hours 5 hours Camp 1 / Camp 2 Upper Guanacos / Camp 1 18095ft -5500m estimated distance 6 Km estimated trekking hours 7 hours Camp 1 / Camp 2 Upper Guanacos 18095ft -5500m estimated distance 3 Km estimated trekking hours 5 – 6 hours Camp 2 18095ft – 5500m Camp 2 / Camp 3 Colera 19740ft – 6000m estimated distance 2 Km estimated trekking hours 3 – 4 hours Camp 3 / SUMMIT / Camp 3 22974ft – 6962m. Climbing day from Camp 3 to the SUMMIT!!! 6830m Filo del guanaco 6650m La Cueva 6500m Travesia 6380m Independencia 6180m Piedras Blancas 6000m Colera estimated distance 6 Km estimated trekking hours 7 – 10 hours Camp 3/ Plaza de Mulas Base Camp (Normal Route) estimated distance 6 Km estimated trekking hours 6 hours Plaza de Mulas / Penitentes / Mendoza Not physically demanding estimated distance 24 Km estimated trekking hours 7-8 hours The above information is intended as a guideline only. However, every effort is made to adhere to it. At least 15% of our expeditions have changed due to weather conditions, guides criteria, or other unforeseen events. For example, the second acclimatization day is skipped in many expeditions, depending on guide criteria according to the group's rhythm. If a person is extremely slow, they will not be able to join the group; we recommend hiring a private expedition instead.
-
-### Is a Fast/Extreme Ascent cheaper?
-
-The prices are the same in any open expedition, no matter how many days it takes, so there are no savings when doing a short program, while the primary services are the same for all open expeditions. Deployment & Logistics Transfers Permits Guides Porters Mules Tents Common equipment Sales and administration Taxes and fees Others
-
-### Are there always 2 extra days?
-
-All open expeditions may add up to two (2) extra days if bad weather conditions prevent the regular itinerary. That's why the itineraries are expressed as 18+2, 17+2, or 12+2 days. These extra days are included on the mountain only. If they are not taken on the mountain, they are not included outside the Park. Private expeditions may have +/- extra days if stated during booking.
-
-### What happens if I abandon the expedition?
-
-All services have been quoted in a group, any service out of the group has an extra cost. Summary The early return has no refund/compensation Abandonment may have extra costs Rescue insurance coverage doesn't depend on Acomara Not used porters may have credit/refund 1. Early return has no refund/compensation If a climber or group returns in advance for any reason from Day 1 onwards, there is no compensation nor refund for early return. The days/services not taken on the mountain will not be compensated with a refund, credit, or other benefits. It's stated in the expedition info, and the climber already accepted this in their booking form before sending the 1st payment, which was also signed in the document. Only some cases of personal porter services may avoid this rule, subject to the conditions detailed at the end of this page. No savings for early descent. All services have been quoted in a group. If any passenger leaves the group for any reason, our company doesn't have any savings,  e.g.: deployment and logistics involved were already done the spot was saved the private bus for the group costs the same the group mules cost the same guides are paid the same common equipment is still the same the food was already bought, packed, and sent fees were already paid sellers' commissions were already paid etc.
-2. Abandonment may have extra costs The climbers who quit the group will stay in Base Camp Plaza de Mulas FREE of charge until the group returns from the summit. If a climber left the Base Camp for a rescue (point 3 below) or for another reason, all services in advance separately from the leading group are private services not included in the package and have an extra charge, e.g.: Guided service USD 500/700 Guided service to descend separately from your group (Normal/360 route) Mule service* USD 290/470 Mule separately from your group (Normal/360 route) Porters To carry the personal gear from the high camps to the base camps Transfer to Mendoza USD 275 Transfer to Mendoza city separately from your group The night in advance The returning night included will only be the one with your leading group This represents an extra cost of USD 1065/1445 Normal/360 route for descending out of the leading group in advance. Please remember that climbers are not allowed to leave the Park on their own due to regulations, which means the guided service is mandatory. If you have some physical discomfort and can abandon the Park on your own, the insurance company will not consider it a rescue.- The mule service must be confirmed and paid until 6 pm on the previous day.
-3. Rescue insurance coverage doesn't depend on Acomara The climber or rescue insurance must cover/refund all extra expenses to the climber if a rescue (helicopter, ambulance, etc.). Most policies cover evacuation expenses only in case of life risk. If the Insurance Company doesn't authorize the services in writing in advance, the climber has to pay for them and later ask for a refund from the Insurance Company. DISCLAIMER: Acomara will take action to help if an incident occurs and doesn't take responsibility for the rescue insurance coverage, procedures, and rescue costs. 4. Not used porters may have credit/refund Please visit the section “Optional services” and see the details and conditions of each porter option. Credits/Refunds must be required until 60 days after the end of the expedition, and they will be made by PayPal exclusively 60 days after they are required by email. No refunds or compensations will be made in cash or services at the end of the expedition.
-
-### What are the included services?
-
-3 nights out of the Park (Mendoza city / Penitentes)* Assistance for lost luggage recovery Group transfer Airport / Hotel on arrival Hotel in Mendoza (breakfast included)* Luggage care Transfer Mendoza / Penitentes roundtrip Meals in Penitentes (breakfast, lunch, dinner) Lodging in Penitentes Load arrangement assistance Load mules roundtrip Transfer to the Aconcagua trailhead roundtrip Meals on the mountain (breakfast, lunch, dinner) Confluencia Base Camp services Trek to Plaza Francia Plaza de Mulas Base Camp services Plaza Argentina Base Camp services Trek to the Horcones' Glacier Trek to Mt. Bonete´s Summit Porters for altitude camps Professional guides 2 extra days in case of bad weather Tents / Domes / Toilets Electricity in Base Camp Radio communication 1st aid Kit (including oxygen tube) Assistance in Mendoza city if any help Aconcagua Medal Aconcagua Summit Certificate- NOTE: Each program takes different camps according to each route. Please, visit  Normal route extended or Fast and 360 Polish route for detailed info. Extreme (12+2 days) itineraries have only one night out of the Park and don't include the trek to Plaza Francia, trek to Horcones glacier, and Mt. Bonete. Special offers and LITE programs may have additional restrictions; please consult us.
-
-
-### What are the not included services?
-
-Flight tickets Meals and extra nights in Mendoza City -if needed- Park’s entrance permit and insurance Personal equipment (sleeping bag, mattress, boots, etc.) Abandonment expenses Porters for personal equipment PayPal and bank transfer fees Tips and any other not stated as included Detail of Full expedition programs. Special offers and LITE programs may have additional restrictions; please consult us.
-
-### What are the optional services?
-
-We inform you about some of our optional services that complement your expedition; these services will allow you to increase your success to reach the summit and have a more comfortable and safer expedition. Have your Family and Friends Accompany you to Base Camp!! We offer you the possibility of inviting your loved ones to accompany you during the first 8 days of your expedition to Aconcagua and wish you all the good fortune from base camp before leaving to the altitude camps. The trekking has the same services as the first 8 days of your expedition, so your loved ones will enjoy the same personalized attention throughout the journey, ensuring safety and a comfortable walking pace according to the group. This activity requires no previous knowledge or experience of mountaineering, but it requires adequate physical condition and training. Trekking to Plaza de Mulas Base Camp Itinerary (height in feet/meters as sea level) Day 1: Mendoza City (2508 f / 760 m) Check Equipment and assistance for renting equipment. Day 2: Mendoza City (2508 f / 760 m) – Penitentes (8992 f / 2900) – Obtaining entrance permits. Transfer to Penitentes. Preparing loads for the mules. Day 3: Horcones (8992 f / 2900 m) – Confluencia (10890 f / 3400 m). Day 4: Trek to Plaza Francia (Aconcagua's South Wall unique viewpoint) (13200 f / 4000 m). Day 5: Confluencia (10890 f / 3400 m) – Plaza de Mulas (Aconcagua´s Base Camp) (14058 f / 4300 m). Day 6: Plaza de Mulas (14058 f / 4300 m). Resting day. Day 7: Plaza de Mulas (14058 f / 4300 m). Short trek in the area and visiting the Refugio Plaza de Mulas Hotel. Day 8: Plaza de Mulas – Confluencia – Horcones – Mendoza City – transportation in public bus. Consult the departure Dates Included Services All meals on the mountain. Tents. One night of lodging in Penitentes. Professional guides (English and Spanish). Load mules for personal equipment. Private transfer from Mendoza City to Penitentes and return in public bus. Assistance with equipment rental and purchase of permits. Not Included Services Personal equipment and sleeping bag. Aconcagua Park permits entrance. Expenses for giving up the expedition. Porter's Service The Premium porter service is the most complete and recommended option, but we also have other options. Porters are very well adapted to high mountain work in Aconcagua; they carry the loads in altitude camps. Most of them have reached the summit several times. Their bodies react to altitude much better and faster than many athletes do. Our mules will carry your personal gear and the expedition equipment only up to the base camp. It is essential to consider that the effect of altitude is powerful at altitude camps; there, you will count on a porter's help to carry your personal equipment, food, or common gear during the days in which acclimatization treks carry on. Thereby, you will keep your energies to reach the summit. Besides, a porter allows you to have a more comfortable and safer expedition, decreasing the risk of accidents since your chances of falling increase with the weight. Porters may take your gear on the stretches of your election.
-
-### Which are the sections for porters?
-
-There are different altitude camps where porters carry the gear the way up and down:
-
-### What sort of gear do we carry on the expeditions?
-
-Each person will carry their gear in all stretches during our expeditions. Generally, the common equipment of the expedition, which has to be transported from the base camps towards the altitude camps, consists of tents, altitude meals, kitchen sets (stoves, fuel, pots, etc.), and the garbage generated by the expedition, and toilet waste. Porters help us carry most of this equipment during our expedition. Still, climbers will be asked to collaborate on carrying some of this equipment during the days in which acclimatization treks are carried out.
-
-### What is the gear every climber must carry during the expedition?
-
-Everyone must carry their equipment in all sections, this weight depends on each person, but it usually is between 15 and 18kgs. Porters for personal gear are not included for any stretch of the expedition, but this service may be hired in advance as an optional service. It is important to remember that the climber must collaborate by carrying part of the common equipment during the days indicated on the following tables. Normal Route Besides the personal equipment, every mountaineer will have to collaborate, without exception, transporting the material assigned by the guide of the expedition during the days the acclimatization treks are carried out, according to the following detail:- Approximate weight
-If you don't feel like carrying this load, we offer you a porter to take one part of your entire load. This service must be hired in advance, and it has an extra cost. During the 10th, 11th, 13th, and 15th day of the itinerary, our program includes porters who carry the tents, the common gear, the garbage, and the waste generated by the group. 360 Polish Traverse Route Besides the personal equipment, every mountaineer will have to collaborate, without exception, in transporting the material assigned by the guide of the expedition according to the following detail:- Approximate weight
-If you don't feel like carrying this load, we offer you a porter to take one part of your entire load. This service must be hired in advance, and it has an extra cost. During the 9th, 11/12th, 13th, and 15th days of the itinerary, our program includes porters who carry the tents, the garbage, and the waste generated by the group. Very important Our company does not guarantee the availability of those services which haven't been booked in advance. This service requires essential logistic labor, preparation, and availability of porters at all base camps on specific dates. Hiring is subject to availability at the moment of booking. The prices for early booking on the internet are always lower than the prices of these same services hired in our offices in Mendoza City. You will be able to book by sending us a mail at info@aconcaguaexpeditions.com.   In case different camps are used from the ones above mentioned, either for weather issues or other reasons, the number of stretches of portages booked by the passenger will be respected. The stretches are not interchangeable. If you book a series of specific sections, you will not be able to interchange those stretches for others different from those booked when you are in the mountain. Bilingual personal assistance in case of illness Your safety and health are our priority. Suppose you happen to be evacuated from Aconcagua for medical reasons, or you finish your expedition with any medical condition. In that case, our team will provide you with personal bilingual support for all medical activities you need to do when returning from Aconcagua. Like assisting you if you need additional medical attention, medical studies like lung x-rays, buying medicine, hospital admission, etc. The expenses arising from hospital admission, medical examinations, doctor's fees, ambulances, medications, etc., are not included. In addition, you will be able to use our optional service of full bilingual assistance for your time in Mendoza until you fully recover. The objective is for you to feel wholly accompanied and content until you fully recover your physical health and you can return to your country. Extra Acclimatization Program (EAP) The expedition may be hired with the EAP option (Extra Acclimatization Program), which consists in taking two or three additional days before the beginning of the expedition, in the Andes, outside Aconcagua Park, such as Puente del Inca or Cordón del Plata, carrying on guided treks around the area, reaching 13123/16404 ft, which ensures, even more, the acclimatization process to altitude (essential for the expedition) and thus better chances to achieve the summit. Besides, the EAP offers the possibility of spending a few days in the Andes in a 100% natural environment. You will find yourself practically alone with the mountains, unlike Aconcagua, a crowded park. If you are interested in EAP,  send us an email at info@aconcaguaexpeditions.com. Extra nights and single room While you are in Mendoza city, you will stay in your Hotel with breakfast included for one night (in the extended programs), in a double room, which you will share with another expedition member. This is the night of the first day of the itinerary. If you wish to stay alone in the room or hire extra hotel nights, you may arrange that with us at a more reasonable price than the one the Hotel provides. We recommend you book it in advance since there might not be available during the Aconcagua season. Book now by sending an email to info@aconcaguaexpeditions.com. Special Menu Suppose the passenger has any preference about meals, Vegetarian Menu, Celiac Menu, Dairy-Free Menu, eggs free Menu, or further considerations. In that case, they may request a Special Menu by sending an email to info@aconcaguaexpeditions.com. Pitching of tents and single tent Usually, there is good weather in Aconcagua during the season; however it is rough to be up there when it is stormy, that is why we work with the best brand of mountain tents. The climbers pitch the tents with the guide's assistance, one tent every two people. If you wish, our team is in charge of pitching your tent, or if you want to for a single tent, you can easily book them. It is not possible to sleep alone at altitude camps for safety reasons. You may book by sending us an email at info@aconcaguaexpeditions.com. Helicopter flights in Park Aconcagua We suggest you take maximum advantage of your expedition in South America. Hiring a passionate Helicopter trip by Aconcagua Park and traveling the Andes is a fascinating adventure. Don't miss this excellent opportunity to live such an adventure and take the best pictures and videos to share with your friends. For further information, please send us an email to info@aconcaguaexpeditions.com.
-Private Transfer This service includes a driver waiting for you at Mendoza Airport to take you on a Private Transfer to your Hotel in the city. This is a one-way service. At the end of your expedition, you may hire a transfer from the Hotel to the airport directly at the front desk of your Hotel. If you want to save money, you may also take a taxi or Uber from the airport on your own for a much lower price. Hot shower Enjoy a pack of 3 amazing 15' Hot Showers each in Plaza de Mulas, surrounded by the best landscapes. You will love it! Private toilette Have your Private Toilet locked exclusively for you, unshared with any other people, during your stay at the Base Camp. Available only in Plaza de Mulas and Plaza Argentina. WiFi Service With our WiFi service, you can share the details of your expedition with your family through your social networks and other Experiences: Starlink service subject to weather, limited speed, unstable connectivity. In case of no connection, we will refund the corresponding amount of the number of days the connection was unavailable. No other compensation will be valid. Very important Acomara does not guarantee the availability of services that haven't been booked in advance. Early booking internet prices are always lower than the prices of the same services hired in person in our offices in Mendoza city. The hiring of optional services is subject to availability at the time of booking. You may book witting us at info@aconcaguaexpeditions.com.
-
-### Are there beds on the mountain?
-
-Usually at base camp we sleep in beds inside our domes and tents. Also, single tents are available as an optional service hired in advance only. In the high camps, it is not allowed to set up beds. We sleep in sleeping bags and insulate to help us protect ourselves from the cold. The insulator and optional therm-a-rest are part of your personal equipment, not included in the expedition.
-
-### How can we increase the chances of success?
-
-Please check the optional services; you will find useful services that will help you have a successful, safer, and comfortable expedition. Porter´s Service They will help you with your equipment in the altitude camps; an extra charge will apply. Extra Acclimatization Program (EAP) The expedition may be hired with the EAP option (Extra Acclimatization Program), which consists of taking two or three additional days before the beginning of the expedition, in the Andes, outside Aconcagua Park, in our lodge in Penitentes. You can do some guided/unguided treks around the area (up to 4500m) Meals and special menus If you have any preference about meals (Vegetarian, Celiac, Lactose-free, Vegan, Kosher, and further considerations), you may request a Special Menu; an extra charge may apply. Pitching of tents and single tent Our team may pitch your tent. You can also hire a single tent. An extra charge may apply. Helicopter flights in Park Aconcagua We suggest you take maximum advantage of your expedition in South America. Hiring a passionate Helicopter trip by Aconcagua Park and traveling the Andes. An extra charge will apply. Private Transfer You may hire a transfer from Mendoza Airport to your Hotel. We also provide services from/to Santiago de Chile Airport and other destinations. Only booked in advance, please consult price. Lodging Single room in Mendoza 5 stars upgrade in Mendoza Single room in Penitentes Single tent in Base Camp Extra nights Hot Showers We have the best hot shower system to enjoy a lovely shower while you are in the Base Camp. Additional charges may apply. Satellite Phone Satellite Phone is also available, subject to availability (~USD 7 per min) Bottled Water Although we provide all drinking water during the expedition, you may also ask for bottled water or filter water for an additional charge. Water in our camps comes from rivers and melting snow, all approved for human consumption. Only booked in advance with an extra charge.
-
-### Which hotel will the expedition stay in?
-
-The Hotel is a 5 stars hotel, we usually hire the following hotels : Diplomatic Intercontinental Huentala NH Raices Aconcagua Hilton Others subject to availability The hotel name will depend on availability and pricing on each date, and it will be informed 15 days before starting in the booking details of each reservation. Climbers may book extra nights in the same hotel with us in advance only. Our Full programs include the hotel in Mendoza City at the beginning -on Day 1-. The other nights out of the Park -including the returning night- are usually taken in Penitentes; it may vary according to logistics.
-
-### What communication do we have on the mountain?
-
-Our team uses VHF Radio to communicate between camps and each other. We also have WiFi in Plaza de Mulas and some high-altitude camps. Unfortunately, the WiFi service may not be fully operational due to mountain weather conditions and uncertain events. Your family and friends may follow the expedition with a specific hashtag on Instagram, and if you wish, they may also email us, and we will inform them of all the news about your expedition.
-
-### Where can we leave the luggage while we do the expedition?
-
-We offer luggage storage Free of charge in Penitentes, also inside the tents at the Base Camp. Penitentes is the best option for safety, and to avoid transporting by mules. All luggage has to be locked. Our offices in Mendoza City don't have luggage storage. Luggage storage at the Hotel is also available for all those who reserve extra nights at the end of the expedition, so they will return to the same Hotel. If this is your case, leaving your luggage in the Hotel in Mendoza City will be available Free of charge; otherwise, Penitentes will be the available option.
-
-### What happens if we don't take the extra days on the mountain?
-
-You will be ready to leave before your flight out. All open expeditions include up to 2 extra days added on the mountain if bad weather conditions or other circunstances prevent the regular itinerary. Full extended programs of 17+2 days and 18+2 days include 3 nights out of the Park: Day 1 in Mendoza city Day 2 in Penitentes Returning Day in Penitentes If the extra days are not taken on the mountain or an early return for any reason, the extra days are not included in Mendoza in any case. Lite and Fast expeditions don't include Hotel in Mendoza.
-
-### Where to buy flight tickets?
-
-Our company does not make airline or bus reservations. Mendoza MDZ Airport is the only one in this City We advise searching for the best rates on www.kayak.com or www.despegar.com The most frequently airlines which fly to MDZ are: Aerolineas.com * Latam.com Copaair.com Voegol.com Skyairline.com Flybondi.com * Jetsmart.com *- Domestic flights also available
-Besides the alliances with other airlines. The most common combinations to arrive in Mendoza (MDZ) are through the following airports: EZE Buenos Aires (Ezeiza) – Argentina AEP Buenos Aires (Aeroparque) – Argentina SCL Santiago de Chile – Chile GRU São Paulo – Brasil LIM Lima – Perú PTY Panamá – Panamá Terminal Mendoza is only one Bus Station. You may buy bus tickets at www.andesmar.com
-
-### Is the returning night included?
-
-Yes, it's included at the end of the expedition in Penitentes, not in Mendoza City. The expedition ends as follows: Penultimate day (Plaza de Mulas / Penitentes): descend from Plaza de Mulas base camp transfer from Park entry to Penitentes wait for luggage carried by mules while resting and taking a hot shower dinner, and hosting in our lodge in Penitentes It includes: breakfast, lunch, dinner, and hosting Last day (Penitentes / Mendoza): breakfast transfer from Penitentes to Mendoza City end of services Nobody knows when the expedition will end; it's subject to weather conditions and the guide's criteria. The itineraries are a guideline only; 70+ % of our expeditions follow the itineraries, while 30% do not. The expeditions may end sooner or later than the days detailed in the itinerary. The services will always end one day after the group leaves the Park—no compensation nor refunds for early descent.
-
-### What's the permit price and procedure?
-
-PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1100 to USD 1800 if you buy it on your own. The Park reserves the right to change the permit price and procedure without notice; Acomara does not take responsibility if any change on the permit price and procedure. PROCEDURE 90 days in advance Acomara does all the paperwork in advance only, FREE of extra charge for all customers who complete the following steps until 90 days before departure: Required information Complete info at the booking form Passport picture Sent to info@acomara.com Permit price Plus currency conversion, if correspond Medical certificate Only if required
-
-### Can I buy the permit in advance directly from Aconcagua Park?
-
-No, the permit is not available to buy online. Aconcagua Park has only authorized a small group of companies to acquire permits in advance for their clients, paid in advance only.
-
-### What happens if I do not buy the permit 90-day in advance?
-
-You must buy the permit in advance -a minimum of 3 working days-; it must be purchased in person at the Park offices through the following steps: Create an account at the Park website Check the link down below Validate your ID Personal information required Fill up the expedition details Please ask us for company info, and expedition details Print all the documents the system will give you after filling up Include a Passport copy Get the coupon to pay Permit price varies every day according to currency conversion Exchange money The permit is payable only in CASH in argentine pesos Find an authorized payment office Check open bank hours in advance Deliver the payment receipt in person at the Park offices After this point, you obtain your permit Go to the Park offices on the next working day to ask if your permit is ready to deliver It takes at least one working day to have it ready to deliver Deliver your permit to your guide on Day 1 of your program IMPORTANT: Park offices and payment offices may have long lines to wait; please be patient Park offices don't take payments; they do not handle any payment Only CASH payment is accepted in argentine pesos (USD not accepted) Credit Cards are not accepted for permit payment Don't forget to check the open hours of each specific date, usually working days only Acomara doesn't have the chance to get the permit for climbers who didn't get it in advance. If a climber doesn't have the permit on Day 1, the Park will not allow them to enter, and it will be considered a cancellation from the client-side. Non-refundable, non-reschedule. Please find more info at the Park Aconcagua website. Disclaimer. Acomara doesn't take responsibility for the permit price and procedure. All information included on this page is related to the season 2024/25, and it seems to be the same for the next season, which will not confirmed until  Nov 2025
-
-### Do I need rescue insurance?
-
-Yes, Rescue Insurance is a mandatory requirement from the Park to cover helicopter evacuation, among other expenses. It has to be stated in the insurance policy: rescue coverage until 7000m / 23000ft and helicopter rescue. Global Rescue clients just need to show their Policy Number or Card and usually don't have to pay for the Helicopter if they need it. Other insurances require the climber to pay for the Helicopter before use, which may be an issue, and later ask for a refund. And they are not automatically approved by the Park. The Park Permit is always for 21 days, so 30 days of coverage are required, regardless of whether the expedition is shorter. Only the Park authorities can Accept/Reject the Insurance Policy, which may take 4+ working days; Acomara can't verify it. 90 days of anticipation is recommended. Click here to hire now DISCLAIMER: Plans and conditions are a copy of July 2023 from Global Rescue Inc. and may vary without notice. All insurance companies try to make excuses and delays and apply small letters in their contracts to avoid coverage. Although Global Rescue may be the best choice, they also make the same while making excuses to avoid coverage. Acomara doesn't take responsibility for insurance coverage.
-
-### Do I need a Passport or Visa?
-
-We will process the invitation letter through our government's Remote Procedures (TAD) page. The form will then be automatically uploaded to the consulate page, where you will process your Visa. The invitation letter from Acomara Aconcagua Expeditions is a solid recommendation for obtaining a Visa. In 20+ years, all climbers with our invitation letters have received their Visas.
-This is the required information to process the invitation letter Full name Birthdate Nationality Passport number Postal address E-mail Phone number The city in which the process will begin Approximate stay in Argentina (entry and exit) First page of the passport (Attach)
-
-### What is the minimum age to enter Aconcagua Park?
-
-We have had climbers kids from 10 years old with successful climbs. Minors between 14 and 17 may come to Aconcagua only with an authorization notarized and apostilled by La Haya and signed by both parents, even if accompanied by one of the two parents. Their documents have to be confirmed at least 60 days in advance by Park authorities. Children under 14 years old require special procedures. Please ask. Weather / Climbing Season The weather conditions are unpredictable, and it depends on the specific days of the summit attempt, which are impossible to know in advance. On the last 12 seasons (+600 open and private expeditions): 91% of our expeditions reached the summit in the High season. On the other hand, during the High season, we will find seven times more people in the Park than Low season. 88% of our expeditions reached the summit in the Low season. In the seasons 2021/22 and 2023/24, all our 42 open expeditions reached the summit. We exceeded our record, and we are the record of the entire Aconcagua Park, 100% summit success rate on the season! Difficulty / Technical level The Northeast or Normal route climbing Mount Aconcagua does not present any technical difficulty. Our expeditions are made walking; we may have to use crampons for safety reasons during the summit day. Depending on the route's conditions, we can walk on snow or ice. In the base camp, we practice with crampons by going to the Horcones glacier, which is not difficult.
-Climbers don't require previous climbing experience on rocks or ice to join our expeditions. Statistically, the highest probability of reaching the summit is for people between 45 and 60 years old. They have more significant mental strength than young people and better manage the anxiety of reaching the summit. Anyway, that does not mean that it does not require substantial effort. It is important not to be overweight, but mental strength is the key to success. We believe that it will not be our legs that take us to the summit, but our mental strength will allow us to reach the summit of Aconcagua, enjoying every step without any hurry.
-The main concern for non-experts is the effects of the altitude. Correct acclimatization can overcome these, which is a factor in our extended programs by both routes. Another point to bear in mind is the temperatures on the mountain, the effects of which are strongly reduced with Vegetarian We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the optional Vegetarian menu; you may also ask for special requirements in advance. Breakfast: coffee tea milk milk with cocoa eggs cereals wholemeal bread different types of cheeses pretzels cookies juice pudding seeds nuts fresh fruit Lunch & Dinner different kinds of salads cream soup pasta with sauce pies (tuna, cheese, etc.) integral rice/ rice with sauce pizza etc. Dessert: chocolate apple pie cakes strawberry and fresh cheese mousse stuffed oranges Grapefruit au gratin with cinnamon flan jelly fruit salad We also include candy different types of cookies cereal bar power gel snacks dried fruit olives etc. At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals and are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge. Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.). All menus include Free repeat on-demand. Celiac We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the optional Celiac menu Breakfast: coffee or infusion with free lactose milk gluten-free bread fruit corn cereals, liquid yogurt applesauce gluten-free cookies gluten-free cereal bar, skim cheese skimmed fruit yogurt with nuts Lunch & Dinner fish spinach meat potatoes rice chicken zucchini chard skim cheese quince cauliflower stewed peas omelet potato and blood sausage macaroni tuna pie pumpkin omelet quinoa mini pizzas slices of chicken with lettuce baked sole baked spinach rice mixed salad Dessert: chocolate muffins with rice flour apple cake cheesecake chocolate donuts apple pie strawberry dessert frozen yogurt vanilla dessert fruit salad compote We also include candy different types of cookies cereal bar power gel snacks dried fruit olives etc. At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge. Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.). All menus include Free repeat on-demand. Lactose free We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the optional Lactose-free menu Breakfast: lactose-free milk coffee tea jam honey cereal bars mary-type cookies with jam bread with olive oil churros walnuts seasonal fruit yogurt Lunch & Dinner seasonal fruit quince sweet rice with mushrooms salads roast chicken with potatoes bread, chard pork tenderloin pesto noodles tuna aubergines stuffed zucchini hake cherry tomato cannelloni potato omelet Dessert lactose-free cream and raspberry mill hoes glazed lemon cake new york cheesecake compote walnuts seasonal fruit At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge. Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.). All menus include Free repeat on-demand. Vegan We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the  optional Vegan menu Breakfast vegetable drink banana cookies coconut and sunflower seeds toasted pumpkin seeds or seeds and fresh fruit green tea and homemade whole grain rye and spelled bread toasts unsweetened soy almond milk pomegranate grains walnuts and sunflower seeds oatmeal and dried fruit bar chickpea flour cookies or crackers Lunch & dinner quick stir fry of tofu and kale with sesame vegan broccoli chickpea rice meatballs vegetable salad tangerine Peppers stuffed with textured soybeans quinoa soup beans carrots smoked tofu roasted spiced chickpeas lentils vegan chickpea and tacos Dessert apple pineapple and coconut smoothie bowl with red berries pear almond milk figs coconut milk vegan chocolate cake coconut milk and green tea popsicles, pineapple cake brownie cup with yogurt and fruit At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge. Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.). All menus include Free repeat on-demand. Kosher We buy the best Kosher food options and ingredients in Mendoza and Buenos Aires; we also take care of the logistics involved from Buenos Aires / Mendoza / Penitentes / Base Camps. We organize Private Expeditions where we rest during the Sabbath. KOSHER FOOD IN MENDOZA CITY: At the beginning and the end of your Expedition, we will take care of the hosting in a Hotel with Kosher-certified food available in its restaurant. The hotel owner is one of the most representative members of the Jewish community on the west side of our country. KOSHER FOOD ON THE MOUNTAIN: We prepare the Kosher food in our kitchen tents and restaurant tents on base camps. In high-altitude camps, the guides are responsible for melting the snow to get water and prepare meals. We buy the best pre-elaborated Kosher meals to send to the mountain, and then we heat them in the camps by our cookers or by the guides in high altitude camps. We add new kitchen utensils for each expedition; they are brand new on the 1st day of preparing the mountain's meals. According to our experience with Kosher menus, we always suggest the client give the chef recommendations on the base camp, where the meals are prepared separately from the rest of the climbers. On high altitude camps, the guide will prepare the meals; you may start the fire before cooking at all times. We provide Kosher menus on the Base Camps (pre-elaborated in Mendoza in the house of Rabbi); we include an optional meeting with him in Mendoza before starting. Meat Options Meatballs Meatloaf Meat breaded Chicken Milanese Chicken legs with honey Lemon Chicken Legs Pasta with tomato sauce Mini meatballs Potato pie Milk Options Pumpkin pie with chicken Canelones Eggplant, cheese, and tomato pie Accompaniments Mashed potatoes Mashed vegetables Pasta Baked potatoes Baked vegetables Kosher menus have an additional charge, 90 days in advance. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge. Regular We strongly believe the excellent quality ingredients and good tasting meals are keys to have a successful and enjoyable expedition. This is the Regular menu included in our expeditions: Breakfast coffee tea milk yogur chocolate cereals bread (different types) ham cheese eggs bacon fresh fruits crackers cookies pudding marmalades honey butter peanut butter Lunch & Dinner cream soups to hydrate argentine steak meat in different recipes pork in different recipes chicken in different recipes tuna in different recipes different types of pasta with a variety of sauces rice in different recipes pizza different kinds of fresh salads others Dessert fresh fruits mousse puddings sweet potato cakes others We also include dried fruit cereal bars power gel candy snacks cookies olives others At the Base Camp, all meals are served in dining tents and prepared for specialised chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge. Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favourite flavours (energy bars, snacks, etc.). All menus include Free repeat on-demand.
-
-### Do you have a Gear List?
-
-Yes, please visit https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm Please click the PRINT button for a PDF checklist.
-
-### Are differences in the gear for both routes?
-
-There are almost no differences in personal gear between the Normal route expedition and the 360 Polish Traverse route. The only small difference in Aconcagua is that some climbers bring the ice axe for better fixation when walking on ice by the Polish route. All other personal equipment has no differences. The Polish Direct route that goes through the middle of the glacier requires ice climbing equipment to climb the Polish Glacier. This option is available only on a private Aconcagua climb.
-
-### Can we rent equipment in Mendoza?
-
-Yes, however, availability and proper quality are not guaranteed. We strongly recommend renting in advance to guarantee availability and adequate quality. When renting in advance, your gear will be waiting for you at the time of the gear check, if any issue, a staff member of the rental store will solve it in less than 2 hours, no matter if it is Sunday or any other day. If you plan to rent in person in a local store in the City, it's important to come 1-2 days before Day 1 of your program, since on Day 1 you have to have all your personal gear with you at the time of the gear check with your guides.
-
-### What plastic boots are suitable?
-
-Please visit “Double Boots” at the link below https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm
-
-### What crampons are suitable?
-
-Please visit “Crampons” at the link below https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm You don't need to have experience in the use of crampons, since before using them, we are going to practice.
-
-### How big should our backpack be?
-
-We recommend using three backpacks: –      A 75-100L backpack or a larger one for transporting all your belongings in the altitude camps –      A waterproof duffel bag big enough to fit the large backpack for transporting your personal items from the park entrance until base camp and return. –      A 35L or similar size daypack where you will carry your water, lunch, passport, sunblock, and the clothes you will wear during the day up to the base camp, on the acclimatization treks, and also for the summit day. This 3rd backpack is optional, since you may also use your big 75L backpack instead. All these are recommendations; please take in mind some climbers have their preferences. Please visit  https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm where you will find a detail of the required personal equipment (including estimated rental prices)
-
-### How much weight do we carry on the mountain?
-
-Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)
-1. Our mules will carry all the loads to the base camps Confluencia, Plaza de Mulas, and Plaza Argentina, round trip. There you will only have to carry your daypack (35L) with lunch and water to consume during the afternoon, in addition to your wallet, sunscreen, camera, etc. 2. Unlike other companies, our Full expeditions include porters to transport tents and garbage and kitchen equipment, fuel, first aid kit, oxygen tubes, toilet paper, other items, waste of bath, and part of the meals. The climbers will collaborate by carrying some food during the acclimatization treks (when they do not have to carry their equipment). They will have to take their personal equipment when they move from one camp to another, and if necessary, they will also carry a small amount of water to 1-2 camps (only in exceptional cases that there is no snow to melt). Optionally, personal porters can be hired to carry the equipment of each climber, with an additional charge, available only in advance. Lite expeditions do not include porters, and the climbers will carry it.
-
-### Do we need an ice axe?
-
-Its use in Aconcagua is subject to snow and ice conditions, so it's impossible to confirm in advance whether the climbers will need it or not. However, many mountaineers use them when they go on Route 360, and it's a must for the Polish Direct Route. Petzl Glacier is recommended. It can pose a danger to mountaineers without proper experience, so the guide may prefer a good pair of boots with suitable crampons and poles to avoid using the ice axe. It's frequently left in the base camp.
-
-### Can we use a camelbak?
-
-Although it is used by some climbers in Aconcagua, it has the problem that the water in the hose can freeze in low temperatures, especially in high-altitude camps. You can click here for the gear list.
-
-### Do you have a training program?
-
-Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario
-
-### Do you have any nutrition comments?
-
-These are the basic indicators to bear in mind. Representation of the number of calories which should contribute by the different energetic nutrients during an expedition to Aconcagua: Proteins: 10 / 15%, where 1gr. of proteins provides four calories. Fats: 25 / 30%, where 1gr. of fat provides nine calories Carbohydrates: 50 / 60%, where 1 gr. Carbohydrates provide four calories Nutritionists and chefs develop our meals to bring all the necessary energies to do an Aconcagua expedition. Anyway, all our meals have Free repeat on demand to guarantee adequate adaptation to each person.
-
-### Do you have any hydration comments?
-
-In mountaineering, hydration is just as important as food or even more since liquids' loss is relevant. It worsens as we ascend and gain altitude because the lack of oxygen saturation in the blood causes compensatory hyperventilation (hypoxia), losing a lot of liquid in the form of water vapour by breathing. Dry air and perspiration are other ways to lose fluids. The rhythm of fluids lost varies from one person to another. Liquids lost are produced by breathing and perspiration, as we already said, and by urine and diarrhoea. We are not always aware of the amount of liquid our body is losing. Certain drugs, such as acetazolamide (Diamox), could induce dehydration due to its diuretic power. Keeping proper hydration is elemental to reduce the risk of heat, cold (including freezing), and altitude disorders. Not replacing the liquid lost leads to dehydration, affecting athletic performance markedly. If dehydration goes forward, it can steer a state of shock.
-
-### Do you recommend Diamox or other drugs?
-
-We do not recommend Diamox (acetazolamide) or any other drug. You only have to bring with you the medications under the medical prescription for your consumption. Our acclimatisation process is designed to be enough for everybody. If not, the doctors will check and suggest a medicine depending on each case. At first, Diamox helps to acclimatise; on the other hand, climbers must drink a lot of water to compensate for the dehydration, much more than usually should be drunk, which is already a lot in Aconcagua. Climbers often do not manage to drink too much water and become dehydrated, and that causes freezing, edema, etc. It is also very heavy to carry a lot of water during the day, and it is difficult to urinate very frequently when wearing mountain equipment. Diamox is a diuretic, but you need to drink a lot of water at height altitude, which you do not drink ever in the necessary amount. It is not recommended to add a diuretic. And it hides the symptoms of edema, among other things. Another problem that Diamox brings is that in many circumstances, depending on the type of sediments the water has, Diamox causes the water to feel bad, and that causes climbers not to drink all the water needed. You may buy it at the pharmacy in Mendoza only under a medical prescription; it is up to you; it is not available to purchase independently.
-
-### What is the Extended Acclimatization Program – EAP?
-
-The Extra Acclimatization Program -EAP- is optional but recommended. It consists of up to 4 previous days acclimatizing your body in our lodge on the mountain (9000ft/2730m). You may only stay there to rest and acclimatize or do some treks around the area (up to 15000ft/4550m) to further the process of acclimatization. This option increases the chances of reaching the summit and has a safer and more enjoyable expedition; It will allow your body to get accustomed to the altitude. Spending time in altitude with the same weather as the Aconcagua has proven to be helpful. Also, you will be in contact with nature in a peaceful and quiet environment where you won’t cross paths with many people and join with climbers all around the world at night, in our refuge. By taking this option, you will meet with the rest of your expedition group before entering the park instead of Mendoza City. Since you will need to go in advance, we exchange private group transfer for a regular bus transfer to go from Mendoza to the mountain. We do not recommend Diamox or any other drug to improve acclimatization Climbers who can train at 3000-4000m may come to Aconcagua already acclimatized, it will really help them to have a successful climb in Aconcagua 6 tips to climb Aconcagua 1) Find your breath High altitude activities require a different type of breathing to keep supplying oxygen to your body. We recommend training your lungs by adding breathing exercises to your regular Aconcagua training routine. You can try the following exercises: Belly Breathing: this exercise is used in many sports and health practices. It allows you to use your total lung capacity to supply more oxygen to your extremities which helps prevent muscle cramps that cause the accumulation of lactic acids. Pressure Breath: You can add resistance to your exhalation by pursing your lips and exhaling forcefully. This breathwork helps combat the decrease in atmospheric pressure at high altitudes. Inspiratory Muscle Training: This technique is meant to generate resistance to the airflow when inhaling, so you strengthen your inspiratory muscles. There are inspiratory muscle training devices, but you can find homemade alternative ways to produce a similar effect. Breath-holding Drills: This type of hypoxic training allows you to simulate high-altitude breathing since it reduces the amount of oxygen during exercise and enhances your CO2 tolerance. You can start by inhaling to your maximum capacity, exhaling and holding for 3 counts, and inhaling again. As you progress, you can slowly increase the counts. 2) Focus your attention Meditation exercises and mantras help refocus your attention on your activity are also handy tools to keep the attention on your body and climb. 3) Evaluate your training progress in a fun way Following a training routine is fundamental to climb Aconcagua the closest possible to your comfort zone. Make sure you plan your month, so you include at least one or two climbing trips or outdoor activities that test your overall fitness in a fun way. After a few months of training, you can repeat some of the trips, so you have a point of comparison to evaluate your progress. This evaluation is far more fun and motivational than traditional fitness tests! 4) Day by day Enjoy your expedition one step at a time. The goal is to get to the next day, and so on. It is useless to burn stages thinking about what can happen during the summit day. Let yourself enjoy the experience one day at a time. 5) Have suitable clothing and gear Regardless of the date, you choose to come to Aconcagua, your gear must be adequate. You can click this link to view the equipment you need; however, we want to highlight that warm and comfortable boots make a significant difference in your performance. We recommend trying different models and feel which are more comfortable for your feet, shins, and calves. Wearing light and flexible pieces of clothes is also very desirable. The lighter the gear, the better. 6) Hydrate as much as you can Drinking between 3 and 5 liters of water is very important since our body dehydrates a lot faster at high altitudes. This simple act will be a great help to fight altitude sickness. You can drink one liter before and during breakfast, add another 2 liters before lunch and try to finish the remaining 2 liters before 5 or 6 pm, so nights are more comfortable. Drinking so much water can be annoying, but it is a great way to help you cope with altitude much easier.
-
-### What are the Guide's skills and qualifications?
-
-All of our guides are highly skilled English speakers with AAGM or EPGAMT licensing (3-year career) and legally authorized by the Park authorities. We believe that to have a successful expedition is crucial to have the best-qualified professionals. Our guides have at least five (5) years of experience to provide safety on the treks along the different paths with confidence, conviction, and professionalism. We have the greatest number of guides per group. We organize expeditions since 1998, resulting in over 1000 successful expeditions with thousands of climbers without fatalities nor serious accidents (we are the only recognized company with this record). We also have the most experienced guides and professional team in all base camps to provide the best base camp services and the strongest logistical support 24/7 with top-notch equipment. All these, among other reasons, have allowed us to achieve a 100% summit success rate in 42 open expeditions during the seasons 2021/22 and 2023/24.
-
-### Are the guides locals?
-
-Yes, 90%+ of our guides are locals, and all of them are legally certified, registered, and authorized by Aconcagua Park. With no records of any fatality nor major accident when leading a group.
-
-### When should we hire porters?
-
-In advance to guarantee availability, we have a refund policy for porters not taken on the mountain. For safety and logistical reasons, Acomara expeditions cannot include services from other providers or companies. Bookings are subject to availability. Please consult us about our refund policy and conditions.
-
-### Are porters included after base camp?
-
-Unlike the other companies, we include unlimited porters to carry the tents, cooking equipment, fuel, first aid kit, oxygen tubes, toilet paper, part of the meals, and other elements, including solid waste in all our FULL expeditions. Private and Lite expeditions may have a different porter service. The climbers will collaborate by carrying some food during two acclimatization treks. They have to carry their personal equipment when moving to the three altitude camps only, and if some water is necessary, the water is regularly obtained from the snow melting in each camp; it's unusual to carry water, in the last 25 seasons only two times was necessary to carry some water. Personal porters to carry each person's personal equipment are available only if booked in advance and for an additional charge. Our mules will carry all common and personal equipment to the Base Camps, roundtrip. Since the mules don't go with the climbers, the climbers will have to carry their small daypack to carry the wallet, cell phone, water to drink when walking, lunch for the day, medicines, etc.
-
-### How much weight do we carry on the mountain?
-
-Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)
-1. Our mules will carry all the loads to the base camps Confluencia, Plaza de Mulas, and Plaza Argentina, round trip. There you will only have to carry your daypack (35L) with lunch and water to consume during the afternoon, in addition to your wallet, sunscreen, camera, etc. 2. Unlike other companies, our Full expeditions include porters to transport tents and garbage and kitchen equipment, fuel, first aid kit, oxygen tubes, toilet paper, other items, waste of bath, and part of the meals. The climbers will collaborate by carrying some food during the acclimatization treks (when they do not have to carry their equipment). They will have to take their personal equipment when they move from one camp to another, and if necessary, they will also carry a small amount of water to 1-2 camps (only in exceptional cases that there is no snow to melt). Optionally, personal porters can be hired to carry the equipment of each climber, with an additional charge, available only in advance. Lite expeditions do not include porters, and the climbers will carry it.
-
-### What is the group size, and how many guides?
-
-NUMBER OF GUIDES Our expeditions have an average of seven (7) climbers with three (3) highly professional and successfully experienced Guides for the summit attempt. While many companies provide only two (2) guides for 8 or 9 climbers, resulting in climbers either being left alone or with a single guide for many people, if any abandon the group for any reason. It happens all the time and represents a significant difference not only in service to have a successful expedition but also in your Safety. We have a max of 1-3 guide-climber ratio on the summit attempt or even better in many cases, while many have 1-4 or even worst. To have a successful expedition is crucial to have the best-qualified professionals. Our guides have at least five (5) years of experience to provide Safety on the treks along the different paths with confidence, conviction, and professionalism. They are English speakers with AAGM or EPGAMT licensing (3-year career) and are legally authorized by the Park authorities. GROUP SIZE We have a maximum of 11 climbers per group. If we have a group of 12 climbers, we split it into two (2) groups of seven (6) climbers each. Most guides regularly join the group from the City; however, one guide could join the group for the summit attempt, depending on weather conditions and the guides' logistics.
-
-### When do we meet with the group guides?
-
-On day 1 of the itinerary for the leader guide, and some times an assistant guide may join the group on the mountain.
-
-### How much is the regular tip?
-
-Tipping in Argentina is not mandatory; it depends on each person. You may calculate USD 200-400 for guides and USD 30-60 for porters and cooks. In total, it may be USD 250-450 per climber; however, it's up to each person; it may be higher or lower. No one on our staff will ever ask you for a tip, unless you give it to them.
-
-### What happens if someone has to descend during the summit day?
-
-If a person cannot continue ascending, one of the group's guides climbs down with that person, and the rest of the group continues ascending with the remaining guides. We do that until there is only one guide left. If there is only one guide left, with two or more climbers, and someone has to descend, the entire group has to go down. For safety reasons, no one can be alone on the mountain without guiding assistance. Some private expeditions ask for one guide per person to avoid this situation (this is optional but not available for open expeditions). Safety & Eco Safety 1st Your safety will always be our 1st priority, we organize expeditions since 1998, with over 1000 successful expeditions with thousands of climbers without diseases nor serious accidents in all our history (we are the only one of the well-recognized companies with this record). In Confluencia, Plaza de Mulas, and Plaza Argentina there are medical checks that are mandatory. There, doctors determine whether you may ascend. If your health seems compromised, you will undergo a new medical check to determine whether you continue. If doctors determine you are not fit to continue, Park Rangers will kindly ask you to abandon the expedition. Bear in mind that guides are knowledgeable in first-aid techniques and are in contact 24/7 with the Park Rangers for emergencies. Therefore, if someone gets sick in the altitude camps, guides count with basic assistance to aid you. You will never be alone on the mountain. All our activities are guided under COVID-19 approved protocol. Environmental Care From Acomara, we are strongly committed to caring for the environment, taking care not to leave any waste, actively collaborating in preserving flora and fauna, and being active participants in protecting the Aconcagua Protected Areas. Deeply integrated with the local community as local people that we are. We also ask all people climbing Aconcagua to act in an eco-friendly way, especially in the Park.
-
-
-### Cuál es el precio de la expedición?
-
-El precio es USD 7.250, y algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según los lugares libres de cada fecha. Se puede reservar con un pequeño anticipo. Más allá del precio, lo importante es elegir el programa adecuado para vos (duración, aclimatación, nivel de experiencia, etc.), ya que eso impacta directamente en tus probabilidades de cumbre y en la experiencia general. Si te parece, puedo enviarte toda la información detallada por email. Compartime tu correo. Y si te sirve, agendamos una videollamada corta (15 min) y te explico todo para que elijas la mejor opción. Decime qué día y horario te queda cómodo.
-
-
-### What is the price of the expedition?
-
-The price is USD 7,250, and some departures have a promotion between USD 5,990 and USD 6,390 depending on the spots left on each date. You can reserve your spot with a small deposit. Beyond the price, what really matters is choosing the right program for you (duration, acclimatization, level of experience, etc.), as this directly impacts your chances of reaching the summit and your overall experience. If you'd like, I can send you all the detailed information by email. Please share your email address. And if it works for you, we can schedule a short video call (15 min) where I'll explain everything so you can choose the best option. Please tell me a day and time that work for you.
-
-
-### Cuáles son las fechas de salida?
-
-Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27: 18+2 DÍAS | NORMAL EXTENDIDO (recomendado) Noviembre: 14 | 22 Diciembre: 1 | 4 | 20 | 27 Enero: 2 | 10 | 31 Febrero: 7 14+2 DÍAS | NORMAL ASCENSO RÁPIDO Noviembre: 18 | 26 Diciembre: 5 | 10 Enero: 6 | 14 Febrero: 11 12+2 DÍAS | NORMAL ASCENSO EXTREMO Noviembre: 20 | 28 Diciembre: 7 | 12 | 26 Enero: 2 | 8 | 16 Febrero: 6 | 13 17+2 DÍAS | GLACIAR POLACO 360° Diciembre: 1 | 28 Enero: 3 Febrero: 1 Cada programa está diseñado para un nivel diferente de experiencia y aclimatación, por lo que elegir el adecuado es clave para tu éxito y una experiencia óptima. Si lo deseas, puedo recomendarte las mejores fechas y el programa más adecuado según tu experiencia. También podemos programar una breve videollamada de 15 minutos para repasar todo juntos. Decime qué día y hora te convienen más.
-
-
-### What are the departure dates?
-
-If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season: 18+2 DAYS | NORMAL EXTENDED (recommended) November: 14 | 22 December: 1 | 4 | 20 | 27 January: 2 | 10 | 31 February: 7 14+2 DAYS | NORMAL FAST ASCENT November: 18 | 26 December: 5 | 10 January: 6 | 14 February: 11 12+2 DAYS | NORMAL EXTREME ASCENT November: 20 | 28 December: 7 | 12 | 26 January: 2 | 8 | 16 February: 6 | 13 17+2 DAYS | 360° POLISH GLACIER December: 1 | 28 January: 3 February: 1 Each program is designed for a different level of experience and acclimatization, so choosing the right one is key for your success and overall experience. If you'd like, I can recommend the best dates and program based on your background. We can also schedule a short 15-minute video call to go over everything together. Please tell me what day and time work best for you.
-
-
-### Tienes info para hacer un Trek a Plaza Francia?
-
-Aquí tienes la información para los treks de Plaza Francia. No tenemos salidas grupales, solo salidas privadas. El precio es de USD 1.499 por persona (mínimo 2 personas). Puedes ver más info en el siguiente link: https://aconcaguaexpeditions.com/espaniol/expediciones/trekkingabiertoplazafrancia.htm
-
-
-### Do you have information for a trek to Plaza Francia?
-
-Here is the information for the Plaza Francia treks. We don't have group departures, only private trips. The price is USD 1,499 per person (minimum 2 people). You can find more information at the following link: https://aconcaguaexpeditions.com/ingles/expediciones/trekkingplazafrancia.htm
-
+`abierta-vs-privada` · en: faq-004 · fuente: faq-web; precio de privadas, Fernando (oct 2026) · confianza: confirmed
+
+También preguntan: ¿Hacen expediciones privadas? ¿Cuánto salen? · Grupo cerrado con guía exclusivo · Expedição privada, quanto custa?
+
+Open and Private expeditions are very similar and include almost the same core services.  
+The main advantages of a Private expedition are flexibility and personalization. You can choose your departure date, and you will have your own dedicated guides—ensuring better communication, enhanced safety, and a well-paced ascent tailored to your rhythm.  
+You will also benefit from a more flexible itinerary, allowing you to move faster or slower depending on your acclimatization and overall condition.  
+In addition, Private expeditions can include extra services such as a private toilet, hot showers, MSR MiniWorks EX water filters, solar panels for charging devices, and other customized options.  
+Private expeditions start at USD 7,990 per person. Open expeditions don't have an exclusive guide.  
+
+### ¿Qué diferencia hay entre el programa extendido y los cortos?
+
+`extendido-vs-corto` · en: faq-005 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Conviene el extendido o el rápido? · Why the long itinerary instead of the short one? · Programa longo ou curto?
+
+We always recommend extended itineraries, as the additional days for rest and acclimatization significantly increase your chances of reaching the Summit.  
+The 12+2 days Extreme Ascent and 14+2 days Fast Ascent programs on the Normal Route are designed for experienced climbers who are well-trained, properly acclimatized, and have limited time. These options offer a more demanding, faster-paced challenge.  
+By choosing a Fast or Extreme Ascent, you will skip key acclimatization hikes such as the trek to Plaza Francia (4,200 m) and the ascent of Mt. Bonete (5,100 m).  
+
+### ¿Qué programa tiene más chances de hacer cumbre?
+
+`mejor-programa-para-cumbre` · en: faq-006 · fuente: faq-web; regla de 6.000 m, Fernando (oct 2026) · confianza: confirmed
+
+> Nota para el equipo: La web decía "por encima de 5.000 m"; Fernando corrigió a 6.000 m. Corregir también la web.
+
+También preguntan: ¿Con cuál es más probable llegar a la cima? · Qual programa tem mais chance de chegar ao cume?
+
+The Normal Route 18+2 days program offers the best chances of reaching the summit, especially as a Private expedition, where everything is tailored to your pace and needs.  
+Only if you have already been above 6,000 m, are very well trained and arrive acclimatized, you may consider a Fast Ascent (14+2 days). However, to maximize success and safety, the extended itinerary on the Normal Route remains the most recommended option.  
+
+### ¿Cuándo empezamos a caminar?
+
+`cuando-empieza-la-caminata` · en: faq-008 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Qué día arranca el trekking? · First hiking day · Quando começa a caminhada?
+
+The trekking begins upon entering the Park, with the hike from the Park Entrance to Confluencia Camp by Normal Route (approximately 4 hours). The exact day depends on the chosen program.  
+
+### ¿Cuántas noches pasamos en el campamento base?
+
+`noches-en-campamento-base` · en: faq-010 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Cuántos días estamos en Plaza de Mulas? · Quantas noites no acampamento base?
+
+In the extended itineraries (17+2 days and 18+2 days), we usually sleep between 5 and 7 nights at the base camp.  
+The number of days may vary depending on weather conditions and guides criteria; the leader guide will decide according to each group.  
+The fast itinerary (12+2 days) usually takes 3-4 nights only  
+
+### ¿Cuántos kilómetros y horas se camina cada día?
+
+`distancias-y-horas-de-caminata` · en: faq-011 · fuente: faq-web · confianza: web
+
+También preguntan: Distancias entre campamentos · Hiking hours per day · Quantos quilômetros por dia?
+
+Normal Route distances  
+Horcones / Confluencia  
+estimated max altitude 3300m 10890ft  
+estimated distance 7.5 km  
+estimated trekking hours 4 hrs  
+Confluencia / Plaza Francia / Confluencia  
+estimated max altitude 4000m 13200ft  
+estimated distance 20 km  
+estimated trekking hours 8 hrs  
+Confluencia / Plaza de Mulas  
+estimated max altitude 4260m 14058ft  
+estimated distance 9 km Confluencia / Playa Ancha  
+estimated distance 8 km Playa Ancha / Plaza de Mulas  
+estimated trekking hours 8 hrs  
+Plaza de Mulas / Horcones Glacier  
+estimated max altitude 4300m 14150ft  
+estimated distance 1 km  
+estimated trekking hours 3 hrs  
+Crampon hike on the glacier  
+Plaza de Mulas / Mt. Bonete Summit / Plaza de Mulas  
+estimated max altitude 5091m 16732ft  
+estimated distance 7 km  
+estimated trekking hours 7 hrs  
+
+Start high altitude trek  
+Plaza de Mulas / Camp 1 Plaza Canada / Plaza de Mulas  
+Acclimatization day  
+
+estimated max altitude 4910m 16203ft  
+estimated distance 7 km  
+estimated trekking hours 5-6 hrs  
+Plaza de Mulas / Camp 1 Plaza Canada  
+Moving day  
+
+estimated max altitude 4910m 16203ft  
+estimated distance 1 km Plaza de Mulas / Piedras Conway  
+estimated distance 2 km Piedras Conway / Plaza Canada  
+estimated trekking hours 3-4 hrs  
+Camp 1 Plaza Canada / Camp 2 Nido de Condores  
+Moving day  
+
+estimated max altitude 5250m 17325ft  
+estimated distance 2 km Plaza Canada / Cambio de pendiente  
+estimated distance 1 km Cambio / Nido de Condores  
+estimated trekking hours 4-5 hrs  
+Camp 2 Nido de Condores / Camp 3 Colera / Camp 2  
+Acclimatization day  
+estimated max altitude 6000m 20000ft  
+estimated distance 4 km  
+estimated trekking hours 4 hrs  
+
+Camp 2 Nido de Condores / Camp 3 Colera  
+Moving day  
+estimated max altitude 6000m 20000ft  
+estimated distance 2 km  
+estimated trekking hours 2-3 hrs  
+Camp 3 Colera / SUMMIT / Camp 3 Colera  
+Summit day  
+6962m 22834ft SUMMIT  
+6830m Filo del guanaco  
+6650m La Cueva  
+6500m Travesia  
+6380m Independencia  
+6180m Piedras Blancas  
+6000m Colera  
+estimated distance 3.5 km  
+estimated trekking hours 7-10 hrs  
+Camp 3 Colera / Plaza de Mulas  
+estimated distance 7 km  
+estimated trekking hours 6 hrs  
+Plaza de Mulas / Penitentes / Mendoza  
+Not physically demanding  
+estimated distance 24 km  
+estimated trekking hours 7-8 hrs  
+
+360 Polish Route distances  
+Estimated max altitudes  
+Estimated distances  
+Estimated trekking hours  
+Penitentes / Pampa de Leñas  
+9,383ft – 2860m  
+estimated distance 12 Km  
+estimated trekking hours 6 hours  
+Pampa de Leñas / Casa de Piedra  
+10,630ft – 3240m  
+estimated distance 12km  
+estimated trekking hours 6 hours  
+Casa de Piedra / Plaza Argentina Base camp  
+13200ft – 4200m  
+estimated distance 10 Km  
+estimated trekking hours 6 hours  
+Plaza Argentina Base camp  
+13200ft – 4200m  
+Start high altitude trek.  
+Plaza Argentina / Camp 1 / Plaza Argentina  
+16335ft – 4950m  
+estimated distance 8 Km  
+estimated trekking hours 7 hours  
+Plaza Argentina Base camp  
+13200ft – 4200m  
+Plaza Argentina / Camp 1  
+16335ft – 4950m  
+estimated distance 4 Km  
+estimated trekking hours 5 hours  
+Camp 1 / Camp 2 Upper Guanacos / Camp 1  
+18095ft -5500m  
+estimated distance 6 Km  
+estimated trekking hours 7 hours  
+Camp 1 / Camp 2 Upper Guanacos  
+18095ft -5500m  
+estimated distance 3 Km  
+estimated trekking hours 5 – 6 hours  
+Camp 2  
+18095ft – 5500m  
+Camp 2 / Camp 3 Colera  
+19740ft – 6000m  
+estimated distance 2 Km  
+estimated trekking hours 3 – 4 hours  
+Camp 3 / SUMMIT / Camp 3  
+22974ft – 6962m. Climbing day from Camp 3 to the SUMMIT!!!  
+6830m Filo del guanaco  
+6650m La Cueva  
+6500m Travesia  
+6380m Independencia  
+6180m Piedras Blancas  
+6000m Colera  
+estimated distance 6 Km  
+estimated trekking hours 7 – 10 hours  
+Camp 3/ Plaza de Mulas Base Camp (Normal Route)  
+estimated distance 6 Km  
+estimated trekking hours 6 hours  
+Plaza de Mulas / Penitentes / Mendoza  
+Not physically demanding  
+estimated distance 24 Km  
+estimated trekking hours 7-8 hours  
+The above information is intended as a guideline only. However, every effort is made to adhere to it. At least 15% of our expeditions have changed due to weather conditions, guides criteria, or other unforeseen events. For example, the second acclimatization day is skipped in many expeditions, depending on guide criteria according to the group's rhythm. If a person is extremely slow, they will not be able to join the group; we recommend hiring a private expedition instead.  
+
+### ¿Siempre hay 2 días extra?
+
+`dias-extra` · en: faq-013 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Para qué son los dos días de reserva por mal tiempo? · Weather days · Os dias extras estão sempre incluídos?
+
+All open expeditions may add up to two (2) extra days if bad weather conditions prevent the regular itinerary. That's why the itineraries are expressed as 18+2, 17+2, or 12+2 days.  
+These extra days are included on the mountain only. If they are not taken on the mountain, they are not included outside the Park.  
+Private expeditions may have +/- extra days if stated during booking.  
+
+
+<a id="precios"></a>
+## Precios, reserva y pago
+
+### ¿Cuál es el precio de la expedición?
+
+`precio-expedicion` · es: faq-058, en: faq-059 · fuente: Fernando (WhatsApp, oct 2026) · confianza: confirmed
+
+También preguntan: ¿Cuánto sale? · ¿Cuánto cuesta el 18+2? · ¿Qué valor tiene la expedición? · ¿Tienen promociones o descuentos? · How much does it cost? · What's the price of the 18+2 program? · Quanto custa a expedição? · Qual é o valor?
+
+**ES** — ¿Cuál es el precio de la expedición?
+
+El precio es USD 7.250, y algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según los lugares libres de cada fecha. Se reserva con un anticipo de USD 699. Todos los programas abiertos cuestan lo mismo, sin importar la duración.  
+Más allá del precio, lo importante es elegir el programa adecuado para vos (duración, aclimatación, nivel de experiencia, etc.), ya que eso impacta directamente en tus probabilidades de cumbre y en la experiencia general.  
+Si te parece, puedo enviarte toda la información detallada por email. Compartime tu correo. Y si te sirve, agendamos una videollamada corta (15 min) y te explico todo para que elijas la mejor opción. Decime qué día y horario te queda cómodo.  
+
+**EN** — What is the price of the expedition?
+
+The price is USD 7,250, and some departures have a promotion between USD 5,990 and USD 6,390 depending on the spots left on each date. You reserve your spot with a USD 699 deposit. All open programs cost the same, regardless of their length.  
+Beyond the price, what really matters is choosing the right program for you (duration, acclimatization, level of experience, etc.), as this directly impacts your chances of reaching the summit and your overall experience.  
+If you'd like, I can send you all the detailed information by email. Please share your email address. And if it works for you, we can schedule a short video call (15 min) where I'll explain everything so you can choose the best option. Please tell me a day and time that work for you.  
+
+### ¿Cómo reservo y cómo se paga?
+
+`reserva-y-formas-de-pago` · es: faq-076, en: faq-077 · fuente: Fernando (WhatsApp, oct 2026) · confianza: confirmed
+
+También preguntan: ¿Cuánto es la seña? · ¿Puedo pagar con tarjeta? · ¿Aceptan transferencia o PayPal? · ¿Se puede pagar en cripto? · How much is the deposit? · Can I pay by credit card? · Como faço a reserva? Posso pagar com cartão?
+
+**ES** — ¿Cómo reservo y cómo se paga?
+
+Se reserva con un anticipo de USD 699 en www.aconcaguaexpeditions.com/booking.  
+Formas de pago: PayPal (5,5% de comisión), transferencia bancaria (3,8% de impuesto) o USDT por Coinbase o Binance (sin impuesto). Con tarjeta no se mantiene el precio promocional.  
+El plazo para pagar el saldo y la disponibilidad de cada fecha los confirma un asesor.  
+
+**EN** — How do I book and how can I pay?
+
+You book with a USD 699 deposit at www.aconcaguaexpeditions.com/booking.  
+Payment methods: PayPal (5.5% fee), bank transfer (3.8% tax) or USDT via Coinbase or Binance (no tax). Paying by card does not keep the promotional price.  
+The deadline for the balance and the availability of each date are confirmed by an advisor.  
+
+### ¿Los programas cortos son más baratos?
+
+`programas-cortos-mismo-precio` · en: faq-012 · fuente: faq-web · confianza: web
+
+También preguntan: ¿El ascenso rápido cuesta menos? · O programa curto é mais barato?
+
+The prices are the same in any open expedition, no matter how many days it takes, so there are no savings when doing a short program, while the primary services are the same for all open expeditions.  
+Deployment & Logistics  
+Transfers  
+Permits  
+Guides  
+Porters  
+Mules  
+Tents  
+Common equipment  
+Sales and administration  
+Taxes and fees  
+Others  
+
+
+<a id="fechas"></a>
+## Fechas de salida
+
+### ¿Cuáles son las fechas de salida?
+
+`fechas-salida` · es: faq-060, en: faq-061 · fuente: Fernando (salidas programadas, salidas.yaml) · confianza: confirmed
+
+> Nota para el equipo: Las fechas se editan en salidas.yaml. orchestrator/departures.py lee este texto.
+
+También preguntan: ¿Qué fechas tienen? · ¿Cuándo es la próxima salida? · ¿Hay salidas en enero? · When do you go? · Do you have departures in December? · Quais são as datas de saída?
+
+**ES** — ¿Cuáles son las fechas de salida?
+
+Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27:  
+18+2 DÍAS | NORMAL EXTENDIDO (recomendado)  
+Noviembre: 14 | 22  
+Diciembre: 1 | 4 | 20 | 27  
+Enero: 2 | 10 | 31  
+Febrero: 7  
+14+2 DÍAS | NORMAL ASCENSO RÁPIDO  
+Noviembre: 18 | 26  
+Diciembre: 5 | 10  
+Enero: 6 | 14  
+Febrero: 11  
+12+2 DÍAS | NORMAL ASCENSO EXTREMO  
+Noviembre: 20 | 28  
+Diciembre: 7 | 12 | 26  
+Enero: 2 | 8 | 16  
+Febrero: 6 | 13  
+17+2 DÍAS | GLACIAR POLACO 360°  
+Diciembre: 1 | 28  
+Enero: 3  
+Febrero: 1  
+Cada programa está diseñado para un nivel diferente de experiencia y aclimatación, por lo que elegir el adecuado es clave para tu éxito y una experiencia óptima. Si lo deseas, puedo recomendarte las mejores fechas y el programa más adecuado según tu experiencia. También podemos programar una breve videollamada de 15 minutos para repasar todo juntos. Decime qué día y hora te convienen más.  
+
+**EN** — What are the departure dates?
+
+If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season:  
+18+2 DAYS | NORMAL EXTENDED (recommended)  
+November: 14 | 22  
+December: 1 | 4 | 20 | 27  
+January: 2 | 10 | 31  
+February: 7  
+14+2 DAYS | NORMAL FAST ASCENT  
+November: 18 | 26  
+December: 5 | 10  
+January: 6 | 14  
+February: 11  
+12+2 DAYS | NORMAL EXTREME ASCENT  
+November: 20 | 28  
+December: 7 | 12 | 26  
+January: 2 | 8 | 16  
+February: 6 | 13  
+17+2 DAYS | 360° POLISH GLACIER  
+December: 1 | 28  
+January: 3  
+February: 1  
+Each program is designed for a different level of experience and acclimatization, so choosing the right one is key for your success and overall experience. If you'd like, I can recommend the best dates and program based on your background. We can also schedule a short 15-minute video call to go over everything together. Please tell me what day and time work best for you.  
+
+
+<a id="temporada"></a>
+## Temporada y clima
+
+### ¿Cuál es la mejor época para subir el Aconcagua?
+
+`mejor-epoca` · en: faq-007 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Conviene ir en diciembre, enero o febrero? · Temporada alta y temporada baja · Melhor mês para subir o Aconcágua
+
+The best time to climb depends on the type of experience you are looking for.  
+Low Season: fewer people, a more peaceful and immersive nature experience, and slightly colder temperatures.  
+High Season: a more social atmosphere, with more climbers in all camps and on summit day, and slightly warmer temperatures.  
+The weather conditions that truly matter are those on summit day, and they are highly unpredictable—even 10–15 days in advance. For this reason, no specific period of the season can be consistently defined as having better summit conditions.  
+Over the past 12 seasons, 91% of our expeditions reached the summit during High Season, compared to 88% in Low Season. However, High Season is also significantly busier, with up to seven times more climbers in the Park.  
+Notably, in the 2021/22 and 2023/24 seasons, we achieved a 100% summit success rate—becoming the only company in the Park to accomplish this in two consecutive seasons, with all 42 of our open expeditions reaching the summit.  
+Season dates:  
+Low Season: Nov 19 – Dec 14  
+High Season: Dec 15 – Jan 31  
+Low Season: Feb 1 – Feb 20  
+Note: The Polish Route opens on December 1st. Aconcagua Provincial Park regulations and dates may change without prior notice.  
+
+### ¿Qué porcentaje de cumbre tienen según la temporada?
+
+`tasa-de-cumbre-por-temporada` · en: faq-068 · fuente: faq-web · confianza: web
+
+También preguntan: Éxito de cumbre en temporada alta y baja · Summit statistics · Taxa de cume
+
+The weather conditions are unpredictable, and it depends on the specific days of the summit attempt, which are impossible to know in advance.  
+On the last 12 seasons (+600 open and private expeditions):  
+91% of our expeditions reached the summit in the High season. On the other hand, during the High season, we will find seven times more people in the Park than Low season.  
+88% of our expeditions reached the summit in the Low season.  
+In the seasons 2021/22 and 2023/24, all our 42 open expeditions reached the summit. We exceeded our record, and we are the record of the entire Aconcagua Park, 100% summit success rate on the season!  
+
+
+<a id="incluye"></a>
+## Qué incluye y qué no
+
+### ¿Qué servicios están incluidos?
+
+`servicios-incluidos` · en: faq-015 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Qué incluye la expedición? · ¿Qué cubre lo que pago? · What does the price include? · O que inclui a expedição?
+
+3 nights out of the Park (Mendoza city / Penitentes)*  
+Assistance for lost luggage recovery  
+Group transfer Airport / Hotel on arrival  
+Hotel in Mendoza (breakfast included)*  
+Luggage care  
+Transfer Mendoza / Penitentes roundtrip  
+Meals in Penitentes (breakfast, lunch, dinner)  
+Lodging in Penitentes  
+Load arrangement assistance  
+Load mules roundtrip  
+Transfer to the Aconcagua trailhead roundtrip  
+Meals on the mountain (breakfast, lunch, dinner)  
+Confluencia Base Camp services  
+Trek to Plaza Francia  
+Plaza de Mulas Base Camp services  
+Plaza Argentina Base Camp services  
+Trek to the Horcones' Glacier  
+Trek to Mt. Bonete´s Summit  
+Porters for altitude camps  
+Professional guides  
+2 extra days in case of bad weather  
+Tents / Domes / Toilets  
+Electricity in Base Camp  
+Radio communication  
+1st aid Kit (including oxygen tube)  
+Assistance in Mendoza city if any help  
+Aconcagua Medal  
+Aconcagua Summit Certificate  
+*NOTE: Each program takes different camps according to each route. Please, visit  Normal route extended or Fast and 360 Polish route for detailed info. Extreme (12+2 days) itineraries have only one night out of the Park and don't include the trek to Plaza Francia, trek to Horcones glacier, and Mt. Bonete. Special offers and LITE programs may have additional restrictions; please consult us.  
+
+### ¿Qué servicios no están incluidos?
+
+`servicios-no-incluidos` · en: faq-016 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Qué tengo que pagar aparte? · ¿Qué no cubre el precio? · What is not included? · O que eu pago à parte?
+
+Flight tickets  
+Meals and extra nights in Mendoza City -if needed-  
+Park’s entrance permit and insurance  
+Personal equipment (sleeping bag, mattress, boots, etc.)  
+Abandonment expenses  
+Porters for personal equipment  
+PayPal and bank transfer fees  
+Tips and any other not stated as included  
+Detail of Full expedition programs. Special offers and LITE programs may have additional restrictions; please consult us.  
+
+### ¿Está incluida la noche de regreso?
+
+`noche-de-regreso` · en: faq-028 · fuente: faq-web · confianza: web
+
+También preguntan: ¿La última noche es en Mendoza o en Penitentes? · Return night included? · A noite de volta está incluída?
+
+Yes, it's included at the end of the expedition in Penitentes, not in Mendoza City. The expedition ends as follows:  
+Penultimate day (Plaza de Mulas / Penitentes):  
+descend from Plaza de Mulas base camp  
+transfer from Park entry to Penitentes  
+wait for luggage carried by mules while resting and taking a hot shower  
+dinner, and hosting in our lodge in Penitentes  
+It includes: breakfast, lunch, dinner, and hosting  
+Last day (Penitentes / Mendoza):  
+breakfast  
+transfer from Penitentes to Mendoza City  
+end of services  
+Nobody knows when the expedition will end; it's subject to weather conditions and the guide's criteria. The itineraries are a guideline only; 70+ % of our expeditions follow the itineraries, while 30% do not. The expeditions may end sooner or later than the days detailed in the itinerary. The services will always end one day after the group leaves the Park—no compensation nor refunds for early descent.  
+
+
+<a id="opcionales"></a>
+## Servicios opcionales
+
+### ¿Qué servicios opcionales tienen?
+
+`servicios-opcionales` · en: faq-017 · fuente: faq-web · confianza: web
+
+También preguntan: Extras: wifi, ducha caliente, baño privado, carpa individual, habitación single, traslado privado, helicóptero · Optional extras: wifi Starlink, hot shower, private toilet, single tent · Serviços opcionais: wifi, banho quente
+
+We inform you about some of our optional services that complement your expedition; these services will allow you to increase your success to reach the summit and have a more comfortable and safer expedition.  
+
+Bilingual personal assistance in case of illness  
+Your safety and health are our priority. Suppose you happen to be evacuated from Aconcagua for medical reasons, or you finish your expedition with any medical condition. In that case, our team will provide you with personal bilingual support for all medical activities you need to do when returning from Aconcagua. Like assisting you if you need additional medical attention, medical studies like lung x-rays, buying medicine, hospital admission, etc. The expenses arising from hospital admission, medical examinations, doctor's fees, ambulances, medications, etc., are not included. In addition, you will be able to use our optional service of full bilingual assistance for your time in Mendoza until you fully recover. The objective is for you to feel wholly accompanied and content until you fully recover your physical health and you can return to your country.  
+Extra Acclimatization Program (EAP)  
+The expedition may be hired with the EAP option (Extra Acclimatization Program), which consists in taking two or three additional days before the beginning of the expedition, in the Andes, outside Aconcagua Park, such as Puente del Inca or Cordón del Plata, carrying on guided treks around the area, reaching 13123/16404 ft, which ensures, even more, the acclimatization process to altitude (essential for the expedition) and thus better chances to achieve the summit. Besides, the EAP offers the possibility of spending a few days in the Andes in a 100% natural environment. You will find yourself practically alone with the mountains, unlike Aconcagua, a crowded park. If you are interested in EAP,  send us an email at info@aconcaguaexpeditions.com.  
+Extra nights and single room  
+While you are in Mendoza city, you will stay in your Hotel with breakfast included for one night (in the extended programs), in a double room, which you will share with another expedition member. This is the night of the first day of the itinerary. If you wish to stay alone in the room or hire extra hotel nights, you may arrange that with us at a more reasonable price than the one the Hotel provides. We recommend you book it in advance since there might not be available during the Aconcagua season.  
+Book now by sending an email to info@aconcaguaexpeditions.com.  
+Special Menu  
+Suppose the passenger has any preference about meals, Vegetarian Menu, Celiac Menu, Dairy-Free Menu, eggs free Menu, or further considerations. In that case, they may request a Special Menu by sending an email to info@aconcaguaexpeditions.com.  
+Pitching of tents and single tent  
+Usually, there is good weather in Aconcagua during the season; however it is rough to be up there when it is stormy, that is why we work with the best brand of mountain tents. The climbers pitch the tents with the guide's assistance, one tent every two people. If you wish, our team is in charge of pitching your tent, or if you want to for a single tent, you can easily book them. It is not possible to sleep alone at altitude camps for safety reasons. You may book by sending us an email at info@aconcaguaexpeditions.com.  
+Helicopter flights in Park Aconcagua  
+We suggest you take maximum advantage of your expedition in South America. Hiring a passionate Helicopter trip by Aconcagua Park and traveling the Andes is a fascinating adventure. Don't miss this excellent opportunity to live such an adventure and take the best pictures and videos to share with your friends. For further information, please send us an email to info@aconcaguaexpeditions.com.  
+
+Private Transfer  
+This service includes a driver waiting for you at Mendoza Airport to take you on a Private Transfer to your Hotel in the city. This is a one-way service. At the end of your expedition, you may hire a transfer from the Hotel to the airport directly at the front desk of your Hotel.  
+If you want to save money, you may also take a taxi or Uber from the airport on your own for a much lower price.  
+Hot shower  
+Enjoy a pack of 3 amazing 15' Hot Showers each in Plaza de Mulas, surrounded by the best landscapes. You will love it!  
+Private toilette  
+Have your Private Toilet locked exclusively for you, unshared with any other people, during your stay at the Base Camp. Available only in Plaza de Mulas and Plaza Argentina.  
+WiFi Service  
+With our WiFi service, you can share the details of your expedition with your family through your social networks and other Experiences: Starlink service subject to weather, limited speed, unstable connectivity. In case of no connection, we will refund the corresponding amount of the number of days the connection was unavailable. No other compensation will be valid.  
+Very important  
+Acomara does not guarantee the availability of services that haven't been booked in advance. Early booking internet prices are always lower than the prices of the same services hired in person in our offices in Mendoza city. The hiring of optional services is subject to availability at the time of booking. You may book witting us at info@aconcaguaexpeditions.com.  
+
+### ¿Cómo podemos aumentar las chances de cumbre?
+
+`como-aumentar-chances-de-cumbre` · en: faq-022 · fuente: faq-web · confianza: web
+
+También preguntan: Servicios para llegar mejor a la cumbre · Como aumentar as chances de chegar ao cume?
+
+Please check the optional services; you will find useful services that will help you have a successful, safer, and comfortable expedition.  
+Porter´s Service  
+They will help you with your equipment in the altitude camps; an extra charge will apply.  
+Extra Acclimatization Program (EAP)  
+The expedition may be hired with the EAP option (Extra Acclimatization Program), which consists of taking two or three additional days before the beginning of the expedition, in the Andes, outside Aconcagua Park, in our lodge in Penitentes. You can do some guided/unguided treks around the area (up to 4500m)  
+Meals and special menus  
+If you have any preference about meals (Vegetarian, Celiac, Lactose-free, Vegan, Kosher, and further considerations), you may request a Special Menu; an extra charge may apply.  
+Pitching of tents and single tent  
+Our team may pitch your tent. You can also hire a single tent. An extra charge may apply.  
+Helicopter flights in Park Aconcagua  
+We suggest you take maximum advantage of your expedition in South America. Hiring a passionate Helicopter trip by Aconcagua Park and traveling the Andes. An extra charge will apply.  
+Private Transfer  
+You may hire a transfer from Mendoza Airport to your Hotel. We also provide services from/to Santiago de Chile Airport and other destinations. Only booked in advance, please consult price.  
+Lodging  
+Single room in Mendoza  
+5 stars upgrade in Mendoza  
+Single room in Penitentes  
+Single tent in Base Camp  
+Extra nights  
+Hot Showers  
+We have the best hot shower system to enjoy a lovely shower while you are in the Base Camp. Additional charges may apply.  
+Satellite Phone  
+Satellite Phone is also available, subject to availability (~USD 7 per min)  
+Bottled Water  
+Although we provide all drinking water during the expedition, you may also ask for bottled water or filter water for an additional charge. Water in our camps comes from rivers and melting snow, all approved for human consumption. Only booked in advance with an extra charge.  
+
+### ¿Qué es el Programa de Aclimatación Extra (EAP)?
+
+`programa-de-aclimatacion-extra-eap` · en: faq-048 · fuente: faq-web · confianza: web
+
+También preguntan: Días extra de aclimatación en Penitentes antes de la expedición · Extra acclimatization days · Aclimatação extra
+
+The Extra Acclimatization Program -EAP- is optional but recommended. It consists of up to 4 previous days acclimatizing your body in our lodge on the mountain (9000ft/2730m). You may only stay there to rest and acclimatize or do some treks around the area (up to 15000ft/4550m) to further the process of acclimatization. This option increases the chances of reaching the summit and has a safer and more enjoyable expedition; It will allow your body to get accustomed to the altitude. Spending time in altitude with the same weather as the Aconcagua has proven to be helpful.  
+Also, you will be in contact with nature in a peaceful and quiet environment where you won’t cross paths with many people and join with climbers all around the world at night, in our refuge.  
+By taking this option, you will meet with the rest of your expedition group before entering the park instead of Mendoza City. Since you will need to go in advance, we exchange private group transfer for a regular bus transfer to go from Mendoza to the mountain.  
+We do not recommend Diamox or any other drug to improve acclimatization  
+Climbers who can train at 3000-4000m may come to Aconcagua already acclimatized, it will really help them to have a successful climb in Aconcagua  
+6 tips to climb Aconcagua  
+1) Find your breath  
+High altitude activities require a different type of breathing to keep supplying oxygen to your body. We recommend training your lungs by adding breathing exercises to your regular Aconcagua training routine. You can try the following exercises:  
+Belly Breathing: this exercise is used in many sports and health practices. It allows you to use your total lung capacity to supply more oxygen to your extremities which helps prevent muscle cramps that cause the accumulation of lactic acids.  
+Pressure Breath: You can add resistance to your exhalation by pursing your lips and exhaling forcefully. This breathwork helps combat the decrease in atmospheric pressure at high altitudes.  
+Inspiratory Muscle Training: This technique is meant to generate resistance to the airflow when inhaling, so you strengthen your inspiratory muscles. There are inspiratory muscle training devices, but you can find homemade alternative ways to produce a similar effect.  
+Breath-holding Drills: This type of hypoxic training allows you to simulate high-altitude breathing since it reduces the amount of oxygen during exercise and enhances your CO2 tolerance. You can start by inhaling to your maximum capacity, exhaling and holding for 3 counts, and inhaling again. As you progress, you can slowly increase the counts.  
+2) Focus your attention  
+Meditation exercises and mantras help refocus your attention on your activity are also handy tools to keep the attention on your body and climb.  
+3) Evaluate your training progress in a fun way  
+Following a training routine is fundamental to climb Aconcagua the closest possible to your comfort zone. Make sure you plan your month, so you include at least one or two climbing trips or outdoor activities that test your overall fitness in a fun way. After a few months of training, you can repeat some of the trips, so you have a point of comparison to evaluate your progress. This evaluation is far more fun and motivational than traditional fitness tests!  
+4) Day by day  
+Enjoy your expedition one step at a time. The goal is to get to the next day, and so on. It is useless to burn stages thinking about what can happen during the summit day. Let yourself enjoy the experience one day at a time.  
+5) Have suitable clothing and gear  
+Regardless of the date, you choose to come to Aconcagua, your gear must be adequate. You can click this link to view the equipment you need; however, we want to highlight that warm and comfortable boots make a significant difference in your performance. We recommend trying different models and feel which are more comfortable for your feet, shins, and calves. Wearing light and flexible pieces of clothes is also very desirable. The lighter the gear, the better.  
+6) Hydrate as much as you can  
+Drinking between 3 and 5 liters of water is very important since our body dehydrates a lot faster at high altitudes. This simple act will be a great help to fight altitude sickness. You can drink one liter before and during breakfast, add another 2 liters before lunch and try to finish the remaining 2 liters before 5 or 6 pm, so nights are more comfortable. Drinking so much water can be annoying, but it is a great way to help you cope with altitude much easier.  
+
+
+<a id="treks"></a>
+## Treks
+
+### ¿Tienen info para hacer un trek a Plaza Francia?
+
+`trek-plaza-francia` · es: faq-062, en: faq-063 · fuente: Fernando; FAQ may 2026 · confianza: confirmed
+
+> Nota para el equipo: El link en español dice "trekkingabierto" (abierto) pero es solo privado; ver pendientes.
+
+También preguntan: Trekking a la cara sur del Aconcagua · ¿Cuánto sale el trek a Plaza Francia? · Trek to the South Face viewpoint · Trekking para Plaza Francia, quanto custa?
+
+**ES** — ¿Tienen info para hacer un trek a Plaza Francia?
+
+No tenemos salidas grupales a Plaza Francia, solo salidas privadas. El precio es de USD 1.499 por persona (mínimo 2 personas).  
+Más info: https://aconcaguaexpeditions.com/espaniol/expediciones/trekkingabiertoplazafrancia.htm  
+
+**EN** — Do you have information for a trek to Plaza Francia?
+
+We don't have group departures to Plaza Francia, only private trips. The price is USD 1,499 per person (minimum 2 people).  
+More information: https://aconcaguaexpeditions.com/ingles/expediciones/trekkingplazafrancia.htm  
+
+### ¿Pueden familiares o amigos acompañarme en un trek hasta Plaza de Mulas?
+
+`trek-familiares-a-plaza-de-mulas` · en: faq-066 · fuente: faq-web · confianza: web
+
+También preguntan: Trekking al campamento base Plaza de Mulas · Mi acompañante no quiere hacer cumbre · Trek to Aconcagua base camp · Trekking até o acampamento base
+
+We offer you the possibility of inviting your loved ones to accompany you during the first 8 days of your expedition to Aconcagua and wish you all the good fortune from base camp before leaving to the altitude camps. The trekking has the same services as the first 8 days of your expedition, so your loved ones will enjoy the same personalized attention throughout the journey, ensuring safety and a comfortable walking pace according to the group. This activity requires no previous knowledge or experience of mountaineering, but it requires adequate physical condition and training.  
+Price: USD 4,890 per person (promotion USD 3,690).  
+Trekking to Plaza de Mulas Base Camp  
+Itinerary (height in feet/meters as sea level)  
+Day 1: Mendoza City (2508 f / 760 m) Check Equipment and assistance for renting equipment.  
+Day 2: Mendoza City (2508 f / 760 m) – Penitentes (8992 f / 2900) – Obtaining entrance permits. Transfer to Penitentes. Preparing loads for the mules.  
+Day 3: Horcones (8992 f / 2900 m) – Confluencia (10890 f / 3400 m).  
+Day 4: Trek to Plaza Francia (Aconcagua's South Wall unique viewpoint) (13200 f / 4000 m).  
+Day 5: Confluencia (10890 f / 3400 m) – Plaza de Mulas (Aconcagua´s Base Camp) (14058 f / 4300 m).  
+Day 6: Plaza de Mulas (14058 f / 4300 m). Resting day.  
+Day 7: Plaza de Mulas (14058 f / 4300 m). Short trek in the area and visiting the Refugio Plaza de Mulas Hotel.  
+Day 8: Plaza de Mulas – Confluencia – Horcones – Mendoza City – transportation in public bus.  
+Consult the departure Dates  
+Included Services  
+All meals on the mountain.  
+Tents.  
+One night of lodging in Penitentes.  
+Professional guides (English and Spanish).  
+Load mules for personal equipment.  
+Private transfer from Mendoza City to Penitentes and return in public bus.  
+Assistance with equipment rental and purchase of permits.  
+Not Included Services  
+Personal equipment and sleeping bag.  
+Aconcagua Park permits entrance.  
+Expenses for giving up the expedition.  
+
+
+<a id="logistica"></a>
+## Logística (vuelos, hotel, equipaje, comunicación)
+
+### ¿Cuándo tengo que llegar a Mendoza y cuándo puedo volver?
+
+`vuelos-llegada-salida` · en: faq-009 · fuente: faq-web; llegada el día anterior y traslados al aeropuerto no incluidos, Fernando (oct 2026) · confianza: confirmed
+
+> Nota para el equipo: La web decía "llegar hasta las 11 AM del día 1" y que había un traslado grupal aeropuerto-hotel a las 13 h del día 1. Fernando dice llegar el día anterior y que los traslados al aeropuerto no están incluidos. Ver pendientes-para-fernando.md.
+
+También preguntan: ¿Qué día saco el vuelo de ida y de vuelta? · What day do I arrive in Mendoza? · Que dia chego em Mendoza e que dia volto?
+
+FLY IN  
+You have to arrive in Mendoza (MDZ Airport) the day before Day 1 of your program.  
+We recommend coming 1-2 days before Day 1 if you need to Rent Gear. This is also to have backup time in case of any flight cancellation or missing luggage that may prevent you from joining the expedition group.  
+You may book the extra nights with us in the same Hotel as your expedition (subject to availability; reservations until 30 days in advance only).  
+Airport transfers are not included; a private transfer can be reserved in advance with an extra charge.  
+FLY OUT  
+You can take your flight back from the last itinerary day from 5 PM onwards.  
+For example:  
+On Day 20 in the Normal Route Extended itinerary (18+2 extra days).  
+On Day 19 in the 360 Polish Route (17+2 extra days).  
+On Day 16 in the Normal Route Fast itinerary (14+2 extra days)  
+On Day 14 in the Normal Route Extreme itinerary (12+2 extra days).  
+Note: If your expedition has good weather conditions and doesn't take extra days on the mountain, you will be ready to leave 1-2 days before the last itinerary day. Since weather conditions are unpredictable, knowing this in advance is impossible.  
+
+### ¿Hay camas en la montaña?
+
+`camas-en-la-montana` · en: faq-021 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Dónde se duerme en el campamento base? · Do we sleep in tents? · Dorme-se em barraca?
+
+Usually at base camp we sleep in beds inside our domes and tents. Also, single tents are available as an optional service hired in advance only.  
+In the high camps, it is not allowed to set up beds. We sleep in sleeping bags and insulate to help us protect ourselves from the cold. The insulator and optional therm-a-rest are part of your personal equipment, not included in the expedition.  
+
+### ¿En qué hotel se aloja la expedición en Mendoza?
+
+`hotel-en-mendoza` · en: faq-023 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Qué hotel usan? · Which hotel in Mendoza? · Qual hotel em Mendoza?
+
+The Hotel is a 5 stars hotel, we usually hire the following hotels :  
+Diplomatic  
+Intercontinental  
+Huentala  
+NH  
+Raices Aconcagua  
+Hilton  
+Others subject to availability  
+The hotel name will depend on availability and pricing on each date, and it will be informed 15 days before starting in the booking details of each reservation. Climbers may book extra nights in the same hotel with us in advance only. Our Full programs include the hotel in Mendoza City at the beginning -on Day 1-. The other nights out of the Park -including the returning night- are usually taken in Penitentes; it may vary according to logistics.  
+
+### ¿Qué comunicación hay en la montaña?
+
+`comunicacion-en-la-montana` · en: faq-024 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Hay wifi o señal de teléfono? · Is there internet or phone signal? · Tem internet ou sinal de celular?
+
+Our team uses VHF Radio to communicate between camps and each other. We also have WiFi in Plaza de Mulas and some high-altitude camps. Unfortunately, the WiFi service may not be fully operational due to mountain weather conditions and uncertain events.  
+Your family and friends may follow the expedition with a specific hashtag on Instagram, and if you wish, they may also email us, and we will inform them of all the news about your expedition.  
+
+### ¿Dónde dejamos el equipaje durante la expedición?
+
+`donde-dejar-el-equipaje` · en: faq-025 · fuente: faq-web · confianza: web
+
+También preguntan: Guardar la valija mientras subimos · Luggage storage · Onde deixo a mala?
+
+We offer luggage storage Free of charge in Penitentes, also inside the tents at the Base Camp. Penitentes is the best option for safety, and to avoid transporting by mules. All luggage has to be locked. Our offices in Mendoza City don't have luggage storage.  
+Luggage storage at the Hotel is also available for all those who reserve extra nights at the end of the expedition, so they will return to the same Hotel. If this is your case, leaving your luggage in the Hotel in Mendoza City will be available Free of charge; otherwise, Penitentes will be the available option.  
+
+### ¿Dónde compro los pasajes de avión?
+
+`donde-comprar-vuelos` · en: faq-027 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Ustedes reservan vuelos? · Aerolíneas que vuelan a Mendoza · Flights to Mendoza · Onde compro as passagens?
+
+Our company does not make airline or bus reservations.  
+Mendoza MDZ Airport is the only one in this City  
+We advise searching for the best rates on www.kayak.com or www.despegar.com  
+The most frequently airlines which fly to MDZ are:  
+Aerolineas.com *  
+Latam.com  
+Copaair.com  
+Voegol.com  
+Skyairline.com  
+Flybondi.com *  
+Jetsmart.com *  
+*Domestic flights also available  
+Besides the alliances with other airlines.  
+The most common combinations to arrive in Mendoza (MDZ) are through the following airports:  
+EZE Buenos Aires (Ezeiza) – Argentina  
+AEP Buenos Aires (Aeroparque) – Argentina  
+SCL Santiago de Chile – Chile  
+GRU São Paulo – Brasil  
+LIM Lima – Perú  
+PTY Panamá – Panamá  
+Terminal Mendoza is only one Bus Station. You may buy bus tickets at www.andesmar.com  
+
+
+<a id="permiso-y-seguro"></a>
+## Permiso del Parque y seguro
+
+### ¿Cuánto cuesta el permiso del Parque y cómo se tramita?
+
+`permiso-precio-y-tramite` · en: faq-029 · fuente: faq-web · confianza: web
+
+También preguntan: Valor del permiso de ascenso · Trámite del permiso con 90 días de anticipación · Climbing permit fee · Valor da permissão do parque
+
+PRICE  
+It varies from USD 650 to USD 1,400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1,100 to USD 1,800 if you buy it on your own.  
+The Park reserves the right to change the permit price and procedure without notice; Acomara does not take responsibility if any change on the permit price and procedure.  
+PROCEDURE 90 days in advance  
+Acomara does all the paperwork in advance only, FREE of extra charge for all customers who complete the following steps until 90 days before departure:  
+Required information  
+Complete info at the booking form  
+Passport picture  
+Sent to info@acomara.com  
+Permit price  
+Plus currency conversion, if correspond  
+Medical certificate  
+Only if required  
+
+### ¿Puedo comprar el permiso directamente al Parque por adelantado?
+
+`permiso-comprar-directo-al-parque` · en: faq-030 · fuente: faq-web · confianza: web
+
+También preguntan: Sacar el permiso por mi cuenta online · Comprar a permissão direto no parque
+
+No, the permit is not available to buy online. Aconcagua Park has only authorized a small group of companies to acquire permits in advance for their clients, paid in advance only.  
+
+### ¿Qué pasa si no compro el permiso con 90 días de anticipación?
+
+`permiso-sin-90-dias` · en: faq-031 · fuente: faq-web · confianza: web
+
+También preguntan: Permiso a último momento · Late permit purchase · Permissão sem 90 dias de antecedência
+
+You must buy the permit in advance -a minimum of 3 working days-; it must be purchased in person at the Park offices through the following steps:  
+Create an account at the Park website  
+Check the link down below  
+Validate your ID  
+Personal information required  
+Fill up the expedition details  
+Please ask us for company info, and expedition details  
+Print all the documents the system will give you after filling up  
+Include a Passport copy  
+Get the coupon to pay  
+Permit price varies every day according to currency conversion  
+Exchange money  
+The permit is payable only in CASH in argentine pesos  
+Find an authorized payment office  
+Check open bank hours in advance  
+Deliver the payment receipt in person at the Park offices  
+After this point, you obtain your permit  
+Go to the Park offices on the next working day to ask if your permit is ready to deliver  
+It takes at least one working day to have it ready to deliver  
+Deliver your permit to your guide on Day 1 of your program  
+IMPORTANT:  
+Park offices and payment offices may have long lines to wait; please be patient  
+Park offices don't take payments; they do not handle any payment  
+Only CASH payment is accepted in argentine pesos (USD not accepted)  
+Credit Cards are not accepted for permit payment  
+Don't forget to check the open hours of each specific date, usually working days only  
+Acomara doesn't have the chance to get the permit for climbers who didn't get it in advance. If a climber doesn't have the permit on Day 1, the Park will not allow them to enter, and it will be considered a cancellation from the client-side. Non-refundable, non-reschedule. Please find more info at the Park Aconcagua website.  
+Disclaimer. Acomara doesn't take responsibility for the permit price and procedure. All information included on this page is related to the season 2024/25, and it seems to be the same for the next season, which will not confirmed until  Nov 2025  
+
+### ¿Necesito seguro de rescate?
+
+`seguro-de-rescate` · en: faq-032 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Qué seguro piden? · Seguro con cobertura de helicóptero hasta 7.000 m · Rescue insurance requirements · Seguro de resgate obrigatório
+
+Yes, Rescue Insurance is a mandatory requirement from the Park to cover helicopter evacuation, among other expenses.  
+It has to be stated in the insurance policy: rescue coverage until 7000m / 23000ft and helicopter rescue.  
+It is not included in the expedition. With Global Rescue it costs around USD 400.  
+Global Rescue clients just need to show their Policy Number or Card and usually don't have to pay for the Helicopter if they need it. Other insurances require the climber to pay for the Helicopter before use, which may be an issue, and later ask for a refund. And they are not automatically approved by the Park.  
+The Park Permit is always for 21 days, so 30 days of coverage are required, regardless of whether the expedition is shorter. Only the Park authorities can Accept/Reject the Insurance Policy, which may take 4+ working days; Acomara can't verify it. 90 days of anticipation is recommended.  
+Click here to hire now  
+DISCLAIMER: Plans and conditions are a copy of July 2023 from Global Rescue Inc. and may vary without notice. All insurance companies try to make excuses and delays and apply small letters in their contracts to avoid coverage. Although Global Rescue may be the best choice, they also make the same while making excuses to avoid coverage. Acomara doesn't take responsibility for insurance coverage.  
+
+
+<a id="requisitos"></a>
+## Requisitos (experiencia, edad, documentos)
+
+### ¿Necesito experiencia? ¿Qué programa me conviene?
+
+`experiencia-y-programa-recomendado` · es: faq-078, en: faq-079 · fuente: Fernando (WhatsApp, oct 2026) · confianza: confirmed
+
+También preguntan: Nunca estuve en altura, ¿puedo ir? · Hice el Kilimanjaro, ¿puedo hacer el 14+2? · ¿Hace falta ser montañista profesional? · I've climbed Kilimanjaro, can I do the fast ascent? · Is it OK for a beginner? · Preciso de experiência para subir o Aconcágua?
+
+**ES** — ¿Necesito experiencia? ¿Qué programa me conviene?
+
+No hace falta ser profesional, pero sí buena condición física, haber hecho trekking de varios días, caminado en altura y dormido en carpa. Lo más importante es la solvencia mental.  
+Para quien no estuvo por encima de 6.000 m (incluido quien hizo el Kilimanjaro), el indicado es el 18+2 días, Ruta Normal Extendido: es el que tiene más días de aclimatación (caminatas a Plaza Francia y al cerro Bonete).  
+El 14+2 y el 12+2 son solo para quien ya estuvo por encima de 6.000 m, está muy entrenado y llega aclimatado: saltean las caminatas de aclimatación. Todos los programas abiertos cuestan lo mismo.  
+
+**EN** — Do I need experience? Which program is right for me?
+
+You don't need to be a professional, but you do need good fitness, experience with multi-day treks, walking at altitude and sleeping in a tent. Mental strength matters most.  
+If you have never been above 6,000 m (including Kilimanjaro climbers), the right program is the 18+2 days Normal Route Extended: it has the most acclimatization days (treks to Plaza Francia and Mt. Bonete).  
+The 14+2 and 12+2 programs are only for climbers who have already been above 6,000 m, are very well trained and arrive acclimatized: they skip the acclimatization treks. All open programs cost the same.  
+
+### ¿Necesito pasaporte o visa?
+
+`pasaporte-y-visa` · en: faq-033 · fuente: faq-web · confianza: web
+
+También preguntan: Carta de invitación para la visa · Visa for Argentina · Preciso de visto?
+
+We will process the invitation letter through our government's Remote Procedures (TAD) page. The form will then be automatically uploaded to the consulate page, where you will process your Visa. The invitation letter from Acomara Aconcagua Expeditions is a solid recommendation for obtaining a Visa. In 20+ years, all climbers with our invitation letters have received their Visas.  
+
+This is the required information to process the invitation letter  
+Full name  
+Birthdate  
+Nationality  
+Passport number  
+Postal address  
+E-mail  
+Phone number  
+The city in which the process will begin  
+Approximate stay in Argentina (entry and exit)  
+First page of the passport (Attach)  
+
+### ¿Cuál es la edad mínima para entrar al Parque Aconcagua?
+
+`edad-minima` · en: faq-034 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Pueden subir menores de edad? · Can minors climb? · Idade mínima
+
+We have had climbers kids from 10 years old with successful climbs.  
+Minors between 14 and 17 may come to Aconcagua only with an authorization notarized and apostilled by La Haya and signed by both parents, even if accompanied by one of the two parents.  
+Their documents have to be confirmed at least 60 days in advance by Park authorities.  
+Children under 14 years old require special procedures. Please ask.  
+
+### ¿Qué tan difícil o técnica es la subida? ¿Necesito experiencia?
+
+`dificultad-y-experiencia` · en: faq-069 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Hace falta saber escalar? · Is it a technical climb? · É uma escalada técnica?
+
+The Northeast or Normal route climbing Mount Aconcagua does not present any technical difficulty. Our expeditions are made walking; we may have to use crampons for safety reasons during the summit day. Depending on the route's conditions, we can walk on snow or ice. In the base camp, we practice with crampons by going to the Horcones glacier, which is not difficult.  
+
+Climbers don't require previous climbing experience on rocks or ice to join our expeditions. Statistically, the highest probability of reaching the summit is for people between 45 and 60 years old. They have more significant mental strength than young people and better manage the anxiety of reaching the summit. Anyway, that does not mean that it does not require substantial effort.  
+It is important not to be overweight, but mental strength is the key to success. We believe that it will not be our legs that take us to the summit, but our mental strength will allow us to reach the summit of Aconcagua, enjoying every step without any hurry.  
+
+The main concern for non-experts is the effects of the altitude. Correct acclimatization can overcome these, which is a factor in our extended programs by both routes. Another point to bear in mind is the temperatures on the mountain, the effects of which are strongly reduced with  
+
+
+<a id="equipo"></a>
+## Equipo
+
+### ¿Qué equipo lleva la empresa y qué lleva cada uno?
+
+`equipo-comun-que-lleva-la-empresa` · en: faq-019 · fuente: faq-web · confianza: web
+
+También preguntan: Equipo común de la expedición · Common equipment carried by the team · Equipamento comum
+
+Each person will carry their gear in all stretches during our expeditions. Generally, the common equipment of the expedition, which has to be transported from the base camps towards the altitude camps, consists of tents, altitude meals, kitchen sets (stoves, fuel, pots, etc.), and the garbage generated by the expedition, and toilet waste. Porters help us carry most of this equipment during our expedition. Still, climbers will be asked to collaborate on carrying some of this equipment during the days in which acclimatization treks are carried out.  
+
+### ¿Qué peso y qué equipo tiene que cargar cada escalador?
+
+`equipo-personal-obligatorio` · en: faq-020 · fuente: faq-web · confianza: web
+
+También preguntan: Carga personal entre campamentos de altura · How much weight do I carry between high camps? · Quanto peso carrego?
+
+Everyone must carry their equipment in all sections, this weight depends on each person, but it usually is between 15 and 18kgs. Porters for personal gear are not included for any stretch of the expedition, but this service may be hired in advance as an optional service. It is important to remember that the climber must collaborate by carrying part of the common equipment during the days indicated on the following tables.  
+Normal Route  
+Besides the personal equipment, every mountaineer will have to collaborate, without exception, transporting the material assigned by the guide of the expedition during the days the acclimatization treks are carried out, according to the following detail:  
+* Approximate weight  
+If you don't feel like carrying this load, we offer you a porter to take one part of your entire load. This service must be hired in advance, and it has an extra cost. During the 10th, 11th, 13th, and 15th day of the itinerary, our program includes porters who carry the tents, the common gear, the garbage, and the waste generated by the group.  
+360 Polish Traverse Route  
+Besides the personal equipment, every mountaineer will have to collaborate, without exception, in transporting the material assigned by the guide of the expedition according to the following detail:  
+* Approximate weight  
+If you don't feel like carrying this load, we offer you a porter to take one part of your entire load. This service must be hired in advance, and it has an extra cost. During the 9th, 11/12th, 13th, and 15th days of the itinerary, our program includes porters who carry the tents, the garbage, and the waste generated by the group.  
+Very important  
+Our company does not guarantee the availability of those services which haven't been booked in advance. This service requires essential logistic labor, preparation, and availability of porters at all base camps on specific dates. Hiring is subject to availability at the moment of booking. The prices for early booking on the internet are always lower than the prices of these same services hired in our offices in Mendoza City. You will be able to book by sending us a mail at info@aconcaguaexpeditions.com.   In case different camps are used from the ones above mentioned, either for weather issues or other reasons, the number of stretches of portages booked by the passenger will be respected. The stretches are not interchangeable. If you book a series of specific sections, you will not be able to interchange those stretches for others different from those booked when you are in the mountain.  
+
+### ¿Tienen una lista de equipo?
+
+`lista-de-equipo` · en: faq-035 · fuente: faq-web · confianza: web
+
+También preguntan: Lista de qué llevar · Gear list · Lista de equipamentos
+
+Yes, please visit https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm  
+Please click the PRINT button for a PDF checklist.  
+
+### ¿Hay diferencias de equipo entre las dos rutas?
+
+`equipo-por-ruta` · en: faq-036 · fuente: faq-web · confianza: web
+
+También preguntan: Equipo para el Polaco · Equipamento para a rota polonesa
+
+There are almost no differences in personal gear between the Normal route expedition and the 360 Polish Traverse route. The only small difference in Aconcagua is that some climbers bring the ice axe for better fixation when walking on ice by the Polish route. All other personal equipment has no differences.  
+The Polish Direct route that goes through the middle of the glacier requires ice climbing equipment to climb the Polish Glacier. This option is available only on a private Aconcagua climb.  
+
+### ¿Se puede alquilar equipo en Mendoza?
+
+`alquiler-de-equipo` · en: faq-037 · fuente: faq-web · confianza: web
+
+También preguntan: Alquiler de equipo y cuánto sale · Gear rental · Aluguel de equipamento
+
+Yes, however, availability and proper quality are not guaranteed. We strongly recommend renting in advance to guarantee availability and adequate quality. When renting in advance, your gear will be waiting for you at the time of the gear check, if any issue, a staff member of the rental store will solve it in less than 2 hours, no matter if it is Sunday or any other day.  
+Renting all the personal gear costs around USD 1,000. After booking, Acomara helps you with the rental.  
+If you plan to rent in person in a local store in the City, it's important to come 1-2 days before Day 1 of your program, since on Day 1 you have to have all your personal gear with you at the time of the gear check with your guides.  
+
+### ¿Qué botas plásticas o dobles sirven?
+
+`botas` · en: faq-038 · fuente: faq-web · confianza: web
+
+También preguntan: Botas de alta montaña · Mountaineering boots · Botas para o Aconcágua
+
+Please visit “Double Boots” at the link below  
+https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm  
+
+### ¿Qué crampones sirven?
+
+`crampones` · en: faq-039 · fuente: faq-web · confianza: web
+
+También preguntan: Grampones · Crampons · Grampos
+
+Please visit “Crampons” at the link below  
+https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm  
+You don't need to have experience in the use of crampons, since before using them, we are going to practice.  
+
+### ¿De qué tamaño tiene que ser la mochila?
+
+`mochila` · en: faq-040 · fuente: faq-web · confianza: web
+
+También preguntan: Litros de la mochila · Backpack size · Tamanho da mochila
+
+We recommend using three backpacks:  
+–      A 75-100L backpack or a larger one for transporting all your belongings in the altitude camps  
+–      A waterproof duffel bag big enough to fit the large backpack for transporting your personal items from the park entrance until base camp and return.  
+–      A 35L or similar size daypack where you will carry your water, lunch, passport, sunblock, and the clothes you will wear during the day up to the base camp, on the acclimatization treks, and also for the summit day. This 3rd backpack is optional, since you may also use your big 75L backpack instead.  
+All these are recommendations; please take in mind some climbers have their preferences.  
+Please visit  https://aconcaguaexpeditions.com/ingles/6/aconcagua-gear-list.htm where you will find a detail of the required personal equipment (including estimated rental prices)  
+
+### ¿Hace falta piqueta?
+
+`piqueta` · en: faq-042 · fuente: faq-web · confianza: web
+
+También preguntan: Piolet · Ice axe · Piqueta
+
+Its use in Aconcagua is subject to snow and ice conditions, so it's impossible to confirm in advance whether the climbers will need it or not. However, many mountaineers use them when they go on Route 360, and it's a must for the Polish Direct Route. Petzl Glacier is recommended.  
+It can pose a danger to mountaineers without proper experience, so the guide may prefer a good pair of boots with suitable crampons and poles to avoid using the ice axe. It's frequently left in the base camp.  
+
+### ¿Se puede usar camelbak?
+
+`camelbak` · en: faq-043 · fuente: faq-web · confianza: web
+
+También preguntan: Bolsa de hidratación · Hydration bladder · Camelbak
+
+Although it is used by some climbers in Aconcagua, it has the problem that the water in the hose can freeze in low temperatures, especially in high-altitude camps.  
+You can click here for the gear list.  
+
+
+<a id="comida"></a>
+## Comida y menús
+
+### ¿Hay menú vegetariano?
+
+`menu-vegetariano` · en: faq-070 · fuente: faq-web · confianza: web
+
+También preguntan: Comida vegetariana en la expedición · Vegetarian meals · Cardápio vegetariano
+
+We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the optional Vegetarian menu; you may also ask for special requirements in advance.  
+Breakfast:  
+coffee  
+tea  
+milk  
+milk with cocoa  
+eggs  
+cereals  
+wholemeal bread  
+different types of cheeses  
+pretzels  
+cookies  
+juice  
+pudding  
+seeds  
+nuts  
+fresh fruit  
+Lunch & Dinner  
+different kinds of salads  
+cream soup  
+pasta with sauce  
+pies (tuna, cheese, etc.)  
+integral rice/ rice with sauce  
+pizza  
+etc.  
+Dessert:  
+chocolate  
+apple pie  
+cakes  
+strawberry and fresh cheese mousse  
+stuffed oranges  
+Grapefruit au gratin with cinnamon  
+flan  
+jelly  
+fruit salad  
+We also include  
+candy  
+different types of cookies  
+cereal bar  
+power gel  
+snacks  
+dried fruit  
+olives  
+etc.  
+At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals and are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge.  
+Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.).  
+All menus include Free repeat on-demand.  
+
+### ¿Hay menú para celíacos, sin gluten?
+
+`menu-celiaco` · en: faq-071 · fuente: faq-web · confianza: web
+
+También preguntan: Comida sin TACC · Gluten-free meals · Cardápio sem glúten
+
+We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the optional Celiac menu  
+Breakfast:  
+coffee or infusion with free lactose milk  
+gluten-free bread  
+fruit  
+corn cereals,  
+liquid yogurt  
+applesauce  
+gluten-free cookies  
+gluten-free cereal bar,  
+skim cheese  
+skimmed fruit yogurt with nuts  
+Lunch & Dinner  
+fish  
+spinach  
+meat  
+potatoes  
+rice  
+chicken  
+zucchini  
+chard  
+skim cheese  
+quince  
+cauliflower  
+stewed peas  
+omelet  
+potato and blood sausage  
+macaroni  
+tuna pie  
+pumpkin omelet  
+quinoa mini pizzas  
+slices of chicken with lettuce  
+baked sole  
+baked spinach  
+rice  
+mixed salad  
+Dessert:  
+chocolate muffins with rice flour  
+apple cake  
+cheesecake  
+chocolate donuts  
+apple pie  
+strawberry dessert  
+frozen yogurt  
+vanilla dessert  
+fruit salad  
+compote  
+We also include  
+candy  
+different types of cookies  
+cereal bar  
+power gel  
+snacks  
+dried fruit  
+olives  
+etc.  
+At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge.  
+Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.).  
+All menus include Free repeat on-demand.  
+
+### ¿Hay menú sin lactosa?
+
+`menu-sin-lactosa` · en: faq-072 · fuente: faq-web · confianza: web
+
+También preguntan: Intolerancia a la lactosa · Dairy-free meals · Cardápio sem lactose
+
+We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the optional Lactose-free menu  
+Breakfast:  
+lactose-free milk  
+coffee  
+tea  
+jam  
+honey  
+cereal bars  
+mary-type cookies with jam  
+bread with olive oil  
+churros  
+walnuts  
+seasonal fruit  
+yogurt  
+Lunch & Dinner  
+seasonal fruit  
+quince sweet  
+rice with mushrooms  
+salads  
+roast chicken with potatoes  
+bread, chard  
+pork tenderloin  
+pesto noodles  
+tuna  
+aubergines stuffed  
+zucchini  
+hake  
+cherry tomato  
+cannelloni  
+potato omelet  
+Dessert  
+lactose-free cream and raspberry mill hoes  
+glazed lemon cake  
+new york cheesecake  
+compote  
+walnuts  
+seasonal fruit  
+At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge.  
+Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.).  
+All menus include Free repeat on-demand.  
+
+### ¿Hay menú vegano?
+
+`menu-vegano` · en: faq-073 · fuente: faq-web · confianza: web
+
+También preguntan: Comida vegana · Vegan meals · Cardápio vegano
+
+We strongly believe that excellent quality ingredients and good-tasting meals are keys to having a successful and enjoyable expedition. Find below the  optional Vegan menu  
+Breakfast  
+vegetable drink  
+banana cookies  
+coconut and sunflower seeds  
+toasted pumpkin seeds or seeds and fresh fruit  
+green tea and homemade whole grain rye and spelled bread toasts  
+unsweetened soy  
+almond milk  
+pomegranate grains  
+walnuts and sunflower seeds  
+oatmeal and dried fruit bar  
+chickpea flour cookies or crackers  
+Lunch & dinner  
+quick stir fry of tofu and kale with sesame  
+vegan broccoli  
+chickpea  
+rice meatballs  
+vegetable salad  
+tangerine Peppers stuffed with textured soybeans  
+quinoa soup  
+beans  
+carrots  
+smoked tofu  
+roasted spiced chickpeas  
+lentils  
+vegan chickpea and tacos  
+Dessert  
+apple  
+pineapple and coconut smoothie bowl with red berries  
+pear  
+almond milk  
+figs coconut milk  
+vegan chocolate cake  
+coconut milk and green tea popsicles,  
+pineapple cake  
+brownie cup with yogurt and fruit  
+At the Base Camp, all meals are served in dining tents and prepared by specialized chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge.  
+Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favorite flavors (energy bars, snacks, etc.).  
+All menus include Free repeat on-demand.  
+
+### ¿Hay menú kosher?
+
+`menu-kosher` · en: faq-074 · fuente: faq-web · confianza: web
+
+También preguntan: Comida kosher y Shabat · Kosher meals · Comida kosher
+
+We buy the best Kosher food options and ingredients in Mendoza and Buenos Aires; we also take care of the logistics involved from Buenos Aires / Mendoza / Penitentes / Base Camps.  
+We organize Private Expeditions where we rest during the Sabbath.  
+KOSHER FOOD IN MENDOZA CITY:  
+At the beginning and the end of your Expedition, we will take care of the hosting in a Hotel with Kosher-certified food available in its restaurant. The hotel owner is one of the most representative members of the Jewish community on the west side of our country.  
+KOSHER FOOD ON THE MOUNTAIN:  
+We prepare the Kosher food in our kitchen tents and restaurant tents on base camps. In high-altitude camps, the guides are responsible for melting the snow to get water and prepare meals. We buy the best pre-elaborated Kosher meals to send to the mountain, and then we heat them in the camps by our cookers or by the guides in high altitude camps.  
+We add new kitchen utensils for each expedition; they are brand new on the 1st day of preparing the mountain's meals. According to our experience with Kosher menus, we always suggest the client give the chef recommendations on the base camp, where the meals are prepared separately from the rest of the climbers. On high altitude camps, the guide will prepare the meals; you may start the fire before cooking at all times.  
+We provide Kosher menus on the Base Camps (pre-elaborated in Mendoza in the house of Rabbi); we include an optional meeting with him in Mendoza before starting.  
+Meat Options  
+Meatballs  
+Meatloaf  
+Meat breaded  
+Chicken Milanese  
+Chicken legs with honey  
+Lemon Chicken Legs  
+Pasta with tomato sauce  
+Mini meatballs  
+Potato pie  
+Milk Options  
+Pumpkin pie with chicken  
+Canelones  
+Eggplant, cheese, and tomato pie  
+Accompaniments  
+Mashed potatoes  
+Mashed vegetables  
+Pasta  
+Baked potatoes  
+Baked vegetables  
+Kosher menus have an additional charge, 90 days in advance. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge.  
+
+### ¿Qué comida se sirve en la expedición?
+
+`menu-regular` · en: faq-075 · fuente: faq-web · confianza: web
+
+También preguntan: Menú de la expedición · Comidas en la montaña · What do we eat on the mountain? · O que se come na expedição?
+
+We strongly believe the excellent quality ingredients and good tasting meals are keys to have a successful and enjoyable expedition. This is the Regular menu included in our expeditions:  
+Breakfast  
+coffee  
+tea  
+milk  
+yogur  
+chocolate  
+cereals  
+bread (different types)  
+ham  
+cheese  
+eggs  
+bacon  
+fresh fruits  
+crackers  
+cookies  
+pudding  
+marmalades  
+honey  
+butter  
+peanut butter  
+Lunch & Dinner  
+cream soups to hydrate  
+argentine steak  
+meat in different recipes  
+pork in different recipes  
+chicken in different recipes  
+tuna in different recipes  
+different types of pasta with a variety of sauces  
+rice in different recipes  
+pizza  
+different kinds of fresh salads  
+others  
+Dessert  
+fresh fruits  
+mousse  
+puddings  
+sweet potato  
+cakes  
+others  
+We also include  
+dried fruit  
+cereal bars  
+power gel  
+candy  
+snacks  
+cookies  
+olives  
+others  
+At the Base Camp, all meals are served in dining tents and prepared for specialised chefs. At the Altitude Camps, our guides prepare the meals, and they are also in charge of water production. The ingredients vary; they are combined depending on each day; they are not all available at all times as a buffet; they are also subject to availability in Mendoza city. Non-regular menus are only available in advance and may have an additional charge.  
+Although our expeditions include a great variety of meals, the climbers may also bring specific items of their favourite flavours (energy bars, snacks, etc.).  
+All menus include Free repeat on-demand.  
+
+
+<a id="guias-y-porteadores"></a>
+## Guías, porteadores y grupo
+
+### ¿Cómo funciona el servicio de porteadores personales?
+
+`porteadores-personales` · en: faq-067 · fuente: faq-web · confianza: web
+
+También preguntan: Contratar porteador para mi equipo · Personal porter service · Carregador para o equipamento pessoal
+
+The Premium porter service is the most complete and recommended option, but we also have other options.  
+Porters are very well adapted to high mountain work in Aconcagua; they carry the loads in altitude camps. Most of them have reached the summit several times. Their bodies react to altitude much better and faster than many athletes do.  
+Our mules will carry your personal gear and the expedition equipment only up to the base camp.  
+It is essential to consider that the effect of altitude is powerful at altitude camps; there, you will count on a porter's help to carry your personal equipment, food, or common gear during the days in which acclimatization treks carry on.  
+Thereby, you will keep your energies to reach the summit. Besides, a porter allows you to have a more comfortable and safer expedition, decreasing the risk of accidents since your chances of falling increase with the weight. Porters may take your gear on the stretches of your election.  
+
+### ¿En qué tramos se pueden contratar porteadores?
+
+`tramos-de-porteadores` · en: faq-018 · fuente: faq-web · confianza: web
+
+También preguntan: Porter sections between camps · Trechos de carregadores
+
+There are different altitude camps where porters carry the gear the way up and down:  
+
+### ¿Cuánto peso cargamos en la montaña?
+
+`peso-que-carga-cada-uno` · en: faq-041 · fuente: faq-web · confianza: web
+
+También preguntan: Kilos que lleva cada uno · Weight to carry · Quantos quilos carregamos?
+
+Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.  
+The loads are divided into two parts:  
+Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina)  
+From 4300m/14000ft (high camps)  
+
+1. Our mules will carry all the loads to the base camps Confluencia, Plaza de Mulas, and Plaza Argentina, round trip. There you will only have to carry your daypack (35L) with lunch and water to consume during the afternoon, in addition to your wallet, sunscreen, camera, etc.  
+2. Unlike other companies, our Full expeditions include porters to transport tents and garbage and kitchen equipment, fuel, first aid kit, oxygen tubes, toilet paper, other items, waste of bath, and part of the meals. The climbers will collaborate by carrying some food during the acclimatization treks (when they do not have to carry their equipment). They will have to take their personal equipment when they move from one camp to another, and if necessary, they will also carry a small amount of water to 1-2 camps (only in exceptional cases that there is no snow to melt). Optionally, personal porters can be hired to carry the equipment of each climber, with an additional charge, available only in advance. Lite expeditions do not include porters, and the climbers will carry it.  
+
+### ¿Qué formación y habilitaciones tienen los guías?
+
+`guias-formacion` · en: faq-049 · fuente: faq-web · confianza: web
+
+También preguntan: Experiencia de los guías · Guide qualifications · Formação dos guias
+
+All of our guides are highly skilled English speakers with AAGM or EPGAMT licensing (3-year career) and legally authorized by the Park authorities.  
+We believe that to have a successful expedition is crucial to have the best-qualified professionals.  
+Our guides have at least five (5) years of experience to provide safety on the treks along the different paths with confidence, conviction, and professionalism. We have the greatest number of guides per group.  
+We organize expeditions since 1998, resulting in over 1000 successful expeditions with thousands of climbers without fatalities nor serious accidents (we are the only recognized company with this record).  
+We also have the most experienced guides and professional team in all base camps to provide the best base camp services and the strongest logistical support 24/7 with top-notch equipment.  
+All these, among other reasons, have allowed us to achieve a 100% summit success rate in 42 open expeditions during the seasons 2021/22 and 2023/24.  
+
+### ¿Los guías son locales?
+
+`guias-locales` · en: faq-050 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Los guías son argentinos? · Are the guides Argentinian? · Os guias são locais?
+
+Yes, 90%+ of our guides are locals, and all of them are legally certified, registered, and authorized by Aconcagua Park. With no records of any fatality nor major accident when leading a group.  
+
+### ¿Cuándo hay que contratar porteadores?
+
+`cuando-contratar-porteadores` · en: faq-051 · fuente: faq-web · confianza: web
+
+También preguntan: Con cuánta anticipación reservar porteador · When to book a porter · Quando contratar carregador?
+
+In advance to guarantee availability, we have a refund policy for porters not taken on the mountain.  
+For safety and logistical reasons, Acomara expeditions cannot include services from other providers or companies.  
+Bookings are subject to availability. Please consult us about our refund policy and conditions.  
+
+### ¿Hay porteadores incluidos después del campamento base?
+
+`porteadores-incluidos` · en: faq-052 · fuente: faq-web · confianza: web
+
+También preguntan: ¿Quién lleva carpas y comida a los campamentos de altura? · Are porters included? · Carregadores incluídos?
+
+Unlike the other companies, we include unlimited porters to carry the tents, cooking equipment, fuel, first aid kit, oxygen tubes, toilet paper, part of the meals, and other elements, including solid waste in all our FULL expeditions. Private and Lite expeditions may have a different porter service.  
+The climbers will collaborate by carrying some food during two acclimatization treks. They have to carry their personal equipment when moving to the three altitude camps only, and if some water is necessary, the water is regularly obtained from the snow melting in each camp; it's unusual to carry water, in the last 25 seasons only two times was necessary to carry some water.  
+Personal porters to carry each person's personal equipment are available only if booked in advance and for an additional charge.  
+Our mules will carry all common and personal equipment to the Base Camps, roundtrip. Since the mules don't go with the climbers, the climbers will have to carry their small daypack to carry the wallet, cell phone, water to drink when walking, lunch for the day, medicines, etc.  
+
+### ¿De cuántas personas es el grupo y cuántos guías van?
+
+`tamano-de-grupo-y-guias` · en: faq-054 · fuente: faq-web · confianza: web
+
+También preguntan: Cantidad de guías por escalador · Group size and guide ratio · Tamanho do grupo e número de guias
+
+NUMBER OF GUIDES  
+Our expeditions have an average of seven (7) climbers with three (3) highly professional and successfully experienced Guides for the summit attempt.  
+While many companies provide only two (2) guides for 8 or 9 climbers, resulting in climbers either being left alone or with a single guide for many people, if any abandon the group for any reason. It happens all the time and represents a significant difference not only in service to have a successful expedition but also in your Safety. We have a max of 1-3 guide-climber ratio on the summit attempt or even better in many cases, while many have 1-4 or even worst.  
+To have a successful expedition is crucial to have the best-qualified professionals. Our guides have at least five (5) years of experience to provide Safety on the treks along the different paths with confidence, conviction, and professionalism. They are English speakers with AAGM or EPGAMT licensing (3-year career) and are legally authorized by the Park authorities.  
+GROUP SIZE  
+We have a maximum of 11 climbers per group. If we have a group of 12 climbers, we split it into two (2) groups of six (6) climbers each. Most guides regularly join the group from the City; however, one guide could join the group for the summit attempt, depending on weather conditions and the guides' logistics.  
+
+### ¿Cuándo conocemos a los guías del grupo?
+
+`cuando-conocemos-a-los-guias` · en: faq-055 · fuente: faq-web · confianza: web
+
+También preguntan: Primer encuentro con el guía · When do we meet the guides? · Quando conhecemos os guias?
+
+On day 1 of the itinerary for the leader guide, and some times an assistant guide may join the group on the mountain.  
+
+
+<a id="preparacion"></a>
+## Preparación (entrenamiento, nutrición, salud)
+
+### ¿Tienen un programa de entrenamiento?
+
+`plan-de-entrenamiento` · en: faq-044 · fuente: faq-web · confianza: web
+
+También preguntan: Cómo prepararse físicamente · Training plan · Plano de treino
+
+Please visit: training comments to climb Aconcagua  
+Principio del formulario  
+Final del formulario  
+
+### ¿Qué recomendaciones de nutrición tienen?
+
+`nutricion` · en: faq-045 · fuente: faq-web · confianza: web
+
+También preguntan: Qué comer en altura · Nutrition advice · Alimentação na altitude
+
+These are the basic indicators to bear in mind. Representation of the number of calories which should contribute by the different energetic nutrients during an expedition to Aconcagua:  
+Proteins: 10 / 15%, where 1gr. of proteins provides four calories.  
+Fats: 25 / 30%, where 1gr. of fat provides nine calories  
+Carbohydrates: 50 / 60%, where 1 gr. Carbohydrates provide four calories  
+Nutritionists and chefs develop our meals to bring all the necessary energies to do an Aconcagua expedition. Anyway, all our meals have Free repeat on demand to guarantee adequate adaptation to each person.  
+
+### ¿Qué recomendaciones de hidratación tienen?
+
+`hidratacion` · en: faq-046 · fuente: faq-web · confianza: web
+
+También preguntan: Cuántos litros de agua por día · Hydration advice · Hidratação
+
+In mountaineering, hydration is just as important as food or even more since liquids' loss is relevant. It worsens as we ascend and gain altitude because the lack of oxygen saturation in the blood causes compensatory hyperventilation (hypoxia), losing a lot of liquid in the form of water vapour by breathing. Dry air and perspiration are other ways to lose fluids.  
+The rhythm of fluids lost varies from one person to another.  
+Liquids lost are produced by breathing and perspiration, as we already said, and by urine and diarrhoea. We are not always aware of the amount of liquid our body is losing. Certain drugs, such as acetazolamide (Diamox), could induce dehydration due to its diuretic power.  
+Keeping proper hydration is elemental to reduce the risk of heat, cold (including freezing), and altitude disorders.  
+Not replacing the liquid lost leads to dehydration, affecting athletic performance markedly. If dehydration goes forward, it can steer a state of shock.  
+
+### ¿Recomiendan Diamox u otros medicamentos?
+
+`diamox-y-medicamentos` · en: faq-047 · fuente: faq-web · confianza: web
+
+También preguntan: Acetazolamida para la altura · Altitude sickness medication · Remédio para altitude
+
+We do not recommend Diamox (acetazolamide) or any other drug. You only have to bring with you the medications under the medical prescription for your consumption.  
+Our acclimatisation process is designed to be enough for everybody. If not, the doctors will check and suggest a medicine depending on each case. At first, Diamox helps to acclimatise; on the other hand, climbers must drink a lot of water to compensate for the dehydration, much more than usually should be drunk, which is already a lot in Aconcagua. Climbers often do not manage to drink too much water and become dehydrated, and that causes freezing, edema, etc. It is also very heavy to carry a lot of water during the day, and it is difficult to urinate very frequently when wearing mountain equipment.  
+Diamox is a diuretic, but you need to drink a lot of water at height altitude, which you do not drink ever in the necessary amount. It is not recommended to add a diuretic. And it hides the symptoms of edema, among other things.  
+Another problem that Diamox brings is that in many circumstances, depending on the type of sediments the water has, Diamox causes the water to feel bad, and that causes climbers not to drink all the water needed.  
+You may buy it at the pharmacy in Mendoza only under a medical prescription; it is up to you; it is not available to purchase independently.  
+
+
+<a id="politicas"></a>
+## Políticas (abandono, descenso, propinas)
+
+### ¿Qué pasa si abandono la expedición?
+
+`abandono-de-la-expedicion` · en: faq-014 · fuente: faq-web · confianza: web
+
+También preguntan: Si me vuelvo antes, ¿me reintegran algo? · Reembolso por bajar antes · Se eu desistir, tenho reembolso?
+
+All services have been quoted in a group, any service out of the group has an extra cost.  
+Summary  
+The early return has no refund/compensation  
+Abandonment may have extra costs  
+Rescue insurance coverage doesn't depend on Acomara  
+Not used porters may have credit/refund  
+1. Early return has no refund/compensation  
+If a climber or group returns in advance for any reason from Day 1 onwards, there is no compensation nor refund for early return. The days/services not taken on the mountain will not be compensated with a refund, credit, or other benefits. It's stated in the expedition info, and the climber already accepted this in their booking form before sending the 1st payment, which was also signed in the document. Only some cases of personal porter services may avoid this rule, subject to the conditions detailed at the end of this page.  
+No savings for early descent. All services have been quoted in a group. If any passenger leaves the group for any reason, our company doesn't have any savings,  e.g.:  
+deployment and logistics involved were already done  
+the spot was saved  
+the private bus for the group costs the same  
+the group mules cost the same  
+guides are paid the same  
+common equipment is still the same  
+the food was already bought, packed, and sent  
+fees were already paid  
+sellers' commissions were already paid  
+etc.  
+
+2. Abandonment may have extra costs  
+The climbers who quit the group will stay in Base Camp Plaza de Mulas FREE of charge until the group returns from the summit.  
+If a climber left the Base Camp for a rescue (point 3 below) or for another reason, all services in advance separately from the leading group are private services not included in the package and have an extra charge, e.g.:  
+Guided service  
+USD 500/700 Guided service to descend separately from your group (Normal/360 route)  
+Mule service*  
+USD 290/470 Mule separately from your group (Normal/360 route)  
+Porters  
+To carry the personal gear from the high camps to the base camps  
+Transfer to Mendoza  
+USD 275 Transfer to Mendoza city separately from your group  
+The night in advance  
+The returning night included will only be the one with your leading group  
+This represents an extra cost of USD 1065/1445 Normal/360 route for descending out of the leading group in advance.  
+Please remember that climbers are not allowed to leave the Park on their own due to regulations, which means the guided service is mandatory. If you have some physical discomfort and can abandon the Park on your own, the insurance company will not consider it a rescue.  
+*The mule service must be confirmed and paid until 6 pm on the previous day.  
+
+3. Rescue insurance coverage doesn't depend on Acomara  
+The climber or rescue insurance must cover/refund all extra expenses to the climber if a rescue (helicopter, ambulance, etc.). Most policies cover evacuation expenses only in case of life risk. If the Insurance Company doesn't authorize the services in writing in advance, the climber has to pay for them and later ask for a refund from the Insurance Company. DISCLAIMER: Acomara will take action to help if an incident occurs and doesn't take responsibility for the rescue insurance coverage, procedures, and rescue costs.  
+4. Not used porters may have credit/refund  
+Please visit the section “Optional services” and see the details and conditions of each porter option. Credits/Refunds must be required until 60 days after the end of the expedition, and they will be made by PayPal exclusively 60 days after they are required by email. No refunds or compensations will be made in cash or services at the end of the expedition.  
+
+### ¿Qué pasa si no usamos los días extra en la montaña?
+
+`dias-extra-no-usados` · en: faq-026 · fuente: faq-web · confianza: web
+
+También preguntan: Si terminamos antes, ¿los días extra se pasan a Mendoza? · Unused extra days · Se sobrar dias extras?
+
+You will be ready to leave before your flight out. All open expeditions include up to 2 extra days added on the mountain if bad weather conditions or other circunstances prevent the regular itinerary.  
+Full extended programs of 17+2 days and 18+2 days include 3 nights out of the Park:  
+Day 1 in Mendoza city  
+Day 2 in Penitentes  
+Returning Day in Penitentes  
+If the extra days are not taken on the mountain or an early return for any reason, the extra days are not included in Mendoza in any case. Lite and Fast expeditions don't include Hotel in Mendoza.  
+
+### ¿Cuánto es la propina habitual?
+
+`propinas` · en: faq-056 · fuente: faq-web · confianza: web
+
+También preguntan: Propina para guías y porteadores · Tipping · Gorjeta para os guias
+
+Tipping in Argentina is not mandatory; it depends on each person.  
+You may calculate USD 200-400 for guides and USD 30-60 for porters and cooks.  
+In total, it may be USD 250-450 per climber; however, it's up to each person; it may be higher or lower.  
+No one on our staff will ever ask you for a tip, unless you give it to them.  
+
+### ¿Qué pasa si alguien tiene que bajar el día de cumbre?
+
+`descenso-el-dia-de-cumbre` · en: faq-057 · fuente: faq-web · confianza: web
+
+También preguntan: Si un compañero se siente mal en el ataque a cumbre · Someone turns back on summit day · Se alguém tiver que descer no dia do cume
+
+If a person cannot continue ascending, one of the group's guides climbs down with that person, and the rest of the group continues ascending with the remaining guides. We do that until there is only one guide left.  
+If there is only one guide left, with two or more climbers, and someone has to descend, the entire group has to go down.  
+For safety reasons, no one can be alone on the mountain without guiding assistance.  
+Some private expeditions ask for one guide per person to avoid this situation (this is optional but not available for open expeditions).  
+Safety & Eco  
+Safety 1st  
+Your safety will always be our 1st priority, we organize expeditions since 1998, with over 1000 successful expeditions with thousands of climbers without diseases nor serious accidents in all our history (we are the only one of the well-recognized companies with this record).  
+In Confluencia, Plaza de Mulas, and Plaza Argentina there are medical checks that are mandatory. There, doctors determine whether you may ascend. If your health seems compromised, you will undergo a new medical check to determine whether you continue. If doctors determine you are not fit to continue, Park Rangers will kindly ask you to abandon the expedition. Bear in mind that guides are knowledgeable in first-aid techniques and are in contact 24/7 with the Park Rangers for emergencies. Therefore, if someone gets sick in the altitude camps, guides count with basic assistance to aid you. You will never be alone on the mountain.  
+All our activities are guided under COVID-19 approved protocol.  
+Environmental Care  
+From Acomara, we are strongly committed to caring for the environment, taking care not to leave any waste, actively collaborating in preserving flora and fauna, and being active participants in protecting the Aconcagua Protected Areas. Deeply integrated with the local community as local people that we are.  
+We also ask all people climbing Aconcagua to act in an eco-friendly way, especially in the Park.

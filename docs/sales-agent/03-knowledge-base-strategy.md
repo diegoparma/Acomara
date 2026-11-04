@@ -1,76 +1,65 @@
-# Estrategia para tu TXT de conocimiento (1 MB)
+# Base de conocimiento de Nico: cómo está pensada
 
-## Respuesta corta
-Si, se puede usar perfecto. 1 MB es un tamano manejable.
+*Actualizado nov 2026. Cómo editarla: `docs/knowledge/README.md`.*
 
-## Recomendacion
-Usar RAG simple desde el inicio:
-1. Separar el TXT en chunks semanticos.
-2. Crear embeddings por chunk.
-3. Recuperar top-k chunks por consulta.
-4. Responder solo con evidencia recuperada.
+## El problema que resuelve
 
-## Por que no meter todo el TXT en cada prompt
-- Coste mayor por mensaje.
-- Menor velocidad.
-- Mas ruido en contexto.
-- Mayor riesgo de respuestas inconsistentes.
+Hasta octubre 2026 el mismo dato vivía en varios lugares escritos a mano: el FAQ crudo de la web (en inglés), los fragmentos para la búsqueda (generados con awk), los datos clave del prompt, los docs de estado y algunas frases del código. Cuando Fernando cambió el precio a USD 7.250, `estado-nico-para-fernando.md` siguió diciendo USD 6.990; la temporada figuraba como "noviembre a febrero" en un lado y "noviembre a marzo" en otro; el FAQ decía "más de 5.000 m" para los programas cortos y Fernando dice 6.000 m. Además el parser awk cortaba solo en líneas terminadas en "?", así que mezclaba entradas: un fragmento de 12.000 caracteres juntaba edad mínima, tasa de cumbre, dificultad y seis menús, y el itinerario del 18+2 traía pegados el del Polaco y el del 14+2.
 
-## Especificacion tecnica sugerida
-- Tamano chunk: 600 a 900 caracteres.
-- Solapamiento: 80 a 120 caracteres.
-- Metadata por chunk:
-  - source_file
-  - section_title
-  - topic
-  - version
-  - updated_at
-- top_k inicial: 4
-- Re-ranking opcional: habilitar en fase 2
+## El modelo
 
-## Estructura recomendada del conocimiento
-Crear una copia estructurada del TXT con secciones claras:
-1. Itinerarios y modalidades
-2. Fechas y disponibilidad
-3. Precios y que incluye/no incluye
-4. Requisitos fisicos y experiencia
-5. Equipamiento
-6. Proceso de reserva y pagos
-7. Politicas de cancelacion
-8. Seguridad y limites de responsabilidad
-9. FAQ comerciales
-10. Objeciones tipicas y respuestas
+Una fuente canónica, estructurada, y todo lo demás generado:
 
-## Guardrails de respuesta
-- Si no hay evidencia suficiente en chunks recuperados: responder "no tengo confirmado ese dato".
-- Citar brevemente la fuente interna (seccion/tema).
-- Para informacion critica (seguridad, legal, pagos), sugerir confirmacion humana.
+```
+docs/knowledge/fuente/
+  valores.yaml      precios, %, seña, links, temporada: una vez, con fuente, confianza y vigencia
+  salidas.yaml      fechas de salida por programa
+  datos-clave.yaml  datos fijos del prompt (texto con {valores})
+  faq.yaml          entradas del FAQ: key, id, topic, pregunta y respuesta por idioma,
+                    also_asked (cómo lo preguntan los clientes), source, confidence, valid_until
+        │
+        ▼  scripts/build_knowledge.py (sin red)
+  datos-clave.md         → prompt de sistema
+  faq_rag_chunks.jsonl   → un fragmento por entrada e idioma
+  faq_structured.md      → versión legible + tabla de valores vigentes
+        │
+        ▼  scripts/build_cloud_index.py (OpenAI; re-embebe solo lo que cambió)
+  faq_cloud_index.jsonl  → búsqueda en producción (anota el modelo de embeddings)
+```
 
-## Plan de implementacion en 3 fases
-### Fase 1 - Operativo rapido (1-2 dias)
-- Limpiar el TXT.
-- Separar en secciones.
-- Ingesta en vector store.
-- Probar 30 preguntas reales de clientes.
+Reglas:
+- **Un precio se escribe una vez.** Los textos usan `{price_regular}`; el generador lo formatea por idioma (USD 7.250 en es/pt, USD 7,250 en en). Un test falla si un precio confirmado aparece escrito a mano en otra fuente.
+- **Jerarquía.** `datos-clave` (lo que dijo Fernando) > FAQ `confirmed` > FAQ `web`. Lo `pending` no se publica.
+- **Vigencia.** Valores y salidas tienen `valid_until` (fin de temporada 2026/27). Vencido, el build y los tests fallan: obliga a revisar precios antes de la próxima temporada.
+- **Una entrada = una pregunta.** El FAQ migrado quedó en 73 entradas (antes 63 fragmentos, varios mezclados). Los ids `faq-NNN` viejos se mantienen (el código y los logs los usan); las entradas nuevas toman números nuevos y el duplicado `faq-053` se retiró.
+- **Multilingüe por metadatos.** La mayoría de las respuestas están solo en inglés (así vienen de la web); cada entrada tiene además la pregunta en español y `also_asked` en es/en/pt. El modelo responde en el idioma del cliente.
+- **Consistencia entre fuentes.** `tests/test_knowledge_base.py` revisa que todo monto en USD que puede leer un cliente (prompt, reglas, FAQ, índice, `estado-nico-para-fernando.md`, frases del código) exista en `fuente/`.
 
-### Fase 2 - Calidad comercial (3-5 dias)
-- Agregar FAQ y objeciones reales.
-- Ajustar prompts para cierre.
-- Definir reglas de handoff.
+## Búsqueda
 
-### Fase 3 - Escalado multicanal (1-2 semanas)
-- Conectar WhatsApp y correo.
-- Registrar interacciones en CRM.
-- Medir conversion por etapa.
+- Producción: embeddings (OpenAI) sobre "pregunta + also_asked + respuesta", top 4, con el mensaje solo y con el contexto reciente (para "¿y cuánto sale?"); fechas forzadas por código (`departures.py`).
+- Nuevo, opcional: `RETRIEVAL_MODE=hybrid` fusiona el ranking de embeddings con BM25 por palabras clave (RRF). Código en `orchestrator/kb_retrieval.py`.
+- El servidor ahora toma el modelo de embeddings del índice (`embed_model`) y registra un error si las dimensiones no coinciden.
 
-## Checklist antes de produccion
-- [ ] Politicas comerciales validadas por equipo
-- [ ] Precios vigentes y fecha de ultima actualizacion
-- [ ] Plantillas de respuesta por canal
-- [ ] Flujo de escalamiento a humano probado
-- [ ] Prueba con casos dificiles (objeciones, dudas ambiguas, urgencias)
+### Benchmark (`scripts/eval_retrieval.py`, 131 preguntas: 65 es, 51 en, 15 pt, con seguimientos)
 
-## Decision recomendada hoy
-1. Mantener tu TXT como fuente maestra temporal.
-2. Crear una version estructurada por secciones para RAG.
-3. Activar agente de ventas v1 solo para dudas comerciales + avance de pipeline.
+Por palabras clave (BM25, sin red), 4 de noviembre de 2026:
+
+| Fragmentos | hit@1 | hit@3 | hit@4 | MRR | hit@4 es | hit@4 en | hit@4 pt |
+|---|---|---|---|---|---|---|---|
+| Antes (awk, solo inglés) | 27,5% | 38,9% | 44,3% | 0,353 | 32,3% | 68,6% | 13,3% |
+| Ahora (fuente/ + preguntas es + also_asked) | 69,5% | 84,0% | 88,5% | 0,783 | 93,8% | 82,4% | 86,7% |
+
+Embeddings e híbrido: **pendiente**, necesita `OPENAI_API_KEY` (no estaba en la sesión cloud). Con la clave:
+
+```bash
+python3 scripts/build_cloud_index.py && python3 scripts/eval_retrieval.py --mode all --misses
+```
+
+Si híbrido gana a dense en hit@4 sin perder en hit@1, activar `RETRIEVAL_MODE=hybrid` en Vercel.
+
+## Lo que falta
+
+- Respuestas de Fernando: `docs/knowledge/pendientes-para-fernando.md` (contradicciones, datos viejos, preguntas sin respuesta como cancelación y saldo).
+- Cruzar precios, fechas y permisos con `aconcagua-plan-admin` y servicios/treks con `aconcagua-basecamp-web`.
+- Traducir al español las respuestas más consultadas (incluye, no incluye, permiso, seguro, vuelos) cuando Fernando las confirme.
