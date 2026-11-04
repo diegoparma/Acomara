@@ -92,9 +92,10 @@ from orchestrator.caja_interno import internal_reply
 from nico_core import get_tenant
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
-SYSTEM_PROMPT_PATH = ROOT / "docs" / "sales-agent" / "02-system-prompt.md"
-KEY_FACTS_PATH = ROOT / "docs" / "knowledge" / "datos-clave.md"
+TENANT = get_tenant()
+INDEX_PATH = TENANT.knowledge.resolve(TENANT.knowledge.index_path)
+SYSTEM_PROMPT_PATH = TENANT.knowledge.resolve(TENANT.knowledge.system_prompt_path)
+KEY_FACTS_PATH = TENANT.knowledge.resolve(TENANT.knowledge.key_facts_path)
 
 app = Flask(__name__)
 
@@ -164,7 +165,6 @@ class ReplyDecision:
 
 
 # i18n: fixed phrases come from the tenant config (tenants/<slug>/).
-TENANT = get_tenant()
 I18N_PHRASES = TENANT.phrases
 
 
@@ -672,15 +672,12 @@ def load_index(path: Path) -> list[dict[str, Any]]:
 
 def load_system_prompt() -> str:
     if not SYSTEM_PROMPT_PATH.exists():
-        return (
-            "Eres un asistente comercial de expediciones al Aconcagua. "
-            "Responde con precision y no inventes datos."
-        )
+        return TENANT.knowledge.fallback_system_prompt
     prompt = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
     # Core facts go in the fixed system prompt (cacheable) so the model cannot
     # contradict them between runs; the permit was "included" in one run and
     # "not included" in the next (simulation 2026-10-08).
-    if KEY_FACTS_PATH.exists():
+    if KEY_FACTS_PATH is not None and KEY_FACTS_PATH.exists():
         prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{KEY_FACTS_PATH.read_text(encoding='utf-8')}"
     return prompt
 
@@ -1056,8 +1053,8 @@ def log_llm_usage(conversation_id: str, model: str, usage: Any) -> dict[str, Any
     return record
 
 
-# Argentina has no DST: Mendoza is UTC-3 all year.
-ARGENTINA_TZ = timezone(timedelta(hours=-3), "ART")
+# The tenant's time zone (Acomara: Mendoza, UTC-3 all year). Name kept for callers.
+ARGENTINA_TZ = TENANT.locale.tz
 
 
 def today_in_argentina(now: datetime | None = None) -> date:
@@ -1103,7 +1100,7 @@ def generate_reply(
     )
 
     user_prompt = (
-        "Fecha de hoy (Argentina): {today}\n"
+        "Fecha de hoy ({tz_label}): {today}\n"
         "Canal: {channel}\n"
         "Conversation ID: {conversation_id}\n"
         "Cliente pregunta:\n{question}\n\n"
@@ -1131,6 +1128,7 @@ def generate_reply(
         "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
     ).format(
         today=today.isoformat(),
+        tz_label=TENANT.locale.label,
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],

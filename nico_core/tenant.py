@@ -11,7 +11,11 @@ from __future__ import annotations
 import importlib
 import os
 from dataclasses import dataclass, field
+from datetime import timedelta, timezone, tzinfo
+from pathlib import Path
 from typing import Mapping
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_TENANT = "acomara"
 TENANT_ENV = "NICO_TENANT"
@@ -40,6 +44,39 @@ REQUIRED_PHRASES = (
 
 
 @dataclass(frozen=True)
+class KnowledgeConfig:
+    """Where the tenant's knowledge lives. Paths are relative to the repo root.
+
+    The files are referenced, never copied: other work edits them in place.
+    """
+
+    system_prompt_path: str
+    # Facts that always win over retrieved chunks; appended to the system prompt.
+    key_facts_path: str | None = None
+    # Embedded FAQ chunks (JSONL from scripts/build_cloud_index.py).
+    index_path: str | None = None
+    # Used only when the prompt file is missing.
+    fallback_system_prompt: str = "Eres un asistente comercial. Responde con precision y no inventes datos."
+
+    def resolve(self, relative: str | None) -> Path | None:
+        return REPO_ROOT / relative if relative else None
+
+
+@dataclass(frozen=True)
+class LocaleConfig:
+    """Where the business operates: the model gets "today" in this time zone."""
+
+    utc_offset_hours: float = 0
+    tz_abbreviation: str = "UTC"
+    # Shown to the model next to the date: "Fecha de hoy (Argentina)".
+    label: str = "UTC"
+
+    @property
+    def tz(self) -> tzinfo:
+        return timezone(timedelta(hours=self.utc_offset_hours), self.tz_abbreviation)
+
+
+@dataclass(frozen=True)
 class TenantConfig:
     """Everything that makes Nico sell for one business and not another."""
 
@@ -48,7 +85,9 @@ class TenantConfig:
     # Fixed replies per language: {"es": {"key": "text"}, ...}. The first
     # language in `languages` is the fallback for missing keys.
     phrases: Mapping[str, Mapping[str, str]]
+    knowledge: KnowledgeConfig
     languages: tuple[str, ...] = ("es", "en", "pt")
+    locale: LocaleConfig = field(default_factory=LocaleConfig)
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)
