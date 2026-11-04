@@ -328,7 +328,11 @@ _NOT_A_NAME = {
         "Team Equipo Rescue Muy Bien Interesado Interesada Perfecto Perfecta Genial Excelente Great Perfect "
         "Bueno Buena Dale Listo Saludos Abrazo Buenísimo Igualmente Amigo Amiga Crack Capo Maestro Señor Señora "
         "Gente Chicos Todos Everyone Again Mate Bro Fer Igual Nada Mil Muchas Much So Ótimo Obrigado Obrigada "
-        "Valeu Legal Total Hermano Querido Querida Anyway Sir Madam Love De La El Un Una"
+        "Valeu Legal Total Hermano Querido Querida Anyway Sir Madam Love De La El Un Una "
+        "American Brazilian Australian Argentinian Argentine Chilean Mexican Spanish French German Italian British "
+        "English Canadian Israeli Dutch Swiss Indian Polish Peruvian Colombian Uruguayan Excited Ready New Back Fine "
+        "Francés Francesa Alemán Alemana Italiano Italiana Peruano Peruana Colombiano Colombiana Ingeniero Ingeniera "
+        "Profesor Profesora Estudiante Montañista Andinista Principiante"
     ).split()
 }
 
