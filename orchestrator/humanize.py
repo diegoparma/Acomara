@@ -56,6 +56,18 @@ _APOLOGY_RES = tuple(
         r"(?:desculp[ae]|pe[cç]o desculpas)(?: pela| por)? (?:a |qualquer )?confus[aã]o[^.!?\n]*[.!]?",
     )
 )
+# Internal names the client must never see ("refer to the protocol in the KB",
+# "según el FAQ"). Only the reference is removed; the sentence stays.
+_INTERNAL_SOURCE_RES = tuple(
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in (
+        r"\s+(?:in|from|on) (?:the |our )?(?:KB|FAQ|knowledge base|documentation)\b",
+        r"\s+(?:en|de|desde) (?:la |el |nuestra |nuestro |nuestras )?(?:KB|FAQ|base de conocimiento|documentaci[oó]n|evidencia)\b",
+        r"\s+(?:na|da|no|do) (?:KB|FAQ|base de conhecimento|documenta[cç][aã]o)\b",
+        r"(?:^|(?<=[\s¡¿]))(?:seg[uú]n|de acuerdo (?:con|a)|according to|segundo|conforme) (?:la |el |the |a |o |nuestra |our )?"
+        r"(?:KB|FAQ|base de conocimiento|knowledge base|documentaci[oó]n|documentation|evidencia|evidence),?\s*",
+    )
+)
 # "Thanks for your question": fine in a first reply, odd in the middle of a chat.
 _THANKS_FOR_ASKING_RES = tuple(
     re.compile(pattern, re.IGNORECASE)
@@ -285,7 +297,7 @@ def humanize_reply(
         if stripped.strip():
             text = stripped
 
-    for pattern in _ROBOTIC_SENTENCE_RES + _APOLOGY_RES:
+    for pattern in _ROBOTIC_SENTENCE_RES + _APOLOGY_RES + _INTERNAL_SOURCE_RES:
         text = pattern.sub("", text)
 
     text = _drop_repeated_opener(text.lstrip(), previous_replies)
@@ -296,6 +308,7 @@ def humanize_reply(
     # Tidy what the removals left behind.
     text = re.sub(r"[ \t]+([,.!?])", r"\1", text)
     text = re.sub(r",\s*,", ",", text)
+    text = re.sub(r",+([.!?])", r"\1", text)
     text = re.sub(r"[ \t]{2,}", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     text = re.sub(r"(?m)^[ \t,]+|[ \t]+$", "", text)

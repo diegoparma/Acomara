@@ -239,6 +239,15 @@ class HumanizeVarietyTests(unittest.TestCase):
         self.assertEqual(humanize_reply("Buenísimo 🙌 nos vemos en Mendoza 🏔️⛰️!!"), "Buenísimo 🙌 nos vemos en Mendoza!")
         self.assertEqual(humanize_reply("Dale 👍🏽👍🏽"), "Dale 👍🏽")
 
+    def test_internal_source_names_are_removed(self):
+        self.assertEqual(
+            humanize_reply("Please refer to the medical protocol in the KB."), "Please refer to the medical protocol."
+        )
+        self.assertEqual(humanize_reply("Según el FAQ, el permiso no está incluido."), "El permiso no está incluido.")
+        self.assertEqual(humanize_reply("El permiso no está incluido, según la documentación."), "El permiso no está incluido.")
+        self.assertEqual(humanize_reply("According to our FAQ, it takes 20 days."), "It takes 20 days.")
+        self.assertEqual(humanize_reply("Está en la base de datos del Parque."), "Está en la base de datos del Parque.")
+
     def test_recent_assistant_replies(self):
         turns = append_recent_turns([], "a", "b")
         turns = append_recent_turns(turns, "c", "d")
