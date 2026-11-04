@@ -50,8 +50,9 @@ Por palabras clave (BM25, sin red), 4 de noviembre de 2026:
 | Antes (awk, solo inglés) | 27,5% | 38,9% | 44,3% | 0,353 | 32,3% | 68,6% | 13,3% |
 | Con fuente/ + preguntas es + also_asked (131 preguntas) | 69,5% | 84,0% | 88,5% | 0,783 | 93,8% | 82,4% | 86,7% |
 | + 11 respuestas traducidas al español, un fragmento por entrada, 2 entradas nuevas (157 preguntas) | 67,5% | 85,4% | 88,5% | 0,774 | 93,4% | 83,6% | 84,6% |
+| + equipo y comida en español, normalización de género y verbos comunes (157 preguntas) | 68,2% | 84,7% | 86,6% | 0,774 | 92,1% | 81,8% | 80,8% |
 
-La segunda tanda suma 26 preguntas más difíciles (más portugués y seguimientos), así que el total no se compara 1 a 1 con la fila anterior: sobre las 131 originales, la misma configuración da 89,3% en hit@4.
+La segunda tanda suma 26 preguntas más difíciles (más portugués y seguimientos), así que el total no se compara 1 a 1 con la fila anterior: sobre las 131 originales, la misma configuración da 89,3% en hit@4. La última fila suma 16 fragmentos largos en español (menús, equipo): por palabras clave compiten más entre sí y hit@4 baja 2 puntos, aunque hit@1 sube. El índice viejo, medido igual sobre las 157 preguntas, da 41,4%. La medición que importa para producción es la de embeddings (pendiente de la clave).
 
 Embeddings e híbrido: **pendiente**, necesita `OPENAI_API_KEY` (no estaba en la sesión cloud). Con la clave:
 
@@ -65,5 +66,5 @@ Si híbrido gana a dense en hit@4 sin perder en hit@1, activar `RETRIEVAL_MODE=h
 
 - Respuestas de Fernando: `docs/knowledge/pendientes-para-fernando.md` (contradicciones, datos viejos, preguntas sin respuesta como cancelación y saldo).
 - Cruzar precios, fechas y permisos con `aconcagua-plan-admin` y servicios/treks con `aconcagua-basecamp-web`.
-- Respuestas en español: hoy 18 de 75 entradas tienen versión es (precio, reserva, fechas, Plaza Francia, experiencia, logística sin guía, fuera de temporada, rutas, extendido vs. corto, vuelos, días extra, incluye, no incluye, noche de regreso, permiso, seguro, porteadores, grupo). Seguir con equipo y comida.
+- Respuestas en español: hoy 34 de 75 entradas tienen versión es: lo comercial (precio, reserva, fechas, treks, experiencia), qué incluye y qué no, permiso, seguro, vuelos, rutas, grupo, porteadores, todo el equipo y todos los menús. Faltan itinerarios, preparación (entrenamiento, nutrición, Diamox), políticas (abandono, propinas) y logística menor.
 - Las respuestas en es y en de una misma entrada no ocupan dos lugares del top 4: la búsqueda se queda con el mejor fragmento de cada entrada (`kb_retrieval.one_per_entry`).

@@ -219,6 +219,7 @@ class RetrievalTests(unittest.TestCase):
     def test_accents_and_plurals_are_folded(self):
         self.assertEqual(kb_retrieval.tokenize("Fechas de salida"), kb_retrieval.tokenize("fecha salidas"))
         self.assertEqual(kb_retrieval.tokenize("menú"), ["menu"])
+        self.assertEqual(kb_retrieval.tokenize("incluidas"), kb_retrieval.tokenize("incluido"))
 
 
 class IndexBuildTests(unittest.TestCase):
@@ -245,7 +246,7 @@ class BenchmarkTests(unittest.TestCase):
                 self.assertIn(q["lang"], ("es", "en", "pt"))
 
     def test_keyword_retrieval_does_not_regress(self):
-        # Offline floor (keyword only, measured 88.5% hit@4 on 157 questions, 2026-11-04).
+        # Offline floor (keyword only, 86.6% hit@4 on 157 questions, 2026-11-04).
         rows = build_cloud_index.load_chunks()
         report = eval_retrieval.run(rows, eval_retrieval.load_questions(), "keyword", 4)
         self.assertGreaterEqual(report["summary"]["all"]["hit@4"], 0.85)

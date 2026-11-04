@@ -25,6 +25,7 @@ _STOPWORDS = set(
     a al algo algun alguna como con cual cuales cuando de del el ella en entre es esa ese eso esta este esto
     fue ha hay la las le les lo los me mi mis muy no nos o para pero por que se si sin sobre su sus te tu tus
     un una unos y ya yo vos usted ustedes hola gracias tienen tenes tiene puedo quiero
+    estan estar esten son ser sea tener hace hacer
     the an and are as at be by can do does for from have how i if in is it me my of on or our so that this to
     we what when where which who will with you your hi hello thanks
     o os as um uma uns umas da das do dos em na nas no nos com por para que e eu voce voces tem ola obrigado
@@ -43,7 +44,10 @@ def _stem(token: str) -> str:
     if len(token) > 4 and token.endswith("es") and not token.endswith("ees"):
         return token[:-2]
     if len(token) > 3 and token.endswith("s"):
-        return token[:-1]
+        token = token[:-1]
+    # Spanish/Portuguese gender: "incluida" / "incluido" / "incluídas".
+    if len(token) > 4 and token[-1] in "ao":
+        token = token[:-1]
     return token
 
 
