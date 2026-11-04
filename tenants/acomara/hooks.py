@@ -16,6 +16,7 @@ from orchestrator.departures import (
     filter_past_departures,
     season_departures,
 )
+from tenants.acomara.formatting import format_whatsapp_departure_dates
 from orchestrator.sales_rules import apply_video_call_close, extended_alternative_note, short_program_reply
 
 
@@ -49,4 +50,5 @@ HOOKS = TenantHooks(
     select_evidence=select_departure_evidence,
     rewrite_evidence=rewrite_departures,
     close_reply=video_call_close,
+    format_reply=format_whatsapp_departure_dates,
 )

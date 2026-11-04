@@ -14,6 +14,8 @@ Pipeline points, in order:
 3. `rewrite_evidence`: each hit's answer text before the model sees it.
 4. `close_reply`: the model's reply, before the generic email and season
    policies.
+5. `format_reply`: every reply (fixed or not), with the channel name, before
+   the outbound safety filter.
 """
 from __future__ import annotations
 
@@ -43,6 +45,8 @@ class CloseContext:
 
 # (reply, ctx) -> reply
 CloseReply = Callable[[str, CloseContext], str]
+# (reply, channel) -> reply
+FormatReply = Callable[[str, str], str]
 
 
 @dataclass(frozen=True)
@@ -51,6 +55,7 @@ class TenantHooks:
     select_evidence: SelectEvidence | None = None
     rewrite_evidence: RewriteEvidence | None = None
     close_reply: CloseReply | None = None
+    format_reply: FormatReply | None = None
 
 
 def first_fixed_reply(hooks: TenantHooks, user_text: str, lang: str) -> str | None:
