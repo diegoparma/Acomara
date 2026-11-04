@@ -17,7 +17,9 @@ sys.path.insert(0, str(ROOT))
 
 from nico_core.tenant import TenantConfig, load_tenant  # noqa: E402
 
-TENANT_SLUGS = sorted(p.name for p in (ROOT / "tenants").iterdir() if (p / "__init__.py").exists())
+TENANT_SLUGS = sorted(
+    p.name for p in (ROOT / "tenants").iterdir() if (p / "__init__.py").exists() and not p.name.startswith("_")
+)
 
 
 class TenantLoadingTests(unittest.TestCase):
@@ -106,6 +108,49 @@ class SeasonConfigTests(unittest.TestCase):
         self.assertTrue(mentions_off_season("Trip in May", summer))
         self.assertFalse(mentions_off_season("May I book a trip in July?", summer))
         self.assertTrue(mentions_off_season("viaje el 15/12", summer))
+
+
+class NewTenantScriptTests(unittest.TestCase):
+    def test_template_creates_a_complete_placeholder(self) -> None:
+        import importlib
+        import shutil
+        import tempfile
+
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from new_tenant import create_tenant
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "tenants").mkdir()
+            shutil.copy(ROOT / "tenants" / "__init__.py", root / "tenants" / "__init__.py")
+            target = create_tenant("mulas_test", "Mulas Test", root=root)
+            self.assertEqual(
+                sorted(p.name for p in target.iterdir()),
+                ["__init__.py", "datos-clave.md", "phrases.py", "system-prompt.md"],
+            )
+            with self.assertRaises(FileExistsError):
+                create_tenant("mulas_test", "Mulas Test", root=root)
+            # Load it as tenants.mulas_test from the temporary tree.
+            import tenants
+
+            tenants.__path__.append(str(root / "tenants"))
+            try:
+                tenant = importlib.import_module("tenants.mulas_test").TENANT
+            finally:
+                tenants.__path__.remove(str(root / "tenants"))
+                sys.modules.pop("tenants.mulas_test", None)
+                sys.modules.pop("tenants.mulas_test.phrases", None)
+            self.assertTrue(tenant.placeholder)
+            self.assertEqual(tenant.validate(), [])
+            self.assertIn("Mulas Test", tenant.phrases["es"]["bot_question"])
+            self.assertEqual(tenant.integrations.service_name, "mulas-test-orchestrator")
+
+    def test_rejects_bad_slugs(self) -> None:
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from new_tenant import create_tenant
+
+        with self.assertRaises(ValueError):
+            create_tenant("Bad-Slug", "X")
 
 
 if __name__ == "__main__":
