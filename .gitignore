@@ -14,3 +14,6 @@ tests/fixtures/conversations/
 
 # Real customer conversations extracted locally (scripts/extract_advisor_answers.py).
 private/
+
+# Eval runs (transcripts). Commit only summaries under evals/baselines/.
+evals/runs/

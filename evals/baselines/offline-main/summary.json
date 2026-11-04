@@ -1,0 +1,4716 @@
+{
+ "schema": 1,
+ "mode": "offline-stub",
+ "started_at": "2026-11-04T01:18:50+00:00",
+ "config": {
+  "n": 320,
+  "seed": 7,
+  "llm_personas": 0,
+  "concurrency": 8,
+  "nico_model": "gpt-4.1-mini",
+  "simulator_model": "gpt-4.1-mini",
+  "judge_model": "gpt-4.1",
+  "embed_model": null,
+  "offline": true,
+  "judge": true,
+  "max_turns": null,
+  "intents": [],
+  "languages": [],
+  "label": "offline-main"
+ },
+ "git": {
+  "commit": "659cceb",
+  "branch": "claude/loving-davinci-otqdgy",
+  "dirty": false
+ },
+ "n": 320,
+ "errors": 0,
+ "ended_by": {
+  "customer": 320
+ },
+ "avg_turns": 5.681,
+ "overall": {
+  "mean": 72.808,
+  "ci95": 1.346
+ },
+ "dimensions": {
+  "humanness": {
+   "mean": 2.981,
+   "ci95": 0.133
+  },
+  "accuracy": {
+   "mean": 4.616,
+   "ci95": 0.106
+  },
+  "rules": {
+   "mean": 3.956,
+   "ci95": 0.128
+  },
+  "sales": {
+   "mean": 3.95,
+   "ci95": 0.04
+  },
+  "language": {
+   "mean": 3.325,
+   "ci95": 0.196
+  },
+  "length": {
+   "mean": 4.969,
+   "ci95": 0.019
+  }
+ },
+ "deterministic": {
+  "IDENTICAL_REPLY": {
+   "conversations": 263,
+   "rate": 0.8219,
+   "occurrences": 338,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0000",
+     "turn": 3,
+     "text": "Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0000",
+     "turn": 3,
+     "text": "The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0002",
+     "turn": 3,
+     "text": "Flight tickets Meals and extra nights in Mendoza City -if needed- Park’s entrance permit and insurance Personal equipment (sleeping bag, mattress, boots, etc.) ",
+     "detail": ""
+    }
+   ]
+  },
+  "EMPTY_REPLY": {
+   "conversations": 188,
+   "rate": 0.5875,
+   "occurrences": 337,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0002",
+     "turn": 6,
+     "text": "Is rescue insurance included? Is it mandatory? 😬😁",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 1,
+     "text": "Qual programa vocês recomendam? por favor",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 4,
+     "text": "O que está incluído? A permissão do parque está incluída? por favor",
+     "detail": ""
+    }
+   ]
+  },
+  "LANGUAGE_DRIFT": {
+   "conversations": 127,
+   "rate": 0.3969,
+   "occurrences": 278,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not incl",
+     "detail": "esperado es, detectado en"
+    },
+    {
+     "persona": "p7-0001",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en"
+    },
+    {
+     "persona": "p7-0007",
+     "turn": 0,
+     "text": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios",
+     "detail": "esperado pt, detectado es"
+    }
+   ]
+  },
+  "VOSEO_WITH_USTED": {
+   "conversations": 64,
+   "rate": 0.2,
+   "occurrences": 116,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0005",
+     "turn": 1,
+     "text": "Si querés, te las paso en detalle.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0005",
+     "turn": 2,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0010",
+     "turn": 2,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": ""
+    }
+   ]
+  },
+  "SHORT_PROGRAM_TO_INEXPERIENCED": {
+   "conversations": 21,
+   "rate": 0.0656,
+   "occurrences": 21,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0009",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0017",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0030",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": ""
+    }
+   ]
+  },
+  "FAQ_ONLY_PRICE": {
+   "conversations": 17,
+   "rate": 0.0531,
+   "occurrences": 40,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1100"
+    },
+    {
+     "persona": "p7-0001",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1800"
+    },
+    {
+     "persona": "p7-0040",
+     "turn": 5,
+     "text": "Tipping in Argentina is not mandatory; it depends on each person. You may calculate USD 200-400 for guides and USD 30-60 for porters and cooks. In total, it may be USD 250-450 per climber; however, it",
+     "detail": "USD 200"
+    }
+   ]
+  },
+  "OFF_SEASON_NOT_EXPLAINED": {
+   "conversations": 13,
+   "rate": 0.0406,
+   "occurrences": 13,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0028",
+     "turn": 3,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0030",
+     "turn": 7,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0043",
+     "turn": 3,
+     "text": "",
+     "detail": ""
+    }
+   ]
+  },
+  "TOO_LONG": {
+   "conversations": 10,
+   "rate": 0.0312,
+   "occurrences": 10,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0007",
+     "turn": 4,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario A saída de 5/12 é do 14…",
+     "detail": "433 car., burbuja más larga 325"
+    },
+    {
+     "persona": "p7-0041",
+     "turn": 5,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario La del 5/12 es del 14+2…",
+     "detail": "444 car., burbuja más larga 333"
+    },
+    {
+     "persona": "p7-0071",
+     "turn": 5,
+     "text": "Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27 (noviembre y diciembre…",
+     "detail": "586 car., burbuja más larga 475"
+    }
+   ]
+  },
+  "NO_VIDEOCALL_FOR_BUYER": {
+   "conversations": 5,
+   "rate": 0.0156,
+   "occurrences": 5,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0023",
+     "turn": 4,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0246",
+     "turn": 4,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0279",
+     "turn": 4,
+     "text": "",
+     "detail": ""
+    }
+   ]
+  }
+ },
+ "judge_violations": {},
+ "failure_tags": [],
+ "failure_patterns": [
+  {
+   "code": "IDENTICAL_REPLY",
+   "description": "Repite la misma frase larga palabra por palabra",
+   "dimension": "humanness",
+   "severity": 2,
+   "conversations": 263,
+   "rate": 0.8219,
+   "regex": 263,
+   "judge": 0,
+   "impact": 1.6438,
+   "examples": [
+    {
+     "persona": "p7-0000",
+     "turn": 3,
+     "text": "Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0000",
+     "turn": 3,
+     "text": "The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)",
+     "detail": ""
+    }
+   ]
+  },
+  {
+   "code": "LANGUAGE_DRIFT",
+   "description": "Responde en otro idioma que el del cliente",
+   "dimension": "rules",
+   "severity": 3,
+   "conversations": 127,
+   "rate": 0.3969,
+   "regex": 127,
+   "judge": 0,
+   "impact": 1.1906,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not incl",
+     "detail": "esperado es, detectado en"
+    },
+    {
+     "persona": "p7-0001",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en"
+    }
+   ]
+  },
+  {
+   "code": "EMPTY_REPLY",
+   "description": "Nico no respondió nada a un mensaje",
+   "dimension": "rules",
+   "severity": 1,
+   "conversations": 188,
+   "rate": 0.5875,
+   "regex": 188,
+   "judge": 0,
+   "impact": 0.5875,
+   "examples": [
+    {
+     "persona": "p7-0002",
+     "turn": 6,
+     "text": "Is rescue insurance included? Is it mandatory? 😬😁",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 1,
+     "text": "Qual programa vocês recomendam? por favor",
+     "detail": ""
+    }
+   ]
+  },
+  {
+   "code": "VOSEO_WITH_USTED",
+   "description": "Le habla de vos a un cliente que escribe en español neutro / de usted",
+   "dimension": "language",
+   "severity": 1,
+   "conversations": 64,
+   "rate": 0.2,
+   "regex": 64,
+   "judge": 0,
+   "impact": 0.2,
+   "examples": [
+    {
+     "persona": "p7-0005",
+     "turn": 1,
+     "text": "Si querés, te las paso en detalle.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0005",
+     "turn": 2,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": ""
+    }
+   ]
+  },
+  {
+   "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+   "description": "Recomienda 12+2/14+2 a alguien sin 6.000 m",
+   "dimension": "accuracy",
+   "severity": 3,
+   "conversations": 21,
+   "rate": 0.0656,
+   "regex": 21,
+   "judge": 0,
+   "impact": 0.1969,
+   "examples": [
+    {
+     "persona": "p7-0009",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0017",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": ""
+    }
+   ]
+  },
+  {
+   "code": "OFF_SEASON_NOT_EXPLAINED",
+   "description": "El cliente pidió fechas fuera de temporada y nunca se le dijo que es nov-feb/mar",
+   "dimension": "accuracy",
+   "severity": 2,
+   "conversations": 13,
+   "rate": 0.0406,
+   "regex": 13,
+   "judge": 0,
+   "impact": 0.0813,
+   "examples": [
+    {
+     "persona": "p7-0028",
+     "turn": 3,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0030",
+     "turn": 7,
+     "text": "",
+     "detail": ""
+    }
+   ]
+  },
+  {
+   "code": "TOO_LONG",
+   "description": "Respuesta más larga que el límite del canal",
+   "dimension": "length",
+   "severity": 1,
+   "conversations": 10,
+   "rate": 0.0312,
+   "regex": 10,
+   "judge": 0,
+   "impact": 0.0312,
+   "examples": [
+    {
+     "persona": "p7-0007",
+     "turn": 4,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario A saída de 5/12 é do 14…",
+     "detail": "433 car., burbuja más larga 325"
+    },
+    {
+     "persona": "p7-0041",
+     "turn": 5,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario La del 5/12 es del 14+2…",
+     "detail": "444 car., burbuja más larga 333"
+    }
+   ]
+  },
+  {
+   "code": "NO_VIDEOCALL_FOR_BUYER",
+   "description": "Cliente listo para reservar y nunca se le ofreció videollamada",
+   "dimension": "sales",
+   "severity": 1,
+   "conversations": 5,
+   "rate": 0.0156,
+   "regex": 5,
+   "judge": 0,
+   "impact": 0.0156,
+   "examples": [
+    {
+     "persona": "p7-0023",
+     "turn": 4,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0246",
+     "turn": 4,
+     "text": "",
+     "detail": ""
+    }
+   ]
+  }
+ ],
+ "outcomes": {
+  "email_requested": 0.881,
+  "client_gave_email": 0.506,
+  "email_captured": 0.506,
+  "videocall_offered": 0.044,
+  "paused": 0.031
+ },
+ "by_language": {
+  "en": {
+   "n": 80,
+   "overall": 72.958,
+   "critical_rate": 0.225
+  },
+  "es_ar": {
+   "n": 80,
+   "overall": 72.614,
+   "critical_rate": 0.537
+  },
+  "es_neutro": {
+   "n": 80,
+   "overall": 71.459,
+   "critical_rate": 0.487
+  },
+  "pt_br": {
+   "n": 80,
+   "overall": 74.204,
+   "critical_rate": 0.575
+  }
+ },
+ "by_intent": {
+  "agency_reseller": {
+   "n": 20,
+   "overall": 82.29,
+   "critical_rate": 0.35
+  },
+  "asks_if_bot": {
+   "n": 20,
+   "overall": 80.85,
+   "critical_rate": 0.55
+  },
+  "basecamp_only": {
+   "n": 20,
+   "overall": 68.295,
+   "critical_rate": 0.55
+  },
+  "family_decision": {
+   "n": 20,
+   "overall": 72.755,
+   "critical_rate": 0.4
+  },
+  "gear_and_insurance": {
+   "n": 20,
+   "overall": 71.63,
+   "critical_rate": 0.45
+  },
+  "info_seeker": {
+   "n": 20,
+   "overall": 69.81,
+   "critical_rate": 0.6
+  },
+  "medical_question": {
+   "n": 20,
+   "overall": 73.61,
+   "critical_rate": 0.45
+  },
+  "off_season": {
+   "n": 20,
+   "overall": 66.3,
+   "critical_rate": 0.45
+  },
+  "payment_methods": {
+   "n": 20,
+   "overall": 69.19,
+   "critical_rate": 0.25
+  },
+  "price_shopper": {
+   "n": 20,
+   "overall": 66.565,
+   "critical_rate": 0.65
+  },
+  "private_expedition": {
+   "n": 20,
+   "overall": 67.94,
+   "critical_rate": 0.6
+  },
+  "ready_to_book": {
+   "n": 20,
+   "overall": 70.62,
+   "critical_rate": 0.7
+  },
+  "short_program_fan": {
+   "n": 20,
+   "overall": 74.81,
+   "critical_rate": 0.6
+  },
+  "trek_only": {
+   "n": 20,
+   "overall": 72.74,
+   "critical_rate": 0.4
+  },
+  "troll_spam": {
+   "n": 20,
+   "overall": 77.295,
+   "critical_rate": 0.05
+  },
+  "wants_human": {
+   "n": 20,
+   "overall": 80.235,
+   "critical_rate": 0.25
+  }
+ },
+ "by_style": {
+  "burst": {
+   "n": 40,
+   "overall": 68.338,
+   "critical_rate": 0.55
+  },
+  "code_switch": {
+   "n": 40,
+   "overall": 71.938,
+   "critical_rate": 0.6
+  },
+  "emojis": {
+   "n": 40,
+   "overall": 74.085,
+   "critical_rate": 0.4
+  },
+  "long_email": {
+   "n": 40,
+   "overall": 84.705,
+   "critical_rate": 0.275
+  },
+  "normal": {
+   "n": 40,
+   "overall": 76.215,
+   "critical_rate": 0.45
+  },
+  "terse": {
+   "n": 40,
+   "overall": 71.61,
+   "critical_rate": 0.55
+  },
+  "typos": {
+   "n": 40,
+   "overall": 73.023,
+   "critical_rate": 0.275
+  },
+  "voice_note": {
+   "n": 40,
+   "overall": 62.555,
+   "critical_rate": 0.55
+  }
+ },
+ "by_experience": {
+  "above_6000": {
+   "n": 62,
+   "overall": 74.205,
+   "critical_rate": 0.339
+  },
+  "aconcagua_before": {
+   "n": 89,
+   "overall": 73.599,
+   "critical_rate": 0.517
+  },
+  "kilimanjaro": {
+   "n": 56,
+   "overall": 73.455,
+   "critical_rate": 0.518
+  },
+  "none": {
+   "n": 58,
+   "overall": 70.724,
+   "critical_rate": 0.448
+  },
+  "trekking_4000": {
+   "n": 55,
+   "overall": 71.495,
+   "critical_rate": 0.436
+  }
+ },
+ "calibration": {},
+ "usage": {
+  "by_role": [
+   {
+    "role": "nico",
+    "model": "gpt-4.1-mini",
+    "calls": 1510,
+    "input_tokens": 0,
+    "cached_input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0
+   },
+   {
+    "role": "nico_embeddings",
+    "model": "text-embedding-3-small",
+    "calls": 1510,
+    "input_tokens": 0,
+    "cached_input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0
+   }
+  ],
+  "total_cost_usd": 0.0,
+  "models_without_price": []
+ },
+ "cost_per_conversation_usd": 0.0,
+ "per_conversation": [
+  {
+   "id": "p7-0000",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0001",
+   "overall": 73.8,
+   "severity": 8,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0002",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0003",
+   "overall": 61.3,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0004",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0005",
+   "overall": 68.8,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0006",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0007",
+   "overall": 66.2,
+   "severity": 17,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0008",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0009",
+   "overall": 51.2,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0010",
+   "overall": 81.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0011",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0012",
+   "overall": 63.7,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0013",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0014",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0015",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0016",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0017",
+   "overall": 61.3,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0018",
+   "overall": 57.5,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0019",
+   "overall": 78.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0020",
+   "overall": 70.0,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0021",
+   "overall": 57.5,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0022",
+   "overall": 53.8,
+   "severity": 18,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0023",
+   "overall": 75.0,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "NO_VIDEOCALL_FOR_BUYER"
+   ]
+  },
+  {
+   "id": "p7-0024",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0025",
+   "overall": 70.0,
+   "severity": 17,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0026",
+   "overall": 53.8,
+   "severity": 16,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0027",
+   "overall": 63.7,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0028",
+   "overall": 63.7,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0029",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0030",
+   "overall": 51.2,
+   "severity": 15,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0031",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0032",
+   "overall": 63.7,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0033",
+   "overall": 66.2,
+   "severity": 8,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0034",
+   "overall": 63.7,
+   "severity": 16,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0035",
+   "overall": 57.5,
+   "severity": 20,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0036",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0037",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0038",
+   "overall": 92.5,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0039",
+   "overall": 53.8,
+   "severity": 21,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0040",
+   "overall": 57.5,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0041",
+   "overall": 72.5,
+   "severity": 17,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0042",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0043",
+   "overall": 73.8,
+   "severity": 8,
+   "codes": [
+    "LANGUAGE_DRIFT",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0044",
+   "overall": 48.8,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0045",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0046",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0047",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0048",
+   "overall": 86.2,
+   "severity": 6,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0049",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0050",
+   "overall": 88.8,
+   "severity": 3,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0051",
+   "overall": 71.2,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0052",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0053",
+   "overall": 77.5,
+   "severity": 3,
+   "codes": [
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0054",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0055",
+   "overall": 38.8,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0056",
+   "overall": 45.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0057",
+   "overall": 83.8,
+   "severity": 2,
+   "codes": [
+    "FAQ_ONLY_PRICE"
+   ]
+  },
+  {
+   "id": "p7-0058",
+   "overall": 63.7,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0059",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0060",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0061",
+   "overall": 72.5,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0062",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0063",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0064",
+   "overall": 51.2,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0065",
+   "overall": 63.7,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0066",
+   "overall": 82.5,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0067",
+   "overall": 77.5,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0068",
+   "overall": 70.0,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0069",
+   "overall": 53.8,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0070",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0071",
+   "overall": 68.8,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0072",
+   "overall": 82.5,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0073",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0074",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0075",
+   "overall": 76.2,
+   "severity": 11,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0076",
+   "overall": 81.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0077",
+   "overall": 88.8,
+   "severity": 3,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0078",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0079",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0080",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0081",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0082",
+   "overall": 53.8,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0083",
+   "overall": 71.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0084",
+   "overall": 76.2,
+   "severity": 8,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0085",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0086",
+   "overall": 76.2,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0087",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0088",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0089",
+   "overall": 51.2,
+   "severity": 16,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0090",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0091",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0092",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0093",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0094",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0095",
+   "overall": 32.5,
+   "severity": 11,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0096",
+   "overall": 86.2,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0097",
+   "overall": 80.0,
+   "severity": 2,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0098",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0099",
+   "overall": 71.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0100",
+   "overall": 73.8,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0101",
+   "overall": 71.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0102",
+   "overall": 63.7,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0103",
+   "overall": 86.2,
+   "severity": 6,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0104",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0105",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0106",
+   "overall": 81.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0107",
+   "overall": 47.5,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0108",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0109",
+   "overall": 81.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0110",
+   "overall": 66.2,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0111",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0112",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0113",
+   "overall": 71.2,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0114",
+   "overall": 65.0,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0115",
+   "overall": 63.7,
+   "severity": 16,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0116",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0117",
+   "overall": 58.8,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0118",
+   "overall": 83.8,
+   "severity": 2,
+   "codes": [
+    "FAQ_ONLY_PRICE"
+   ]
+  },
+  {
+   "id": "p7-0119",
+   "overall": 45.0,
+   "severity": 22,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0120",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0121",
+   "overall": 92.5,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0122",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0123",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0124",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0125",
+   "overall": 60.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0126",
+   "overall": 70.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0127",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0128",
+   "overall": 53.8,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0129",
+   "overall": 57.5,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0130",
+   "overall": 70.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0131",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0132",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0133",
+   "overall": 80.0,
+   "severity": 2,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0134",
+   "overall": 53.8,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0135",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0136",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0137",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0138",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0139",
+   "overall": 60.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0140",
+   "overall": 71.2,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0141",
+   "overall": 83.8,
+   "severity": 2,
+   "codes": [
+    "FAQ_ONLY_PRICE"
+   ]
+  },
+  {
+   "id": "p7-0142",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0143",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0144",
+   "overall": 63.7,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0145",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0146",
+   "overall": 63.7,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0147",
+   "overall": 68.8,
+   "severity": 11,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0148",
+   "overall": 76.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0149",
+   "overall": 53.8,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0150",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0151",
+   "overall": 58.8,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0152",
+   "overall": 76.2,
+   "severity": 7,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0153",
+   "overall": 51.2,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0154",
+   "overall": 57.5,
+   "severity": 20,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0155",
+   "overall": 76.2,
+   "severity": 14,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0156",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0157",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0158",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0159",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0160",
+   "overall": 60.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0161",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0162",
+   "overall": 76.2,
+   "severity": 8,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0163",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0164",
+   "overall": 55.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0165",
+   "overall": 67.5,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0166",
+   "overall": 86.2,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0167",
+   "overall": 83.8,
+   "severity": 3,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0168",
+   "overall": 57.5,
+   "severity": 17,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0169",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0170",
+   "overall": 70.0,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0171",
+   "overall": 72.5,
+   "severity": 11,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0172",
+   "overall": 62.5,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0173",
+   "overall": 70.0,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0174",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0175",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0176",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0177",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0178",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0179",
+   "overall": 57.5,
+   "severity": 19,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0180",
+   "overall": 73.8,
+   "severity": 8,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0181",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0182",
+   "overall": 76.2,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0183",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0184",
+   "overall": 41.2,
+   "severity": 14,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0185",
+   "overall": 63.7,
+   "severity": 6,
+   "codes": [
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0186",
+   "overall": 76.2,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0187",
+   "overall": 70.0,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0188",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0189",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0190",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0191",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0192",
+   "overall": 70.0,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0193",
+   "overall": 70.0,
+   "severity": 18,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0194",
+   "overall": 81.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0195",
+   "overall": 72.5,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0196",
+   "overall": 72.5,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0197",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0198",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0199",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0200",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0201",
+   "overall": 66.2,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0202",
+   "overall": 92.5,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0203",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0204",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0205",
+   "overall": 71.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0206",
+   "overall": 16.2,
+   "severity": 23,
+   "codes": [
+    "EMPTY_REPLY",
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0207",
+   "overall": 88.8,
+   "severity": 3,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0208",
+   "overall": 83.8,
+   "severity": 2,
+   "codes": [
+    "FAQ_ONLY_PRICE"
+   ]
+  },
+  {
+   "id": "p7-0209",
+   "overall": 88.8,
+   "severity": 3,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0210",
+   "overall": 51.2,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0211",
+   "overall": 60.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0212",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0213",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0214",
+   "overall": 77.5,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0215",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0216",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0217",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0218",
+   "overall": 76.2,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0219",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0220",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0221",
+   "overall": 63.7,
+   "severity": 10,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0222",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0223",
+   "overall": 61.3,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0224",
+   "overall": 76.2,
+   "severity": 11,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0225",
+   "overall": 63.7,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0226",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0227",
+   "overall": 58.8,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0228",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0229",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0230",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0231",
+   "overall": 70.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0232",
+   "overall": 76.2,
+   "severity": 11,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0233",
+   "overall": 76.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0234",
+   "overall": 60.0,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0235",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0236",
+   "overall": 38.8,
+   "severity": 17,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0237",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0238",
+   "overall": 92.5,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0239",
+   "overall": 76.2,
+   "severity": 11,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0240",
+   "overall": 32.5,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0241",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0242",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0243",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0244",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0245",
+   "overall": 76.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0246",
+   "overall": 82.5,
+   "severity": 3,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "NO_VIDEOCALL_FOR_BUYER"
+   ]
+  },
+  {
+   "id": "p7-0247",
+   "overall": 70.0,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0248",
+   "overall": 80.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0249",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0250",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0251",
+   "overall": 71.2,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0252",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0253",
+   "overall": 62.5,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0254",
+   "overall": 72.5,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0255",
+   "overall": 72.5,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0256",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0257",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0258",
+   "overall": 86.2,
+   "severity": 5,
+   "codes": [
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0259",
+   "overall": 88.8,
+   "severity": 3,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0260",
+   "overall": 68.8,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0261",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0262",
+   "overall": 86.2,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0263",
+   "overall": 51.2,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0264",
+   "overall": 72.5,
+   "severity": 16,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0265",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0266",
+   "overall": 72.5,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0267",
+   "overall": 73.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0268",
+   "overall": 90.0,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0269",
+   "overall": 65.0,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "FAQ_ONLY_PRICE",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0270",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0271",
+   "overall": 57.5,
+   "severity": 9,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0272",
+   "overall": 63.7,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0273",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0274",
+   "overall": 71.2,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0275",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0276",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0277",
+   "overall": 83.8,
+   "severity": 3,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0278",
+   "overall": 83.8,
+   "severity": 2,
+   "codes": [
+    "FAQ_ONLY_PRICE"
+   ]
+  },
+  {
+   "id": "p7-0279",
+   "overall": 66.2,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "NO_VIDEOCALL_FOR_BUYER"
+   ]
+  },
+  {
+   "id": "p7-0280",
+   "overall": 51.2,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0281",
+   "overall": 67.5,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0282",
+   "overall": 80.0,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0283",
+   "overall": 78.8,
+   "severity": 5,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0284",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0285",
+   "overall": 63.7,
+   "severity": 22,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0286",
+   "overall": 66.2,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "NO_VIDEOCALL_FOR_BUYER"
+   ]
+  },
+  {
+   "id": "p7-0287",
+   "overall": 60.0,
+   "severity": 14,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0288",
+   "overall": 51.2,
+   "severity": 15,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0289",
+   "overall": 68.8,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0290",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0291",
+   "overall": 72.5,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0292",
+   "overall": 88.8,
+   "severity": 3,
+   "codes": [
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0293",
+   "overall": 66.2,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0294",
+   "overall": 68.8,
+   "severity": 14,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0295",
+   "overall": 51.2,
+   "severity": 9,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0296",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0297",
+   "overall": 70.0,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0298",
+   "overall": 80.0,
+   "severity": 2,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0299",
+   "overall": 77.5,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0300",
+   "overall": 63.7,
+   "severity": 8,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED"
+   ]
+  },
+  {
+   "id": "p7-0301",
+   "overall": 86.2,
+   "severity": 2,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0302",
+   "overall": 71.2,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0303",
+   "overall": 66.2,
+   "severity": 7,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0304",
+   "overall": 76.2,
+   "severity": 4,
+   "codes": [
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0305",
+   "overall": 96.2,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0306",
+   "overall": 70.0,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0307",
+   "overall": 61.3,
+   "severity": 6,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0308",
+   "overall": 71.2,
+   "severity": 6,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0309",
+   "overall": 70.0,
+   "severity": 12,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0310",
+   "overall": 66.2,
+   "severity": 9,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0311",
+   "overall": 86.2,
+   "severity": 1,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0312",
+   "overall": 60.0,
+   "severity": 8,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT"
+   ]
+  },
+  {
+   "id": "p7-0313",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0314",
+   "overall": 73.8,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0315",
+   "overall": 71.2,
+   "severity": 4,
+   "codes": [
+    "EMPTY_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0316",
+   "overall": 80.0,
+   "severity": 3,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0317",
+   "overall": 70.0,
+   "severity": 5,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY"
+   ]
+  },
+  {
+   "id": "p7-0318",
+   "overall": 57.5,
+   "severity": 9,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0319",
+   "overall": 70.0,
+   "severity": 13,
+   "codes": [
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  }
+ ],
+ "worst": [
+  {
+   "persona": {
+    "id": "p7-0206",
+    "language": "es_ar",
+    "country": "Argentina, Buenos Aires",
+    "name": "Florencia",
+    "experience": "none",
+    "group_size": 4,
+    "budget": "premium",
+    "objection": "family",
+    "style": "voice_note",
+    "intent": "price_shopper",
+    "max_turns": 10,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 16.2,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 1.0,
+    "rules": 1.0,
+    "sales": 4.0,
+    "language": 1.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1100",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1800",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not incl",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 2,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1100",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 2,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1800",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not incl",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "Or from USD 1100 to USD 1800 if you buy it on your own.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] eh hola quería info del aconcagua o sea nada bueno eso\n[0] NICO: ¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n        Si te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.\n[1] CLIENTE: [audio transcrito] eh y cuánto sale o sea nada bueno eso\n[1] NICO: PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1100 to USD 1800 if you buy it on your own.\n[2] CLIENTE: [audio transcrito] eh vamos 4 con mi grupo, la idea es diciembre o sea nada bueno eso\n[2] NICO: PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1100 to USD 1800 if you buy it on your own.\n        Si querés, pasame tu email y te mando el detalle completo con precios y fechas.\n[3] CLIENTE: [audio transcrito] eh nunca subí más de 3000 metros o sea nada bueno eso\n[3] NICO: PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1100 to USD 1800 if you buy it on your own.\n[4] CLIENTE: [audio transcrito] eh mi mail es florencia0206@examplecom o sea nada bueno eso\n[4] NICO: (no respondió)\n[5] CLIENTE: [audio transcrito] eh uff es caro, no tienen algún descuento o sea nada bueno eso\n[5] NICO: (no respondió)\n[6] CLIENTE: [audio transcrito] eh qué incluye el permiso está incluido o sea nada bueno eso\n[6] NICO: Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027): 18+2 DÍAS | NORMAL EXTENDIDO (recomendado) Nov 14, 22 Dic 1, 4, 20, 27 Ene 2, 10 |\n[7] CLIENTE: [audio transcrito] eh lo tengo que hablar con mi señora antes o sea nada bueno eso\n[7] NICO: (no respondió)\n[8] CLIENTE: [audio transcrito] eh dale, lo pienso y te escribo o sea nada bueno eso\n[8] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0240",
+    "language": "en",
+    "country": "Australia, Sydney",
+    "name": "Emily",
+    "experience": "none",
+    "group_size": 3,
+    "budget": "premium",
+    "objection": "none",
+    "style": "voice_note",
+    "intent": "off_season",
+    "max_turns": 9,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 32.5,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 1.0,
+    "rules": 2.0,
+    "sales": 4.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "text": "[audio transcrito] uh my email is emily0240@examplecom like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "[audio transcrito] uh what departure dates do you have like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "[audio transcrito] uh thanks like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "OFF_SEASON_NOT_EXPLAINED",
+     "turn": 6,
+     "text": "",
+     "detail": "",
+     "severity": 2,
+     "dimension": "accuracy"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] uh hello, can you tell me about your aconcagua expeditions like yeah that's it\n[0] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[1] CLIENTE: [audio transcrito] uh can we go in july like yeah that's it\n[1] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[2] CLIENTE: [audio transcrito] uh we are 3 friends from utrecht, thinking about january like yeah that's it\n[2] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[3] CLIENTE: [audio transcrito] uh i've never been above 3,000 m like yeah that's it\n[3] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[4] CLIENTE: [audio transcrito] uh my email is emily0240@examplecom like yeah that's it\n[4] NICO: (no respondió)\n[5] CLIENTE: [audio transcrito] uh what departure dates do you have like yeah that's it\n[5] NICO: (no respondió)\n[6] CLIENTE: [audio transcrito] uh thanks like yeah that's it\n[6] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0095",
+    "language": "en",
+    "country": "Germany, Munich",
+    "name": "Hannah",
+    "experience": "kilimanjaro",
+    "group_size": 6,
+    "budget": "premium",
+    "objection": "price",
+    "style": "voice_note",
+    "intent": "payment_methods",
+    "max_turns": 10,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 32.5,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 2.0,
+    "rules": 1.0,
+    "sales": 4.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "text": "[audio transcrito] uh my email is hannah0095@examplecom like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "[audio transcrito] uh how do i pay can i use a credit card and keep the promo price like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "[audio transcrito] uh how much is the deposit and when is the balance due like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 9,
+     "text": "[audio transcrito] uh thanks like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] uh hello, can you tell me about your aconcagua expeditions like yeah that's it\n[0] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[1] CLIENTE: [audio transcrito] uh how much does it cost like yeah that's it\n[1] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[2] CLIENTE: [audio transcrito] uh we are 6 friends from bangalore, thinking about december like yeah that's it\n[2] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[3] CLIENTE: [audio transcrito] uh i climbed kilimanjaro last year like yeah that's it\n[3] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[4] CLIENTE: [audio transcrito] uh my email is hannah0095@examplecom like yeah that's it\n[4] NICO: (no respondió)\n[5] CLIENTE: [audio transcrito] uh how do i pay can i use a credit card and keep the promo price like yeah that's it\n[5] NICO: (no respondió)\n[6] CLIENTE: [audio transcrito] uh how much is the deposit and when is the balance due like yeah that's it\n[6] NICO: (no respondió)\n[7] CLIENTE: [audio transcrito] uh can i pay in crypto like yeah that's it\n[7] NICO: The price is USD 7,250, and some departures have a promotion between USD 5,990 and USD 6,390 depending on the spots left on each date. You can reserve your spot with a small deposit.\n[8] CLIENTE: [audio transcrito] uh that's expensive, any discount like yeah that's it\n[8] NICO: FLY IN You may arrive in Mendoza (MDZ Airport): until Day 1 at 11 AM for Extended programs of 17-18 + 2 extra days until Day 1 at 8 AM for Fast or Extreme itineraries of 12-14 + 2 extra days We recommend coming 1-2 days before Day 1 if you need to Rent Gear.\n[9] CLIENTE: [audio transcrito] uh thanks like yeah that's it\n[9] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0236",
+    "language": "es_ar",
+    "country": "Uruguay, Montevideo",
+    "name": "Martín",
+    "experience": "none",
+    "group_size": 2,
+    "budget": "flexible",
+    "objection": "family",
+    "style": "voice_note",
+    "intent": "off_season",
+    "max_turns": 10,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 38.8,
+   "scores": {
+    "humanness": 3.0,
+    "accuracy": 3.0,
+    "rules": 1.0,
+    "sales": 4.0,
+    "language": 1.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 0,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 1,
+     "text": "[audio transcrito] eh se puede ir en julio o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n\nSi querés, pasame tu email y te mando el detalle completo con ",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "text": "[audio transcrito] eh qué fechas de salida tienen o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "[audio transcrito] eh lo tengo que hablar con mi señora antes o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "[audio transcrito] eh gracias o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] eh buenas, estoy viendo lo del aconcagua o sea nada bueno eso\n[0] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[1] CLIENTE: [audio transcrito] eh se puede ir en julio o sea nada bueno eso\n[1] NICO: (no respondió)\n[2] CLIENTE: [audio transcrito] eh somos 2 amigos de montevideo y queremos ir en febrero o sea nada bueno eso\n[2] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n        Si querés, pasame tu email y te mando el detalle completo con precios y fechas.\n[3] CLIENTE: [audio transcrito] eh nunca subí más de 3000 metros o sea nada bueno eso\n[3] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[4] CLIENTE: [audio transcrito] eh qué fechas de salida tienen o sea nada bueno eso\n[4] NICO: (no respondió)\n[5] CLIENTE: [audio transcrito] eh lo tengo que hablar con mi señora antes o sea nada bueno eso\n[5] NICO: (no respondió)\n[6] CLIENTE: [audio transcrito] eh gracias o sea nada bueno eso\n[6] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0055",
+    "language": "en",
+    "country": "Canada, Vancouver",
+    "name": "Priya",
+    "experience": "none",
+    "group_size": 2,
+    "budget": "flexible",
+    "objection": "price",
+    "style": "normal",
+    "intent": "payment_methods",
+    "max_turns": 7,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 38.8,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 2.0,
+    "rules": 2.0,
+    "sales": 4.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "text": "How do I pay? Can I use a credit card and keep the promo price?",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "How much is the deposit and when is the balance due?",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "Can I pay in crypto?",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: Hello, can you tell me about your Aconcagua expeditions?\n[0] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[1] CLIENTE: How much does it cost?\n[1] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[2] CLIENTE: We are 2 friends from Sydney, thinking about December\n[2] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[3] CLIENTE: I've never been above 3,000 m\n[3] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[4] CLIENTE: How do I pay? Can I use a credit card and keep the promo price?\n[4] NICO: (no respondió)\n[5] CLIENTE: How much is the deposit and when is the balance due?\n[5] NICO: (no respondió)\n[6] CLIENTE: Can I pay in crypto?\n[6] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0184",
+    "language": "es_ar",
+    "country": "Argentina, Rosario",
+    "name": "Lucía",
+    "experience": "trekking_4000",
+    "group_size": 1,
+    "budget": "premium",
+    "objection": "dates",
+    "style": "voice_note",
+    "intent": "payment_methods",
+    "max_turns": 4,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 41.2,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 1.0,
+    "rules": 5.0,
+    "sales": 4.0,
+    "language": 1.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1100",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1800",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not incl",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 3,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1100",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "FAQ_ONLY_PRICE",
+     "turn": 3,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from US",
+     "detail": "USD 1800",
+     "severity": 1,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not incl",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Or from USD 1100 to USD 1800 if you buy it on your own.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] eh hola quería info del aconcagua o sea nada bueno eso\n[0] NICO: ¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n        Si te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.\n[1] CLIENTE: [audio transcrito] eh y cuánto sale o sea nada bueno eso\n[1] NICO: PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1100 to USD 1800 if you buy it on your own.\n[2] CLIENTE: [audio transcrito] eh voy solo, la idea es ir en febrero o sea nada bueno eso\n[2] NICO: Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027): 18+2 DÍAS | NORMAL EXTENDIDO (recomendado) Nov 14, 22 Dic 1, 4, 20, 27 Ene 2, 10 |\n        Si querés, pasame tu email y te mando el detalle completo con precios y fechas.\n[3] CLIENTE: [audio transcrito] eh hice el lanín y algunos trekkings de 4000 o sea nada bueno eso\n[3] NICO: PRICE It varies from USD 650 to USD 1400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1100 to USD 1800 if you buy it on your own."
+  },
+  {
+   "persona": {
+    "id": "p7-0119",
+    "language": "es_neutro",
+    "country": "Colombia, Medellín",
+    "name": "María",
+    "experience": "trekking_4000",
+    "group_size": 6,
+    "budget": "tight",
+    "objection": "none",
+    "style": "code_switch",
+    "intent": "private_expedition",
+    "max_turns": 9,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 45.0,
+   "scores": {
+    "humanness": 3.0,
+    "accuracy": 2.0,
+    "rules": 3.0,
+    "sales": 4.0,
+    "language": 1.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 1,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "text": "I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n\nThere are other alternatives as well. If you'd like, I can list them ",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n\nIf you'd like, send me your email and I'll share the full deta",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 4,
+     "text": "Great, got your email. If you want to talk to an advisor later, just let me know.",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 5,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "¿Qué dates de salida tienen? please",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: Buenas tardes, quisiera información sobre la expedición al Aconcagua please\n[0] NICO: ¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n        Si te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.\n[1] CLIENTE: ¿Ofrecen expediciones privadas con guía exclusivo? ¿Cuál es el price? please\n[1] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[2] CLIENTE: Somos 6 personas desde Medellín, pensamos viajar en enero please\n[2] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[3] CLIENTE: He hecho trekkings de varios días hasta 4.000 m please\n[3] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[4] CLIENTE: Mi correo es maria.0119@example.com please\n[4] NICO: Great, got your email. If you want to talk to an advisor later, just let me know.\n[5] CLIENTE: ¿Qué programa me recomienda? please\n[5] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[6] CLIENTE: ¿Qué dates de salida tienen? please\n[6] NICO: (no respondió)\n[7] CLIENTE: Thank you so much please\n[7] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0056",
+    "language": "en",
+    "country": "USA, Denver",
+    "name": "Priya",
+    "experience": "kilimanjaro",
+    "group_size": 1,
+    "budget": "premium",
+    "objection": "fitness_fear",
+    "style": "voice_note",
+    "intent": "price_shopper",
+    "max_turns": 7,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 45.0,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 2.0,
+    "rules": 3.0,
+    "sales": 4.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "text": "[audio transcrito] uh my email is priya0056@examplecom like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "[audio transcrito] uh what's included is the park permit included like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] uh hello, can you tell me about your aconcagua expeditions like yeah that's it\n[0] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[1] CLIENTE: [audio transcrito] uh how much does it cost like yeah that's it\n[1] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[2] CLIENTE: [audio transcrito] uh i'd be going solo, probably in december like yeah that's it\n[2] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[3] CLIENTE: [audio transcrito] uh i climbed kilimanjaro last year like yeah that's it\n[3] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[4] CLIENTE: [audio transcrito] uh my email is priya0056@examplecom like yeah that's it\n[4] NICO: (no respondió)\n[5] CLIENTE: [audio transcrito] uh that's expensive, any discount like yeah that's it\n[5] NICO: FLY IN You may arrive in Mendoza (MDZ Airport): until Day 1 at 11 AM for Extended programs of 17-18 + 2 extra days until Day 1 at 8 AM for Fast or Extreme itineraries of 12-14 + 2 extra days We recommend coming 1-2 days before Day 1 if you need to Rent Gear.\n[6] CLIENTE: [audio transcrito] uh what's included is the park permit included like yeah that's it\n[6] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0107",
+    "language": "pt_br",
+    "country": "Brasil, Belo Horizonte",
+    "name": "Beatriz",
+    "experience": "aconcagua_before",
+    "group_size": 6,
+    "budget": "premium",
+    "objection": "fitness_fear",
+    "style": "terse",
+    "intent": "price_shopper",
+    "max_turns": 10,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 47.5,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 5.0,
+    "rules": 2.0,
+    "sales": 4.0,
+    "language": 1.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 0,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado pt, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 1,
+     "text": "quanto custa?",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado pt, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 4,
+     "text": "Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027): 18+2",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "do parque está incluída?",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "não estar preparado fisicamente",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: fazem expedição ao aconcágua?\n[0] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[1] CLIENTE: quanto custa?\n[1] NICO: (no respondió)\n[2] CLIENTE: queremos ir em janeiro\n[2] NICO: Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027): 18+2 DÍAS | NORMAL EXTENDIDO (recomendado) Nov 14, 22 Dic 1, 4, 20, 27 Ene 2, 10 |\n        Si querés, pasame tu email y te mando el detalle completo con precios y fechas.\n[3] CLIENTE: no aconcágua em 2022\n[3] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[4] CLIENTE: tá caro, tem desconto?\n[4] NICO: Si planeas escalar el Aconcagua, estas son nuestras salidas programadas para la temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027): 18+2 DÍAS | NORMAL EXTENDIDO (recomendado) Nov 14, 22 Dic 1, 4, 20, 27 Ene 2, 10 |\n[5] CLIENTE: do parque está incluída?\n[5] NICO: (no respondió)\n[6] CLIENTE: não estar preparado fisicamente\n[6] NICO: (no respondió)\n[7] CLIENTE: valeu!\n[7] NICO: ¡De nada! Cualquier cosa me escribís por acá."
+  },
+  {
+   "persona": {
+    "id": "p7-0044",
+    "language": "en",
+    "country": "India, Bangalore",
+    "name": "Hannah",
+    "experience": "trekking_4000",
+    "group_size": 6,
+    "budget": "tight",
+    "objection": "dates",
+    "style": "voice_note",
+    "intent": "off_season",
+    "max_turns": 9,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 48.8,
+   "scores": {
+    "humanness": 3.0,
+    "accuracy": 1.0,
+    "rules": 3.0,
+    "sales": 4.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "[audio transcrito] uh what departure dates do you have like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 6,
+     "text": "If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 D",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 7,
+     "text": "[audio transcrito] uh thanks like yeah that's it",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "OFF_SEASON_NOT_EXPLAINED",
+     "turn": 7,
+     "text": "",
+     "detail": "",
+     "severity": 2,
+     "dimension": "accuracy"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] uh hello, can you tell me about your aconcagua expeditions like yeah that's it\n[0] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[1] CLIENTE: [audio transcrito] uh can we go in july like yeah that's it\n[1] NICO: Usually, 30-44lbs (14-20Kg), it will depend on the personal equipment of each one. The loads are divided into two parts: Up to 4300m/14000ft (Plaza de Mulas / Plaza Argentina) From 4300m/14000ft (high camps)\n[2] CLIENTE: [audio transcrito] uh we are 6 friends from bangalore, thinking about december like yeah that's it\n[2] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[3] CLIENTE: [audio transcrito] uh i've done multi-day treks up to 4,000 m like yeah that's it\n[3] NICO: FLY IN You may arrive in Mendoza (MDZ Airport): until Day 1 at 11 AM for Extended programs of 17-18 + 2 extra days until Day 1 at 8 AM for Fast or Extreme itineraries of 12-14 + 2 extra days We recommend coming 1-2 days before Day 1 if you need to Rent Gear.\n[4] CLIENTE: [audio transcrito] uh my email is hannah0044@examplecom like yeah that's it\n[4] NICO: The price is USD 7,250, and some departures have a promotion between USD 5,990 and USD 6,390 depending on the spots left on each date. You can reserve your spot with a small deposit.\n[5] CLIENTE: [audio transcrito] uh what departure dates do you have like yeah that's it\n[5] NICO: (no respondió)\n[6] CLIENTE: [audio transcrito] uh those dates don't work for me, any others like yeah that's it\n[6] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n[7] CLIENTE: [audio transcrito] uh thanks like yeah that's it\n[7] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0089",
+    "language": "es_ar",
+    "country": "Argentina, Mendoza",
+    "name": "Martín",
+    "experience": "none",
+    "group_size": 4,
+    "budget": "tight",
+    "objection": "dates",
+    "style": "voice_note",
+    "intent": "private_expedition",
+    "max_turns": 10,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 51.2,
+   "scores": {
+    "humanness": 3.0,
+    "accuracy": 5.0,
+    "rules": 1.0,
+    "sales": 4.0,
+    "language": 1.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 0,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 1,
+     "text": "[audio transcrito] eh queremos una expedición privada, con guía solo para nosotros cuánto sale o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n\nSi querés, pasame tu email y te mando el detalle completo con ",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "text": "Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario",
+     "detail": "esperado es, detectado en",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "text": "[audio transcrito] eh mi mail es martin0089@examplecom o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "text": "[audio transcrito] eh qué programa nos conviene o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "text": "[audio transcrito] eh qué fechas de salida tienen o sea nada bueno eso",
+     "detail": "",
+     "severity": 1,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: [audio transcrito] eh buenas, estoy viendo lo del aconcagua o sea nada bueno eso\n[0] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[1] CLIENTE: [audio transcrito] eh queremos una expedición privada, con guía solo para nosotros cuánto sale o sea nada bueno eso\n[1] NICO: (no respondió)\n[2] CLIENTE: [audio transcrito] eh vamos 4 con mi grupo, la idea es diciembre o sea nada bueno eso\n[2] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n        Si querés, pasame tu email y te mando el detalle completo con precios y fechas.\n[3] CLIENTE: [audio transcrito] eh nunca subí más de 3000 metros o sea nada bueno eso\n[3] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[4] CLIENTE: [audio transcrito] eh mi mail es martin0089@examplecom o sea nada bueno eso\n[4] NICO: (no respondió)\n[5] CLIENTE: [audio transcrito] eh qué programa nos conviene o sea nada bueno eso\n[5] NICO: (no respondió)\n[6] CLIENTE: [audio transcrito] eh qué fechas de salida tienen o sea nada bueno eso\n[6] NICO: (no respondió)\n[7] CLIENTE: [audio transcrito] eh en esas fechas no puedo, hay otras o sea nada bueno eso\n[7] NICO: El precio es USD 7.250, y algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según los lugares libres de cada fecha. Se puede reservar con un pequeño anticipo.\n[8] CLIENTE: [audio transcrito] eh dale, lo pienso y te escribo o sea nada bueno eso\n[8] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0030",
+    "language": "en",
+    "country": "Netherlands, Utrecht",
+    "name": "Hannah",
+    "experience": "trekking_4000",
+    "group_size": 2,
+    "budget": "flexible",
+    "objection": "dates",
+    "style": "burst",
+    "intent": "off_season",
+    "max_turns": 10,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 51.2,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 1.0,
+    "rules": 5.0,
+    "sales": 4.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "juez offline: puntajes derivados de los chequeos deterministas",
+   "findings": [
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 0,
+     "text": "12+2 (recommended)",
+     "detail": "",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "Yes, however, availability and proper quality are not guaranteed.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "We strongly recommend renting in advance to guarantee availability and adequate quality.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 5,
+     "text": "The Normal Route 18+2 days program offers the best chances of reaching the summit, especially as a Private expedition, where everything is tailored to your pace",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 5,
+     "text": "If you arrive already acclimatized from climbing another peak above 5,000 m.a.s.l.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 6,
+     "text": "If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 D",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "OFF_SEASON_NOT_EXPLAINED",
+     "turn": 7,
+     "text": "",
+     "detail": "",
+     "severity": 2,
+     "dimension": "accuracy"
+    }
+   ],
+   "violations": [],
+   "transcript": "[0] CLIENTE: Hello,\n[0] CLIENTE: can you tell me about your Aconcagua expeditions?\n[0] NICO: Hi! Thanks for reaching out. How can I help?\n        If it's useful, besides answering here I can email you all the info: prices, dates, services, gear list and recommendations.\n[0] NICO: I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n        There are other alternatives as well. If you'd like, I can list them in detail.\n[1] CLIENTE: Can we go in July?\n[1] NICO: Yes, however, availability and proper quality are not guaranteed. We strongly recommend renting in advance to guarantee availability and adequate quality.\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[2] CLIENTE: We are 2 friends from Sydney,\n[2] CLIENTE: thinking about January\n[2] NICO: Yes, however, availability and proper quality are not guaranteed. We strongly recommend renting in advance to guarantee availability and adequate quality.\n[2] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n[3] CLIENTE: I've done multi-day treks\n[3] CLIENTE: up to 4,000 m\n[3] NICO: (no respondió)\n[3] NICO: The Normal Route 18+2 days program offers the best chances of reaching the summit, especially as a Private expedition, where everything is tailored to your pace and needs. If you arrive already acclimatized from climbing another peak above 5,000 m.a.s.l.\n[4] CLIENTE: My email is hannah.0030@example.com\n[4] NICO: Great, got your email. If you want to talk to an advisor later, just let me know.\n[5] CLIENTE: What departure dates\n[5] CLIENTE: do you have?\n[5] NICO: The Normal Route 18+2 days program offers the best chances of reaching the summit, especially as a Private expedition, where everything is tailored to your pace and needs. If you arrive already acclimatized from climbing another peak above 5,000 m.a.s.l.\n[5] NICO: Please visit: training comments to climb Aconcagua Principio del formulario Final del formulario\n[6] CLIENTE: Those dates don't work for me,\n[6] CLIENTE: any others?\n[6] NICO: If you're planning to climb Aconcagua, these are our scheduled departures for the 2026/27 season (November and December 2026; January and February 2027): 18+2 DAYS | NORMAL EXTENDED (recommended) Nov 14, 22 Dec 1, 4, 20, 27 Jan 2, 10, 31\n[6] NICO: The prices are the same in any open expedition, no matter how many days it takes, so there are no savings when doing a short program, while the primary services are the same for all open expeditions.\n[7] CLIENTE: Thanks!\n[7] NICO: You're welcome! Message me here anytime."
+  }
+ ]
+}
