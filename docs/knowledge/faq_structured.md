@@ -32,11 +32,11 @@
 - [Programas e itinerarios](#programas) (12)
 - [Precios, reserva y pago](#precios) (3)
 - [Fechas de salida](#fechas) (1)
-- [Temporada y clima](#temporada) (2)
+- [Temporada y clima](#temporada) (3)
 - [Qué incluye y qué no](#incluye) (3)
 - [Servicios opcionales](#opcionales) (3)
 - [Treks](#treks) (2)
-- [Logística (vuelos, hotel, equipaje, comunicación)](#logistica) (6)
+- [Logística (vuelos, hotel, equipaje, comunicación)](#logistica) (7)
 - [Permiso del Parque y seguro](#permiso-y-seguro) (4)
 - [Requisitos (experiencia, edad, documentos)](#requisitos) (4)
 - [Equipo](#equipo) (10)
@@ -151,14 +151,21 @@ Note: Meals (breakfast, lunch, and dinner) are included in Penitentes and on the
 
 ### ¿Qué diferencia hay entre la Ruta Normal y la del Glaciar Polaco?
 
-`ruta-normal-vs-polaco` · en: faq-003 · fuente: faq-web · confianza: web
+`ruta-normal-vs-polaco` · en: faq-003, es: faq-084 · fuente: faq-web · confianza: web
 
 También preguntan: ¿Qué ruta es más fácil? · Ruta normal o 360, ¿cuál me conviene? · Diferença entre a via normal e a do glaciar polonês
+
+**EN** — What's the difference between Normal and Polish routes?
 
 The Normal Route (typically 11–20 days) is slightly easier and, in general, offers better chances of reaching the summit. This is mainly because it is shorter and usually benefits from more stable weather conditions—especially on the Extended itinerary (18+2 days), which allows for better acclimatization.  
 This route also offers the unique opportunity to summit two peaks: Mt. Bonete (16,702 ft / 5,091 m) and Mt. Aconcagua (22,834 ft / 6,962 m).  
 In addition, the Normal Route provides options for a Fast Ascent (14+2 days) or an Extreme Ascent (12+2 days), designed for well-trained and properly acclimatized climbers seeking a more demanding challenge.  
 On the other hand, the 360° Polish Glacier Traverse route (17+2 days), also known as the “Two Faces” or “False Polish” route, is less traveled and more demanding. It involves longer distances, colder conditions, and greater exposure to severe weather—particularly the strong “white winds.” Reaching Base Camp (Plaza Argentina) requires more time and energy, making this route a more committing and physically demanding experience.  
+
+**ES** — ¿Qué diferencia hay entre la Ruta Normal y la del Glaciar Polaco?
+
+La Ruta Normal es un poco más fácil y en general da más chances de cumbre: es más corta y suele tener un clima más estable, sobre todo en el 18+2 Extendido, que permite aclimatar mejor. Además permite hacer dos cumbres: el cerro Bonete (5.091 m) y el Aconcagua (6.962 m). Sobre esta ruta están también el Ascenso Rápido (14+2) y el Extremo (12+2), solo para escaladores muy entrenados que ya estuvieron por encima de 6.000 m.  
+La travesía 360° por el Glaciar Polaco (17+2), también llamada "Dos caras" o "Falso Polaco", es menos transitada y más exigente: más distancia, más frío y más exposición al viento blanco. Llegar al campamento base (Plaza Argentina) lleva más tiempo y energía.  
 
 ### ¿Qué diferencia hay entre una expedición abierta y una privada?
 
@@ -174,13 +181,21 @@ Private expeditions start at USD 7,990 per person. Open expeditions don't have a
 
 ### ¿Qué diferencia hay entre el programa extendido y los cortos?
 
-`extendido-vs-corto` · en: faq-005 · fuente: faq-web · confianza: web
+`extendido-vs-corto` · en: faq-005, es: faq-085 · fuente: faq-web · confianza: web
 
 También preguntan: ¿Conviene el extendido o el rápido? · Why the long itinerary instead of the short one? · Programa longo ou curto?
+
+**EN** — What's the difference between extended and short itineraries?
 
 We always recommend extended itineraries, as the additional days for rest and acclimatization significantly increase your chances of reaching the Summit.  
 The 12+2 days Extreme Ascent and 14+2 days Fast Ascent programs on the Normal Route are designed for experienced climbers who are well-trained, properly acclimatized, and have limited time. These options offer a more demanding, faster-paced challenge.  
 By choosing a Fast or Extreme Ascent, you will skip key acclimatization hikes such as the trek to Plaza Francia (4,200 m) and the ascent of Mt. Bonete (5,100 m).  
+
+**ES** — ¿Qué diferencia hay entre el programa extendido y los cortos?
+
+Siempre recomendamos el programa extendido: los días de descanso y aclimatación aumentan mucho las chances de cumbre.  
+El 12+2 (Ascenso Extremo) y el 14+2 (Ascenso Rápido) de la Ruta Normal son para escaladores con experiencia, que ya estuvieron por encima de 6.000 m, están muy entrenados, llegan aclimatados y tienen poco tiempo. Saltean las caminatas de aclimatación a Plaza Francia y al cerro Bonete (5.100 m).  
+Todos los programas abiertos cuestan lo mismo.  
 
 ### ¿Qué programa tiene más chances de hacer cumbre?
 
@@ -356,13 +371,21 @@ The above information is intended as a guideline only. However, every effort is 
 
 ### ¿Siempre hay 2 días extra?
 
-`dias-extra` · en: faq-013 · fuente: faq-web · confianza: web
+`dias-extra` · en: faq-013, es: faq-083 · fuente: faq-web · confianza: web
 
 También preguntan: ¿Para qué son los dos días de reserva por mal tiempo? · Weather days · Os dias extras estão sempre incluídos?
+
+**EN** — Are there always 2 extra days?
 
 All open expeditions may add up to two (2) extra days if bad weather conditions prevent the regular itinerary. That's why the itineraries are expressed as 18+2, 17+2, or 12+2 days.  
 These extra days are included on the mountain only. If they are not taken on the mountain, they are not included outside the Park.  
 Private expeditions may have +/- extra days if stated during booking.  
+
+**ES** — ¿Siempre hay 2 días extra?
+
+Todas las expediciones abiertas pueden sumar hasta 2 días extra si el mal tiempo impide seguir el itinerario normal. Por eso los programas se llaman 18+2, 17+2, 14+2 o 12+2.  
+Los días extra están incluidos solo en la montaña: si no se usan, no se pasan a noches fuera del Parque.  
+En las privadas, los días extra se acuerdan al reservar.  
 
 
 <a id="precios"></a>
@@ -487,6 +510,20 @@ Each program is designed for a different level of experience and acclimatization
 <a id="temporada"></a>
 ## Temporada y clima
 
+### ¿Se puede subir fuera de temporada, por ejemplo en invierno?
+
+`fuera-de-temporada` · es: faq-093, en: faq-094 · fuente: Fernando (WhatsApp, oct 2026) · confianza: confirmed
+
+También preguntan: ¿Hacen expediciones en julio o agosto? · ¿Puedo ir en abril? · Do you run expeditions in June? · Dá para subir em julho?
+
+**ES** — ¿Se puede subir fuera de temporada, por ejemplo en invierno?
+
+Las salidas son de noviembre a febrero (temporada de verano del hemisferio sur). Fuera de temporada no tenemos servicios ni expediciones. Si querés, te paso las fechas de la temporada 2026/27.  
+
+**EN** — Can I climb outside the season, for example in winter?
+
+Departures run from November to February (Southern Hemisphere summer season). Outside the season we have no services or expeditions. If you'd like, I can share the dates for the 2026/27 season.  
+
 ### ¿Cuál es la mejor época para subir el Aconcagua?
 
 `mejor-epoca` · en: faq-007 · fuente: faq-web · confianza: web
@@ -523,13 +560,16 @@ In the seasons 2021/22 and 2023/24, all our 42 open expeditions reached the summ
 
 ### ¿Qué servicios están incluidos?
 
-`servicios-incluidos` · en: faq-015 · fuente: faq-web · confianza: web
+`servicios-incluidos` · en: faq-015, es: faq-080 · fuente: faq-web; alineado con lo que incluye según Fernando (oct 2026) · confianza: confirmed
+
+> Nota para el equipo: Se quitó "Group transfer Airport / Hotel on arrival": Fernando dice que los traslados al aeropuerto no están incluidos. Pendiente confirmar si existe el traslado grupal del día 1.
 
 También preguntan: ¿Qué incluye la expedición? · ¿Qué cubre lo que pago? · What does the price include? · O que inclui a expedição?
 
+**EN** — What are the included services?
+
 3 nights out of the Park (Mendoza city / Penitentes)*  
 Assistance for lost luggage recovery  
-Group transfer Airport / Hotel on arrival  
 Hotel in Mendoza (breakfast included)*  
 Luggage care  
 Transfer Mendoza / Penitentes roundtrip  
@@ -557,11 +597,32 @@ Aconcagua Medal
 Aconcagua Summit Certificate  
 *NOTE: Each program takes different camps according to each route. Please, visit  Normal route extended or Fast and 360 Polish route for detailed info. Extreme (12+2 days) itineraries have only one night out of the Park and don't include the trek to Plaza Francia, trek to Horcones glacier, and Mt. Bonete. Special offers and LITE programs may have additional restrictions; please consult us.  
 
+**ES** — ¿Qué servicios están incluidos?
+
+Incluye:  
+- Hotel en Mendoza con desayuno (primera noche, habitación compartida) y noches en Penitentes*  
+- Traslados Mendoza–Penitentes ida y vuelta, y hasta la entrada del Parque ida y vuelta  
+- Alojamiento y comidas en Penitentes (desayuno, almuerzo y cena)  
+- Todas las comidas en la montaña (desayuno, almuerzo y cena)  
+- Mulas de carga ida y vuelta, y ayuda para armar las cargas  
+- Servicios en los campamentos base (Confluencia, Plaza de Mulas, Plaza Argentina según la ruta)  
+- Caminatas de aclimatación a Plaza Francia, al glaciar Horcones y al cerro Bonete (programas extendidos)  
+- Porteadores de equipo común en los campamentos de altura  
+- Guías profesionales  
+- 2 días extra por mal tiempo  
+- Carpas, domos y baños; electricidad en el campamento base; radio  
+- Botiquín de primeros auxilios con oxígeno  
+- Guarda de equipaje, ayuda si se pierde una valija y asistencia en Mendoza  
+- Medalla y certificado de cumbre del Aconcagua  
+*Cada programa usa campamentos distintos según la ruta. El 12+2 tiene una sola noche fuera del Parque y no incluye las caminatas a Plaza Francia, al glaciar Horcones ni al Bonete. Las ofertas especiales pueden tener restricciones.  
+
 ### ¿Qué servicios no están incluidos?
 
-`servicios-no-incluidos` · en: faq-016 · fuente: faq-web · confianza: web
+`servicios-no-incluidos` · en: faq-016, es: faq-081 · fuente: faq-web · confianza: web
 
 También preguntan: ¿Qué tengo que pagar aparte? · ¿Qué no cubre el precio? · What is not included? · O que eu pago à parte?
+
+**EN** — What are the not included services?
 
 Flight tickets  
 Meals and extra nights in Mendoza City -if needed-  
@@ -573,11 +634,26 @@ PayPal and bank transfer fees
 Tips and any other not stated as included  
 Detail of Full expedition programs. Special offers and LITE programs may have additional restrictions; please consult us.  
 
+**ES** — ¿Qué servicios no están incluidos?
+
+No incluye:  
+- Vuelos y traslados al aeropuerto  
+- Comidas y noches extra en Mendoza (salvo el desayuno del hotel)  
+- Permiso de ingreso al Parque  
+- Seguro de rescate (obligatorio)  
+- Equipo personal (bolsa de dormir, aislante, botas, etc.)  
+- Gastos por abandono de la expedición  
+- Porteadores para el equipo personal  
+- Comisiones de PayPal y de transferencia bancaria  
+- Propinas y todo lo que no figure como incluido  
+
 ### ¿Está incluida la noche de regreso?
 
-`noche-de-regreso` · en: faq-028 · fuente: faq-web · confianza: web
+`noche-de-regreso` · en: faq-028, es: faq-086 · fuente: faq-web · confianza: web
 
 También preguntan: ¿La última noche es en Mendoza o en Penitentes? · Return night included? · A noite de volta está incluída?
+
+**EN** — Is the returning night included?
 
 Yes, it's included at the end of the expedition in Penitentes, not in Mendoza City. The expedition ends as follows:  
 Penultimate day (Plaza de Mulas / Penitentes):  
@@ -591,6 +667,13 @@ breakfast
 transfer from Penitentes to Mendoza City  
 end of services  
 Nobody knows when the expedition will end; it's subject to weather conditions and the guide's criteria. The itineraries are a guideline only; 70+ % of our expeditions follow the itineraries, while 30% do not. The expeditions may end sooner or later than the days detailed in the itinerary. The services will always end one day after the group leaves the Park—no compensation nor refunds for early descent.  
+
+**ES** — ¿Está incluida la noche de regreso?
+
+Sí, está incluida, pero en Penitentes, no en Mendoza.  
+Anteúltimo día: bajada desde Plaza de Mulas, traslado de la entrada del Parque a Penitentes, ducha y descanso mientras llegan las mulas con el equipaje, cena y alojamiento en nuestro refugio de Penitentes (desayuno, almuerzo, cena y alojamiento).  
+Último día: desayuno y traslado de Penitentes a Mendoza; ahí terminan los servicios.  
+Nadie sabe de antemano cuándo termina la expedición: depende del clima y del criterio de los guías (alrededor del 70% sigue el itinerario). Los servicios terminan siempre un día después de que el grupo sale del Parque; no hay compensación ni reintegro si se baja antes.  
 
 
 <a id="opcionales"></a>
@@ -749,13 +832,31 @@ Expenses for giving up the expedition.
 <a id="logistica"></a>
 ## Logística (vuelos, hotel, equipaje, comunicación)
 
+### ¿Venden solo logística o servicios sueltos, sin guía?
+
+`logistica-sin-guia` · es: faq-091, en: faq-092 · fuente: Fernando (WhatsApp, oct 2026) · confianza: confirmed
+
+> Nota para el equipo: ¿Derivar a Aconcagua Basecamp (www.aconcaguabasecamp.com), que vende servicios de campamento? Pendiente de Fernando (pendientes, punto 23).
+
+También preguntan: Solo quiero las mulas y el campamento base · Vamos por nuestra cuenta, ¿nos dan servicios en Plaza de Mulas? · Can I book only mules and base camp services? · Vocês vendem só a logística, sem guia?
+
+**ES** — ¿Venden solo logística o servicios sueltos, sin guía?
+
+Esta temporada no vendemos logística suelta ni servicios sin guía, y tampoco reservamos vuelos: solo expediciones guiadas.  
+
+**EN** — Do you sell logistics only or individual services, without a guide?
+
+This season we don't sell logistics only or unguided services, and we don't book flights: only guided expeditions.  
+
 ### ¿Cuándo tengo que llegar a Mendoza y cuándo puedo volver?
 
-`vuelos-llegada-salida` · en: faq-009 · fuente: faq-web; llegada el día anterior y traslados al aeropuerto no incluidos, Fernando (oct 2026) · confianza: confirmed
+`vuelos-llegada-salida` · en: faq-009, es: faq-090 · fuente: faq-web; llegada el día anterior y traslados al aeropuerto no incluidos, Fernando (oct 2026) · confianza: confirmed
 
 > Nota para el equipo: La web decía "llegar hasta las 11 AM del día 1" y que había un traslado grupal aeropuerto-hotel a las 13 h del día 1. Fernando dice llegar el día anterior y que los traslados al aeropuerto no están incluidos. Ver pendientes-para-fernando.md.
 
 También preguntan: ¿Qué día saco el vuelo de ida y de vuelta? · What day do I arrive in Mendoza? · Que dia chego em Mendoza e que dia volto?
+
+**EN** — When should I fly in / out?
 
 FLY IN  
 You have to arrive in Mendoza (MDZ Airport) the day before Day 1 of your program.  
@@ -770,6 +871,15 @@ On Day 19 in the 360 Polish Route (17+2 extra days).
 On Day 16 in the Normal Route Fast itinerary (14+2 extra days)  
 On Day 14 in the Normal Route Extreme itinerary (12+2 extra days).  
 Note: If your expedition has good weather conditions and doesn't take extra days on the mountain, you will be ready to leave 1-2 days before the last itinerary day. Since weather conditions are unpredictable, knowing this in advance is impossible.  
+
+**ES** — ¿Cuándo tengo que llegar a Mendoza y cuándo puedo volver?
+
+LLEGADA  
+Hay que llegar a Mendoza (aeropuerto MDZ) el día anterior al día 1 del programa. Si vas a alquilar equipo, conviene llegar 1 o 2 días antes; también da margen si se cancela un vuelo o se pierde una valija. Las noches extra se pueden reservar con nosotros en el mismo hotel (sujeto a disponibilidad, hasta 30 días antes).  
+Los traslados al aeropuerto no están incluidos; se puede reservar un traslado privado con cargo.  
+REGRESO  
+El vuelo de vuelta se puede sacar desde las 17 h del último día del itinerario: día 20 en el 18+2, día 19 en el 17+2 Polaco, día 16 en el 14+2 y día 14 en el 12+2.  
+Si el clima acompaña y no se usan los días extra, vas a estar listo para salir 1 o 2 días antes, pero eso no se puede saber de antemano.  
 
 ### ¿Hay camas en la montaña?
 
@@ -848,9 +958,11 @@ Terminal Mendoza is only one Bus Station. You may buy bus tickets at www.andesma
 
 ### ¿Cuánto cuesta el permiso del Parque y cómo se tramita?
 
-`permiso-precio-y-tramite` · en: faq-029 · fuente: faq-web · confianza: web
+`permiso-precio-y-tramite` · en: faq-029, es: faq-089 · fuente: faq-web · confianza: web
 
 También preguntan: Valor del permiso de ascenso · Trámite del permiso con 90 días de anticipación · Climbing permit fee · Valor da permissão do parque
+
+**EN** — What's the permit price and procedure?
 
 PRICE  
 It varies from USD 650 to USD 1,400 if you buy it through us, according to the pre-sale -if available-nationality, route, and departure date. It's not included in the expedition price. Or from USD 1,100 to USD 1,800 if you buy it on your own.  
@@ -865,6 +977,13 @@ Permit price
 Plus currency conversion, if correspond  
 Medical certificate  
 Only if required  
+
+**ES** — ¿Cuánto cuesta el permiso del Parque y cómo se tramita?
+
+PRECIO  
+No está incluido en la expedición. Comprándolo a través de Acomara va de USD 650 a USD 1.400, según la preventa (si hay), la nacionalidad, la ruta y la fecha de salida. Por cuenta propia va de USD 1.100 a USD 1.800. El Parque puede cambiar precios y trámite sin aviso.  
+TRÁMITE (90 días antes)  
+Acomara hace todo el trámite sin cargo extra para quien complete, hasta 90 días antes de la salida: los datos del formulario de reserva, una foto del pasaporte (a info@acomara.com), el pago del permiso (más la conversión de moneda si corresponde) y el certificado médico, solo si se lo piden.  
 
 ### ¿Puedo comprar el permiso directamente al Parque por adelantado?
 
@@ -911,9 +1030,11 @@ Disclaimer. Acomara doesn't take responsibility for the permit price and procedu
 
 ### ¿Necesito seguro de rescate?
 
-`seguro-de-rescate` · en: faq-032 · fuente: faq-web · confianza: web
+`seguro-de-rescate` · en: faq-032, es: faq-082 · fuente: faq-web · confianza: web
 
 También preguntan: ¿Qué seguro piden? · Seguro con cobertura de helicóptero hasta 7.000 m · Rescue insurance requirements · Seguro de resgate obrigatório
+
+**EN** — Do I need rescue insurance?
 
 Yes, Rescue Insurance is a mandatory requirement from the Park to cover helicopter evacuation, among other expenses.  
 It has to be stated in the insurance policy: rescue coverage until 7000m / 23000ft and helicopter rescue.  
@@ -922,6 +1043,13 @@ Global Rescue clients just need to show their Policy Number or Card and usually 
 The Park Permit is always for 21 days, so 30 days of coverage are required, regardless of whether the expedition is shorter. Only the Park authorities can Accept/Reject the Insurance Policy, which may take 4+ working days; Acomara can't verify it. 90 days of anticipation is recommended.  
 Click here to hire now  
 DISCLAIMER: Plans and conditions are a copy of July 2023 from Global Rescue Inc. and may vary without notice. All insurance companies try to make excuses and delays and apply small letters in their contracts to avoid coverage. Although Global Rescue may be the best choice, they also make the same while making excuses to avoid coverage. Acomara doesn't take responsibility for insurance coverage.  
+
+**ES** — ¿Necesito seguro de rescate?
+
+Sí. El seguro de rescate es obligatorio para el Parque y no está incluido en la expedición. La póliza tiene que decir que cubre rescate hasta 7.000 m y rescate en helicóptero.  
+El permiso del Parque es siempre por 21 días, así que se piden 30 días de cobertura aunque la expedición sea más corta.  
+Recomendamos Global Rescue: ronda los USD 400, y con mostrar el número de póliza en general no hay que pagar el helicóptero. Con otros seguros a veces hay que pagar el helicóptero y después pedir el reintegro, y el Parque no siempre los aprueba.  
+Solo el Parque acepta o rechaza la póliza (puede tardar 4 días hábiles o más); Acomara no la puede verificar. Conviene contratarlo con 90 días de anticipación.  
 
 
 <a id="requisitos"></a>
@@ -1481,20 +1609,31 @@ Bookings are subject to availability. Please consult us about our refund policy 
 
 ### ¿Hay porteadores incluidos después del campamento base?
 
-`porteadores-incluidos` · en: faq-052 · fuente: faq-web · confianza: web
+`porteadores-incluidos` · en: faq-052, es: faq-088 · fuente: faq-web · confianza: web
 
 También preguntan: ¿Quién lleva carpas y comida a los campamentos de altura? · Are porters included? · Carregadores incluídos?
+
+**EN** — Are porters included after base camp?
 
 Unlike the other companies, we include unlimited porters to carry the tents, cooking equipment, fuel, first aid kit, oxygen tubes, toilet paper, part of the meals, and other elements, including solid waste in all our FULL expeditions. Private and Lite expeditions may have a different porter service.  
 The climbers will collaborate by carrying some food during two acclimatization treks. They have to carry their personal equipment when moving to the three altitude camps only, and if some water is necessary, the water is regularly obtained from the snow melting in each camp; it's unusual to carry water, in the last 25 seasons only two times was necessary to carry some water.  
 Personal porters to carry each person's personal equipment are available only if booked in advance and for an additional charge.  
 Our mules will carry all common and personal equipment to the Base Camps, roundtrip. Since the mules don't go with the climbers, the climbers will have to carry their small daypack to carry the wallet, cell phone, water to drink when walking, lunch for the day, medicines, etc.  
 
+**ES** — ¿Hay porteadores incluidos después del campamento base?
+
+En todas las expediciones completas incluimos porteadores sin límite para el equipo común: carpas, cocina, combustible, botiquín, oxígeno, papel higiénico, parte de la comida y los residuos.  
+Cada escalador colabora llevando algo de comida en dos caminatas de aclimatación y carga su equipo personal solo al subir a los tres campamentos de altura. El agua se obtiene derritiendo nieve en cada campamento.  
+Los porteadores para el equipo personal se contratan aparte y con anticipación.  
+Las mulas llevan todo el equipo hasta los campamentos base, ida y vuelta. Como no van con el grupo, cada uno camina con una mochila chica (billetera, celular, agua, almuerzo, remedios).  
+
 ### ¿De cuántas personas es el grupo y cuántos guías van?
 
-`tamano-de-grupo-y-guias` · en: faq-054 · fuente: faq-web · confianza: web
+`tamano-de-grupo-y-guias` · en: faq-054, es: faq-087 · fuente: faq-web · confianza: web
 
 También preguntan: Cantidad de guías por escalador · Group size and guide ratio · Tamanho do grupo e número de guias
+
+**EN** — What is the group size, and how many guides?
 
 NUMBER OF GUIDES  
 Our expeditions have an average of seven (7) climbers with three (3) highly professional and successfully experienced Guides for the summit attempt.  
@@ -1502,6 +1641,12 @@ While many companies provide only two (2) guides for 8 or 9 climbers, resulting 
 To have a successful expedition is crucial to have the best-qualified professionals. Our guides have at least five (5) years of experience to provide Safety on the treks along the different paths with confidence, conviction, and professionalism. They are English speakers with AAGM or EPGAMT licensing (3-year career) and are legally authorized by the Park authorities.  
 GROUP SIZE  
 We have a maximum of 11 climbers per group. If we have a group of 12 climbers, we split it into two (2) groups of six (6) climbers each. Most guides regularly join the group from the City; however, one guide could join the group for the summit attempt, depending on weather conditions and the guides' logistics.  
+
+**ES** — ¿De cuántas personas es el grupo y cuántos guías van?
+
+Los grupos tienen en promedio 7 escaladores con 3 guías para el intento de cumbre: como máximo 1 guía cada 3 escaladores, y muchas veces mejor. Muchas empresas llevan 2 guías para 8 o 9 personas.  
+El máximo es de 11 escaladores por grupo; con 12, se divide en dos grupos de 6.  
+Los guías tienen al menos 5 años de experiencia, hablan inglés, tienen licencia AAGM o EPGAMT (carrera de 3 años) y están habilitados por el Parque. La mayoría se suma al grupo desde Mendoza; alguno puede sumarse para el intento de cumbre según el clima y la logística.  
 
 ### ¿Cuándo conocemos a los guías del grupo?
 

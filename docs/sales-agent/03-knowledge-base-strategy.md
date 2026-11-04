@@ -31,7 +31,7 @@ Reglas:
 - **Un precio se escribe una vez.** Los textos usan `{price_regular}`; el generador lo formatea por idioma (USD 7.250 en es/pt, USD 7,250 en en). Un test falla si un precio confirmado aparece escrito a mano en otra fuente.
 - **Jerarquía.** `datos-clave` (lo que dijo Fernando) > FAQ `confirmed` > FAQ `web`. Lo `pending` no se publica.
 - **Vigencia.** Valores y salidas tienen `valid_until` (fin de temporada 2026/27). Vencido, el build y los tests fallan: obliga a revisar precios antes de la próxima temporada.
-- **Una entrada = una pregunta.** El FAQ migrado quedó en 73 entradas (antes 63 fragmentos, varios mezclados). Los ids `faq-NNN` viejos se mantienen (el código y los logs los usan); las entradas nuevas toman números nuevos y el duplicado `faq-053` se retiró.
+- **Una entrada = una pregunta.** El FAQ migrado quedó en 73 entradas (75 con las nuevas) (antes 63 fragmentos, varios mezclados). Los ids `faq-NNN` viejos se mantienen (el código y los logs los usan); las entradas nuevas toman números nuevos y el duplicado `faq-053` se retiró.
 - **Multilingüe por metadatos.** La mayoría de las respuestas están solo en inglés (así vienen de la web); cada entrada tiene además la pregunta en español y `also_asked` en es/en/pt. El modelo responde en el idioma del cliente.
 - **Consistencia entre fuentes.** `tests/test_knowledge_base.py` revisa que todo monto en USD que puede leer un cliente (prompt, reglas, FAQ, índice, `estado-nico-para-fernando.md`, frases del código) exista en `fuente/`.
 
@@ -41,14 +41,17 @@ Reglas:
 - Nuevo, opcional: `RETRIEVAL_MODE=hybrid` fusiona el ranking de embeddings con BM25 por palabras clave (RRF). Código en `orchestrator/kb_retrieval.py`.
 - El servidor ahora toma el modelo de embeddings del índice (`embed_model`) y registra un error si las dimensiones no coinciden.
 
-### Benchmark (`scripts/eval_retrieval.py`, 131 preguntas: 65 es, 51 en, 15 pt, con seguimientos)
+### Benchmark (`scripts/eval_retrieval.py`, preguntas etiquetadas es/en/pt con seguimientos)
 
 Por palabras clave (BM25, sin red), 4 de noviembre de 2026:
 
 | Fragmentos | hit@1 | hit@3 | hit@4 | MRR | hit@4 es | hit@4 en | hit@4 pt |
 |---|---|---|---|---|---|---|---|
 | Antes (awk, solo inglés) | 27,5% | 38,9% | 44,3% | 0,353 | 32,3% | 68,6% | 13,3% |
-| Ahora (fuente/ + preguntas es + also_asked) | 69,5% | 84,0% | 88,5% | 0,783 | 93,8% | 82,4% | 86,7% |
+| Con fuente/ + preguntas es + also_asked (131 preguntas) | 69,5% | 84,0% | 88,5% | 0,783 | 93,8% | 82,4% | 86,7% |
+| + 11 respuestas traducidas al español, un fragmento por entrada, 2 entradas nuevas (157 preguntas) | 67,5% | 85,4% | 88,5% | 0,774 | 93,4% | 83,6% | 84,6% |
+
+La segunda tanda suma 26 preguntas más difíciles (más portugués y seguimientos), así que el total no se compara 1 a 1 con la fila anterior: sobre las 131 originales, la misma configuración da 89,3% en hit@4.
 
 Embeddings e híbrido: **pendiente**, necesita `OPENAI_API_KEY` (no estaba en la sesión cloud). Con la clave:
 
@@ -62,4 +65,5 @@ Si híbrido gana a dense en hit@4 sin perder en hit@1, activar `RETRIEVAL_MODE=h
 
 - Respuestas de Fernando: `docs/knowledge/pendientes-para-fernando.md` (contradicciones, datos viejos, preguntas sin respuesta como cancelación y saldo).
 - Cruzar precios, fechas y permisos con `aconcagua-plan-admin` y servicios/treks con `aconcagua-basecamp-web`.
-- Traducir al español las respuestas más consultadas (incluye, no incluye, permiso, seguro, vuelos) cuando Fernando las confirme.
+- Respuestas en español: hoy 18 de 75 entradas tienen versión es (precio, reserva, fechas, Plaza Francia, experiencia, logística sin guía, fuera de temporada, rutas, extendido vs. corto, vuelos, días extra, incluye, no incluye, noche de regreso, permiso, seguro, porteadores, grupo). Seguir con equipo y comida.
+- Las respuestas en es y en de una misma entrada no ocupan dos lugares del top 4: la búsqueda se queda con el mejor fragmento de cada entrada (`kb_retrieval.one_per_entry`).

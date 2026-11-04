@@ -209,3 +209,56 @@
 - {q: "If I quit early, do I get a refund?", lang: en, expect: [abandono-de-la-expedicion]}
 - {q: "¿Qué pasa si alguien se descompone el día de cumbre?", lang: es, expect: [descenso-el-dia-de-cumbre]}
 - {q: "How can I improve my chances of reaching the top?", lang: en, expect: [como-aumentar-chances-de-cumbre, mejor-programa-para-cumbre]}
+
+# --- tanda 2 (nov 2026): más portugués, seguimientos y entradas nuevas ---------------
+- {q: "Somos un grupo que va sin guía, ¿nos venden mulas y carpa en el base?", lang: es, expect: [logistica-sin-guia]}
+- {q: "We want to climb unguided, can we hire your base camp services?", lang: en, expect: [logistica-sin-guia]}
+- {q: "Queremos subir sozinhos, vocês alugam só as mulas?", lang: pt, expect: [logistica-sin-guia]}
+- {q: "¿Se puede hacer el Aconcagua en agosto?", lang: es, expect: [fuera-de-temporada]}
+- {q: "Is it possible to climb in May?", lang: en, expect: [fuera-de-temporada]}
+- {q: "Posso escalar em junho?", lang: pt, expect: [fuera-de-temporada]}
+- {q: "Quanto custa o programa de 14 dias?", lang: pt, expect: [precio-expedicion, programas-cortos-mismo-precio]}
+- {q: "Quais são as formas de pagamento?", lang: pt, expect: [reserva-y-formas-de-pago]}
+- {q: "Qual a diferença entre o programa longo e o rápido?", lang: pt, expect: [extendido-vs-corto, experiencia-y-programa-recomendado]}
+- {q: "Os guias falam inglês?", lang: pt, expect: [tamano-de-grupo-y-guias, guias-formacion]}
+- {q: "Quantas pessoas vão no grupo?", lang: pt, expect: [tamano-de-grupo-y-guias]}
+- {q: "Preciso de visto para a Argentina?", lang: pt, expect: [pasaporte-y-visa]}
+- {q: "Tem banho quente no acampamento?", lang: pt, expect: [servicios-opcionales, como-aumentar-chances-de-cumbre]}
+- {q: "O seguro está incluído?", lang: pt, expect: [seguro-de-rescate, servicios-no-incluidos]}
+- {q: "¿Los vuelos están incluidos?", lang: es, expect: [servicios-no-incluidos, donde-comprar-vuelos]}
+- {q: "Are flights included?", lang: en, expect: [servicios-no-incluidos, donde-comprar-vuelos]}
+- {q: "¿La comida en la montaña está incluida?", lang: es, expect: [servicios-incluidos, menu-regular]}
+- {q: "¿Qué seguro me sirve para el Parque?", lang: es, expect: [seguro-de-rescate]}
+- {q: "¿Cuántos días de cobertura necesita el seguro?", lang: es, expect: [seguro-de-rescate]}
+- {q: "¿Dormimos la última noche en Mendoza?", lang: es, expect: [noche-de-regreso, hotel-en-mendoza]}
+- {q: "¿Los días de mal tiempo se cobran aparte?", lang: es, expect: [dias-extra, dias-extra-no-usados]}
+- q: "¿y para el de 12 días?"
+  lang: es
+  context:
+    - {role: user, text: "¿Cuál es el itinerario del 18+2?"}
+    - {role: assistant, text: "Día 1 Mendoza, día 2 Penitentes, día 3 Confluencia..."}
+  expect: [itinerario-12-2]
+- q: "and do you have something for vegans?"
+  lang: en
+  context:
+    - {role: user, text: "What kind of food do you serve on the mountain?"}
+    - {role: assistant, text: "Breakfast, lunch and dinner are included, prepared by our chefs at base camp."}
+  expect: [menu-vegano]
+- q: "¿y si lo saco yo?"
+  lang: es
+  context:
+    - {role: user, text: "¿Cuánto sale el permiso?"}
+    - {role: assistant, text: "Con Acomara va de USD 650 a USD 1.400 según nacionalidad, ruta y fecha."}
+  expect: [permiso-precio-y-tramite, permiso-comprar-directo-al-parque, permiso-sin-90-dias]
+- q: "E a seguradora, qual vocês recomendam?"
+  lang: pt
+  context:
+    - {role: user, text: "O que não está incluído?"}
+    - {role: assistant, text: "Não estão incluídos voos, permissão do parque, seguro de resgate e equipamento pessoal."}
+  expect: [seguro-de-rescate]
+- q: "¿y cuántos guías van?"
+  lang: es
+  context:
+    - {role: user, text: "¿De cuántas personas son los grupos?"}
+    - {role: assistant, text: "El máximo es 11 escaladores por grupo."}
+  expect: [tamano-de-grupo-y-guias]

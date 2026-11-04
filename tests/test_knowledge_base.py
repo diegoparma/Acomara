@@ -202,6 +202,16 @@ class RetrievalTests(unittest.TestCase):
         hits = kb_retrieval.rank(self.ROWS, ["menú vegano"], [[1.0, 0.1]], top_k=2, mode="hybrid")
         self.assertIn("b", [h["id"] for h in hits])
 
+    def test_one_chunk_per_entry_in_the_evidence(self):
+        # The es and en versions of one answer must not take two of the four slots.
+        rows = [
+            {"id": "x-es", "key": "precio", "question": "precio", "answer": "a", "embedding": [1.0, 0.0]},
+            {"id": "x-en", "key": "precio", "question": "price", "answer": "a", "embedding": [0.99, 0.1]},
+            {"id": "y", "key": "seguro", "question": "seguro", "answer": "b", "embedding": [0.5, 0.5]},
+        ]
+        hits = kb_retrieval.rank(rows, ["x"], [[1.0, 0.0]], top_k=2, mode="dense")
+        self.assertEqual([h["id"] for h in hits], ["x-es", "y"])
+
     def test_size_mismatch_is_logged(self):
         with self.assertLogs("orchestrator.kb_retrieval", level=logging.ERROR):
             kb_retrieval.dense_scores([[1.0, 0.0, 0.0]], [{"embedding": [1.0, 0.0]}])
@@ -235,7 +245,7 @@ class BenchmarkTests(unittest.TestCase):
                 self.assertIn(q["lang"], ("es", "en", "pt"))
 
     def test_keyword_retrieval_does_not_regress(self):
-        # Offline floor (keyword only, measured 88.5% hit@4 on 2026-11-04).
+        # Offline floor (keyword only, measured 88.5% hit@4 on 157 questions, 2026-11-04).
         rows = build_cloud_index.load_chunks()
         report = eval_retrieval.run(rows, eval_retrieval.load_questions(), "keyword", 4)
         self.assertGreaterEqual(report["summary"]["all"]["hit@4"], 0.85)

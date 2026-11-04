@@ -140,6 +140,21 @@ def rrf(rankings: list[list[int]], k: int = 60) -> dict[int, float]:
     return fused
 
 
+def one_per_entry(rows: list[dict[str, Any]], order: list[int]) -> list[int]:
+    """Keep the best chunk of each FAQ entry: the es and en versions of one answer
+    would otherwise take two of the four evidence slots."""
+    seen: set[str] = set()
+    out = []
+    for i in order:
+        key = rows[i].get("key")
+        if key:
+            if key in seen:
+                continue
+            seen.add(key)
+        out.append(i)
+    return out
+
+
 def rank(
     rows: list[dict[str, Any]],
     queries: list[str],
@@ -151,14 +166,14 @@ def rank(
     dense = dense_scores(query_vectors, rows) if query_vectors else None
     if mode == "dense" and dense is not None:
         order = sorted(range(len(rows)), key=lambda i: dense[i], reverse=True)
-        return [{"score": dense[i], **rows[i]} for i in order[:top_k]]
+        return [{"score": dense[i], **rows[i]} for i in one_per_entry(rows, order)[:top_k]]
 
     bm = bm25_for(rows)
     keyword = [max(s) for s in zip(*(bm.scores(q) for q in queries))] if queries else [0.0] * len(rows)
     kw_order = [i for i in sorted(range(len(rows)), key=lambda i: keyword[i], reverse=True) if keyword[i] > 0]
     if dense is None:
-        return [{"score": keyword[i], **rows[i]} for i in kw_order[:top_k]]
+        return [{"score": keyword[i], **rows[i]} for i in one_per_entry(rows, kw_order)[:top_k]]
     dense_order = sorted(range(len(rows)), key=lambda i: dense[i], reverse=True)
     fused = rrf([dense_order, kw_order])
     order = sorted(fused, key=lambda i: fused[i], reverse=True)
-    return [{"score": dense[i], **rows[i]} for i in order[:top_k]]
+    return [{"score": dense[i], **rows[i]} for i in one_per_entry(rows, order)[:top_k]]
