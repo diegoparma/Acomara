@@ -6,6 +6,7 @@ Every value here was moved out of orchestrator/ unchanged; the golden test
 from nico_core.program_guide import ProgramGuideConfig
 from nico_core.season import SeasonConfig
 from nico_core.tenant import KnowledgeConfig, LocaleConfig, TenantConfig
+from tenants.acomara.hooks import HOOKS
 from tenants.acomara.phrases import I18N_PHRASES
 
 TENANT = TenantConfig(
@@ -90,4 +91,5 @@ TENANT = TenantConfig(
             "es": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
         },
     ),
+    hooks=HOOKS,
 )

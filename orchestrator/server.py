@@ -72,13 +72,6 @@ from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
 from orchestrator.crm_client_status import check_client_status
-from orchestrator.departures import (
-    clarify_season_years,
-    ensure_departure_hit,
-    filter_past_departures,
-    season_departures,
-)
-from orchestrator.sales_rules import apply_video_call_close, extended_alternative_note, short_program_reply
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
@@ -90,6 +83,7 @@ from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_rec
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
 from nico_core import get_tenant
+from nico_core.hooks import CloseContext, first_fixed_reply
 from nico_core.program_guide import program_options_reply
 from nico_core.season import mentions_off_season, numeric_date_is_off_season
 
@@ -1022,9 +1016,9 @@ def generate_reply(
     history_turns: int = DEFAULT_HISTORY_TURNS,
 ) -> str:
     today = today or today_in_argentina()
-    # Past departures are removed here: the small model dropped future ones when asked to.
+    rewrite = TENANT.hooks.rewrite_evidence
     context = hits_to_context(
-        [{**h, "answer": clarify_season_years(filter_past_departures(str(h.get("answer") or ""), today))} for h in hits]
+        [{**h, "answer": rewrite(str(h.get("answer") or ""), today)} for h in hits] if rewrite else hits
     )
     user_lang = get_session_language(session_vars, msg["text"])
 
@@ -2186,13 +2180,13 @@ def process_inbound_message(
             session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
-            short_program = short_program_reply(msg.text, lang)
+            tenant_reply = first_fixed_reply(TENANT.hooks, msg.text, lang)
             if asks_if_bot(msg.text):
                 # Honest and fixed: the model tended to dodge it with "no lo tengo a mano".
                 decision.reply = get_phrase("bot_question", lang)
-            elif short_program is not None:
-                # Fernando's 6,000 m rule; the model got it backwards for Kilimanjaro.
-                decision.reply = short_program
+            elif tenant_reply is not None:
+                # The tenant's own fixed rules (Acomara: Fernando's 6,000 m rule).
+                decision.reply = tenant_reply
             elif guided_reply is not None:
                 decision.reply = guided_reply
             else:
@@ -2204,9 +2198,10 @@ def process_inbound_message(
                     session_vars.get("recent_turns"),
                     runtime["top_k"],
                 )
-                decision.hits = ensure_departure_hit(
-                    decision.hits, runtime["rows"], msg.text, lang, runtime["top_k"]
-                )
+                if TENANT.hooks.select_evidence:
+                    decision.hits = TENANT.hooks.select_evidence(
+                        decision.hits, runtime["rows"], msg.text, lang, runtime["top_k"]
+                    )
                 decision.reply = generate_reply(
                     client,
                     runtime["chat_model"],
@@ -2217,16 +2212,18 @@ def process_inbound_message(
                     history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
                 )
                 decision.reply = drop_repeated_email_ask(decision.reply, session_vars)
-                departures = season_departures(runtime["rows"])
-                decision.reply = apply_video_call_close(
-                    decision.reply,
-                    msg.text,
-                    session_vars,
-                    lang,
-                    has_email=bool(context.extracted_email),
-                    extra_note=extended_alternative_note(msg.text, departures, today_in_argentina(), lang),
-                    departures=departures,
-                )
+                if TENANT.hooks.close_reply:
+                    decision.reply = TENANT.hooks.close_reply(
+                        decision.reply,
+                        CloseContext(
+                            user_text=msg.text,
+                            session_vars=session_vars,
+                            lang=lang,
+                            has_email=bool(context.extracted_email),
+                            index_rows=runtime["rows"],
+                            today=today_in_argentina(),
+                        ),
+                    )
                 decision.reply = apply_email_ack_or_request_policy(
                     decision.reply, session_vars, context.extracted_email, lang, msg.text
                 )

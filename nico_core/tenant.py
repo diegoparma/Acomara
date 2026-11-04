@@ -15,6 +15,7 @@ from datetime import timedelta, timezone, tzinfo
 from pathlib import Path
 from typing import Mapping
 
+from nico_core.hooks import TenantHooks
 from nico_core.program_guide import ProgramGuideConfig
 from nico_core.season import SeasonConfig
 
@@ -95,6 +96,7 @@ class TenantConfig:
     season: SeasonConfig | None = None
     # None: options questions go to the model like any other.
     program_guide: ProgramGuideConfig | None = None
+    hooks: TenantHooks = field(default_factory=TenantHooks)
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)
