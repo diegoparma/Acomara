@@ -82,9 +82,11 @@ from orchestrator.sales_rules import apply_video_call_close, extended_alternativ
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
+    extract_customer_name,
     history_to_messages,
     humanize_reply,
     recent_assistant_replies,
+    style_hints,
     trim_to_last_sentence,
 )
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
@@ -1164,6 +1166,10 @@ def generate_reply(
         if is_whatsapp
         else "Mantén la respuesta corta: máximo 3 líneas y 450 caracteres."
     )
+    hints = style_hints(
+        msg["text"], recent_turns, customer_name=session_vars.get("customer_name"), language=user_lang
+    )
+    style_block = ("\n\nCómo escribir este mensaje:\n" + "\n".join(f"- {h}" for h in hints)) if hints else ""
 
     user_prompt = (
         "Fecha de hoy (Argentina): {today}\n"
@@ -1192,6 +1198,7 @@ def generate_reply(
         "Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n"
         "- No pidas el email si ya lo pediste en esta conversación.\n"
         "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
+        "{style_block}"
     ).format(
         today=today.isoformat(),
         channel=msg["channel"],
@@ -1202,6 +1209,7 @@ def generate_reply(
         context=context,
         lang_instruction=lang_instruction,
         response_length_instruction=response_length_instruction,
+        style_block=style_block,
     )
 
     # Optional: groups calls so the fixed system prompt hits OpenAI's prompt
@@ -2205,6 +2213,12 @@ def process_inbound_message(
         if not session_vars.get("email_captured_at_ts"):
             session_vars["email_captured_at_ts"] = int(time.time())
         session_vars["email_requested"] = True
+
+    # Fix #4: remember the name the client introduces or signs with.
+    if not session_vars.get("customer_name"):
+        customer_name = extract_customer_name(msg.text)
+        if customer_name:
+            session_vars["customer_name"] = customer_name
 
     # Check CRM client status if we have an email
     if context.extracted_email and not session_vars.get("crm_client_found"):

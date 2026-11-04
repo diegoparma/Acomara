@@ -119,6 +119,14 @@ class ConversationFlowTests(unittest.TestCase):
         self.assertEqual(stored_turns[-1], {"role": "assistant", "text": second})
         self.assertEqual(len(stored_turns), 6)
 
+    def test_client_name_is_remembered_and_offered_to_the_model(self):
+        self.model.replies = ["The permit is not included, we arrange it at no extra cost.", "The insurance is separate too."]
+        self.store["conv-flow"] = {"conversation_turn_count": 5, "conversation_language": "en"}
+        self._send("Hi, I'm Wes from Australia. Is the permit included?")
+        self.assertEqual(self.store["conv-flow"]["customer_name"], "Wes")
+        self._send("What about the rescue insurance?")
+        self.assertIn("se llama Wes", self.model.calls[1][-1]["content"])
+
     def test_email_with_a_question_gets_both_bubbles(self):
         self.model.replies = ["El 18+2 sale USD 6.990, sujeto a disponibilidad."]
         self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}

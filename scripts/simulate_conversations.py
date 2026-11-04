@@ -261,6 +261,8 @@ def run(only: str | None) -> dict:
             "paraphrase_opener": 0,
             "apology": 0,
             "tuteo_after_usted": 0,
+            "name_known": 0,
+            "name_used": 0,
             "chars": [],
         },
     }
@@ -327,6 +329,10 @@ def run(only: str | None) -> dict:
                 style["paraphrase_opener"] += bool(_PARAPHRASE.search(reply))
                 style["apology"] += bool(_APOLOGY.search(reply))
                 style["tuteo_after_usted"] += bool(client_said_usted and _TUTEO.search(reply))
+                known_name = session.store.get(conversation_id, {}).get("customer_name")
+                if known_name:
+                    style["name_known"] += 1
+                    style["name_used"] += known_name.lower() in reply.lower()
             check = FACT_CHECKS.get((name, i))
             if check:
                 problems = [f"falta /{rx}/" for rx in check.get("must", []) if not re.search(rx, reply, re.IGNORECASE)]

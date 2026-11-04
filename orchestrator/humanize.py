@@ -304,3 +304,107 @@ def humanize_reply(
     if not text:
         return original
     return _capitalize_first(text)
+
+
+# --- Who the client is and how they write -------------------------------------
+
+_NAME_WORD = r"[A-ZÁÉÍÓÚÑÜÇ][a-záéíóúñüçãõâêô'-]{1,20}"
+_NAME_RES = tuple(
+    re.compile(pattern)
+    for pattern in (
+        rf"(?i:\bme llamo|\bmi nombre es|\bmy name is|\bmeu nome [eé]|\bme chamo)\s+(?P<name>(?i:{_NAME_WORD}))",
+        rf"(?i:\bsoy|\bsou(?: o| a)?|\bi'?m|\bi am|\bthis is|\bac[aá] (?:te escribe|habla))\s+(?P<name>{_NAME_WORD})(?=\s*(?:$|[,.!;)]|\s(?:de|from|y|and|e|da|do|desde|aqu[ií]|here)\b))",
+        rf"(?i:\b(?:regards|best|cheers|thanks|saludos|abrazo|gracias|abra[cç]o|obrigad[oa]|atte\.?|atentamente)),?\s*\n?\s*(?P<name>{_NAME_WORD})\s*[.!]?\s*$",
+    )
+)
+# Capitalized words that follow "soy"/"I'm" and are not names.
+_NOT_A_NAME = {
+    w.lower()
+    for w in (
+        "Argentino Argentina Brasileño Brasileña Chileno Chilena Uruguayo Uruguaya Mexicano Mexicana "
+        "Español Española Médico Médica Guía Nuevo Nueva Interested Planning Looking Going Trying Thinking "
+        "Not Very Really Just From Here Sure Ok Okay Happy Glad Sorry Brasileiro Brasileira Aconcagua Acomara "
+        "Nico Fernando Mendoza Cordoba Córdoba Rosario Buenos Aires Australia Brasil Brazil Chile Usted Yo "
+        "Team Equipo Rescue Muy Bien Interesado Interesada Perfecto Perfecta Genial Excelente Great Perfect "
+        "Bueno Buena Dale Listo Saludos Abrazo Buenísimo Igualmente Amigo Amiga Crack Capo Maestro Señor Señora "
+        "Gente Chicos Todos Everyone Again Mate Bro Fer Igual Nada Mil Muchas Much So Ótimo Obrigado Obrigada "
+        "Valeu Legal Total Hermano Querido Querida Anyway Sir Madam Love De La El Un Una "
+        "American Brazilian Australian Argentinian Argentine Chilean Mexican Spanish French German Italian British "
+        "English Canadian Israeli Dutch Swiss Indian Polish Peruvian Colombian Uruguayan Excited Ready New Back Fine "
+        "Francés Francesa Alemán Alemana Italiano Italiana Peruano Peruana Colombiano Colombiana Ingeniero Ingeniera "
+        "Profesor Profesora Estudiante Montañista Andinista Principiante"
+    ).split()
+}
+
+
+def extract_customer_name(text: str) -> str | None:
+    """The client's first name when they introduce themselves or sign a message.
+
+    Conservative on purpose: a wrong name is worse than none. "Soy de Córdoba",
+    "I'm interested" and "soy médico" are not names.
+    """
+    text = (text or "").strip()
+    if not text:
+        return None
+    for pattern in _NAME_RES:
+        match = pattern.search(text)
+        if match:
+            name = match.group("name").strip("'-")
+            if name.lower() not in _NOT_A_NAME and len(name) >= 2:
+                return name[:1].upper() + name[1:]
+    return None
+
+
+_USTED_RE = re.compile(
+    r"\b(?:usted(?:es)?|le (?:agradezco|consulto|escribo|pregunto)|podr[ií]a (?:usted|indicarme|decirme|informarme)|"
+    r"me podr[ií]a|quisiera saber|disculpe|perdone|necesitar[ií]a)\b",
+    re.IGNORECASE,
+)
+_VOS_RE = re.compile(r"\b(?:quer[eé]s|ten[eé]s|pod[eé]s|sab[eé]s|decime|pasame|contame|vos)\b", re.IGNORECASE)
+
+
+def client_uses_usted(user_texts: list[str]) -> bool:
+    """True when the client writes formally ("usted", "me podría") and never with vos."""
+    joined = " ".join(t for t in user_texts if t)
+    return bool(_USTED_RE.search(joined)) and not _VOS_RE.search(joined)
+
+
+def style_hints(
+    user_text: str,
+    recent_turns: Any,
+    *,
+    customer_name: str | None = None,
+    language: str = "es",
+) -> list[str]:
+    """Short, concrete style notes for this reply, computed from the chat.
+
+    The model follows "mirror the client" much better when told what the
+    client actually did than from a general rule in the system prompt.
+    """
+    turns = recent_turns if isinstance(recent_turns, list) else []
+    user_texts = [str(t.get("text") or "") for t in turns if isinstance(t, dict) and t.get("role") == "user"]
+    user_texts.append(user_text or "")
+    previous = recent_assistant_replies(turns, limit=2)
+    hints: list[str] = []
+
+    if language == "es" and client_uses_usted(user_texts):
+        hints.append('El cliente te trata de "usted": respondé de usted (sin "querés", "tenés", "contame").')
+    stripped = (user_text or "").strip()
+    if 0 < len(stripped) <= 25 and "?" not in stripped[:-1]:
+        hints.append("El cliente escribe corto: contestá en una o dos frases, sin introducción.")
+    elif len(stripped) >= 220:
+        hints.append("El cliente te contó bastante: reaccioná en pocas palabras a lo que contó y después respondé.")
+    if not any(_EMOJI_RE.search(t) for t in user_texts):
+        hints.append("El cliente no usa emojis: este mensaje, sin emojis.")
+    if customer_name:
+        used_recently = any(customer_name.lower() in r.lower() for r in previous)
+        if used_recently:
+            hints.append(f"Ya usaste el nombre {customer_name} hace poco: esta vez no lo pongas.")
+        else:
+            hints.append(f"El cliente se llama {customer_name}. Podés usar el nombre una vez, si sale natural.")
+    if len(previous) == 2 and all(r.rstrip().endswith("?") for r in previous):
+        hints.append("Tus dos últimos mensajes terminaron en pregunta: este no tiene por qué terminar en pregunta.")
+    opener = _opening_interjection(previous[-1]) if previous else None
+    if opener:
+        hints.append(f'Tu mensaje anterior arrancó con "{opener}": arrancá distinto, o directo con la respuesta.')
+    return hints
