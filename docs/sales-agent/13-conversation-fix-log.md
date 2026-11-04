@@ -79,12 +79,21 @@
   - Cuál es el precio canónico vigente de Plaza Francia.
   - Si el bot debe **nunca** confirmar precio (derivar siempre) o si puede leer del canon.
 
-### ⏸ Fix #4 — Detección y uso del nombre
+### ✅ Fix #4 — Detección y uso del nombre (2026-11-04)
+- `orchestrator/humanize.py::extract_customer_name`: "me llamo / soy / I'm / my name is / sou o" y firmas ("Regards, Wes"). Conservador: "soy de Córdoba", "I'm interested", "soy médico" no cuentan. Se guarda una vez en `customer_name`.
+- Decisión: se usa en la charla, no solo en el handoff. El modelo recibe "El cliente se llama X, podés usarlo una vez si sale natural", o "ya lo usaste, esta vez no" si apareció en los últimos 2 mensajes.
+
+#### Propuesta original
 - **Problema real detectado:** Wes Holloway y Diego firmaron su nombre; el bot nunca lo usó.
 - **Propuesta:** extraer firma con regex (`Regards,\s*(...)`, "soy/me llamo/I'm"), persistir en `customer_name`, exponer al prompt.
 - **Pendiente:** definir si lo usamos en saludos sucesivos o sólo en el handoff.
 
-### ⏸ Fix #5 — Anti-repetition guard de plantillas
+### ✅ Fix #5 — Anti-repetition guard de plantillas (2026-11-04)
+- `orchestrator/humanize.py::humanize_reply(previous_replies=...)`: con los últimos 3 mensajes de Nico, saca de la respuesta del modelo un ofrecimiento o pregunta de 40+ caracteres que ya mandó textual (los datos y lo que tiene números se mantienen, por si el cliente vuelve a preguntar), y la reacción de apertura ("¡Genial!") si el mensaje anterior ya abrió con una o si se repite.
+- El prompt v3.5 ya no trae la plantilla fija "I can have a specialist send you pricing…": es un ejemplo de tono, una vez por conversación.
+- La respuesta idéntica completa sigue en la regla 15 de `15-reglas-de-nico.md` ("Como te decía,").
+
+#### Propuesta original
 - **Problema real detectado:** caso Jacques — la plantilla "I can have a specialist send you pricing… What's your email?" se mandó 4 veces idéntica.
 - **Propuesta:** comparar contra `last_assistant_reply` y forzar variación o salir del flujo.
 - **Pendiente:** decidir umbral de similitud y respuesta alternativa.

@@ -1,0 +1,264 @@
+# Preguntas de clientes etiquetadas con la entrada del FAQ que debería encontrar
+# Nico (key de fuente/faq.yaml). Si encuentra cualquiera de las de `expect`
+# entre las primeras k, cuenta como acierto.
+#
+#   python3 scripts/eval_retrieval.py                 # palabras clave (sin red)
+#   python3 scripts/eval_retrieval.py --mode dense    # embeddings (OPENAI_API_KEY)
+#   python3 scripts/eval_retrieval.py --mode all      # dense, keyword e híbrido
+#
+# `context` son los turnos previos, para seguimientos ("¿y cuánto sale?"): el
+# servidor busca con el mensaje solo y con el contexto, y se queda con lo mejor.
+# No copiar acá frases de also_asked: esto mide paráfrasis nuevas.
+
+# --- precios ------------------------------------------------------------------
+- {q: "Hola, ¿qué precio tiene subir el Aconcagua con ustedes?", lang: es, expect: [precio-expedicion]}
+- {q: "cuanto cuesta la expedicion", lang: es, expect: [precio-expedicion]}
+- {q: "¿El 12+2 es más barato que el 18+2?", lang: es, expect: [programas-cortos-mismo-precio, precio-expedicion, experiencia-y-programa-recomendado]}
+- {q: "What's the cost per person?", lang: en, expect: [precio-expedicion]}
+- {q: "Is the short program cheaper?", lang: en, expect: [programas-cortos-mismo-precio, precio-expedicion]}
+- {q: "Qual o preço da expedição ao Aconcágua?", lang: pt, expect: [precio-expedicion]}
+- {q: "Tem alguma promoção?", lang: pt, expect: [precio-expedicion]}
+- {q: "¿Cuánto hay que dejar para reservar el lugar?", lang: es, expect: [reserva-y-formas-de-pago]}
+- {q: "¿Se puede pagar con Binance?", lang: es, expect: [reserva-y-formas-de-pago]}
+- {q: "Can I pay with a bank transfer?", lang: en, expect: [reserva-y-formas-de-pago]}
+- {q: "Aceitam pagamento por PayPal?", lang: pt, expect: [reserva-y-formas-de-pago]}
+- {q: "¿Cuánto sale una expedición privada?", lang: es, expect: [abierta-vs-privada]}
+- {q: "How much is a private expedition just for my wife and me?", lang: en, expect: [abierta-vs-privada]}
+- {q: "¿Cuánto cuesta el permiso del parque?", lang: es, expect: [permiso-precio-y-tramite]}
+- {q: "How much is the park permit?", lang: en, expect: [permiso-precio-y-tramite]}
+- {q: "Quanto custa a permissão do parque?", lang: pt, expect: [permiso-precio-y-tramite]}
+- {q: "¿Cuánto se deja de propina a los guías?", lang: es, expect: [propinas]}
+- {q: "How much should I tip?", lang: en, expect: [propinas]}
+
+# --- seguimientos ---------------------------------------------------------------
+- q: "¿Y cuánto sale?"
+  lang: es
+  context:
+    - {role: user, text: "Nunca estuve en altura, ¿qué programa me conviene?"}
+    - {role: assistant, text: "Para vos el indicado es el 18+2 Extendido, el que tiene más días de aclimatación."}
+  expect: [precio-expedicion]
+- q: "and how much is it?"
+  lang: en
+  context:
+    - {role: user, text: "Which program do you recommend for a first 6000er?"}
+    - {role: assistant, text: "The 18+2 Normal Route Extended, it has the most acclimatization days."}
+  expect: [precio-expedicion]
+- q: "E quanto custa?"
+  lang: pt
+  context:
+    - {role: user, text: "Quero fazer o programa de 18+2 dias"}
+    - {role: assistant, text: "Ótima escolha, é o que tem mais dias de aclimatação."}
+  expect: [precio-expedicion]
+- q: "¿Y está incluido?"
+  lang: es
+  context:
+    - {role: user, text: "¿Hace falta el permiso del parque?"}
+    - {role: assistant, text: "Sí, el Parque exige un permiso de ingreso para escalar."}
+  expect: [permiso-precio-y-tramite, servicios-no-incluidos]
+- q: "¿y cuándo salen?"
+  lang: es
+  context:
+    - {role: user, text: "Me interesa el glaciar polaco"}
+    - {role: assistant, text: "El 360° por el Glaciar Polaco es de 17+2 días, base en Plaza Argentina."}
+  expect: [fechas-salida]
+- q: "what about the dates?"
+  lang: en
+  context:
+    - {role: user, text: "I'm interested in the 14+2"}
+    - {role: assistant, text: "The Fast Ascent is only for climbers who have been above 6,000 m."}
+  expect: [fechas-salida]
+- q: "¿y cuántos son en el grupo?"
+  lang: es
+  context:
+    - {role: user, text: "¿Los guías hablan inglés?"}
+    - {role: assistant, text: "Sí, nuestros guías hablan inglés y están habilitados por el Parque."}
+  expect: [tamano-de-grupo-y-guias]
+- q: "¿Y si no llego a la cumbre me devuelven algo?"
+  lang: es
+  context:
+    - {role: user, text: "¿Qué pasa si me siento mal en la montaña?"}
+    - {role: assistant, text: "Los guías evalúan y, si hace falta, bajás acompañado."}
+  expect: [abandono-de-la-expedicion, descenso-el-dia-de-cumbre]
+- q: "y el seguro?"
+  lang: es
+  context:
+    - {role: user, text: "¿El permiso está incluido?"}
+    - {role: assistant, text: "No, el permiso del Parque se paga aparte; Acomara lo tramita sin cargo."}
+  expect: [seguro-de-rescate]
+
+# --- fechas y temporada --------------------------------------------------------
+- {q: "¿Qué salidas tienen en diciembre?", lang: es, expect: [fechas-salida]}
+- {q: "Quiero ir en enero, ¿hay grupo?", lang: es, expect: [fechas-salida]}
+- {q: "When is the next group leaving?", lang: en, expect: [fechas-salida]}
+- {q: "Tem saída em fevereiro?", lang: pt, expect: [fechas-salida]}
+- {q: "¿Cuál es la mejor época para subir?", lang: es, expect: [mejor-epoca, tasa-de-cumbre-por-temporada]}
+- {q: "Is January better than February for the summit?", lang: en, expect: [mejor-epoca, tasa-de-cumbre-por-temporada]}
+- {q: "Qual é a melhor época para escalar?", lang: pt, expect: [mejor-epoca, tasa-de-cumbre-por-temporada]}
+- {q: "¿Qué porcentaje de cumbre tienen?", lang: es, expect: [tasa-de-cumbre-por-temporada, mejor-epoca]}
+- {q: "What's your summit success rate?", lang: en, expect: [tasa-de-cumbre-por-temporada, mejor-epoca]}
+
+# --- programas --------------------------------------------------------------------
+- {q: "¿Qué diferencia hay entre la ruta normal y el glaciar polaco?", lang: es, expect: [ruta-normal-vs-polaco]}
+- {q: "Normal route or Polish glacier, which one is harder?", lang: en, expect: [ruta-normal-vs-polaco]}
+- {q: "Qual a diferença entre a rota normal e a polonesa?", lang: pt, expect: [ruta-normal-vs-polaco]}
+- {q: "¿Me pasás el itinerario día por día del 18+2?", lang: es, expect: [itinerario-18-2]}
+- {q: "Can you send me the day by day plan for the 18+2?", lang: en, expect: [itinerario-18-2]}
+- {q: "¿Cómo es el itinerario del polaco?", lang: es, expect: [itinerario-polaco-17-2]}
+- {q: "What does the 360 Polish traverse itinerary look like?", lang: en, expect: [itinerario-polaco-17-2]}
+- {q: "Itinerary for the 14 day fast ascent", lang: en, expect: [itinerario-14-2]}
+- {q: "¿Qué días tiene el ascenso extremo de 12+2?", lang: es, expect: [itinerario-12-2]}
+- {q: "¿Por qué recomiendan el extendido y no el rápido?", lang: es, expect: [extendido-vs-corto, experiencia-y-programa-recomendado, mejor-programa-para-cumbre]}
+- {q: "Which program gives me the best chance to summit?", lang: en, expect: [mejor-programa-para-cumbre, extendido-vs-corto]}
+- {q: "Hice el Kilimanjaro y el Toubkal, ¿puedo hacer el de 14 días?", lang: es, expect: [experiencia-y-programa-recomendado, extendido-vs-corto]}
+- {q: "I have never been at altitude, can I do it?", lang: en, expect: [experiencia-y-programa-recomendado, dificultad-y-experiencia]}
+- {q: "Nunca subi montanha alta, consigo fazer?", lang: pt, expect: [experiencia-y-programa-recomendado, dificultad-y-experiencia]}
+- {q: "¿Es técnica la subida? ¿Hay que escalar en hielo?", lang: es, expect: [dificultad-y-experiencia]}
+- {q: "Do I need ice climbing skills?", lang: en, expect: [dificultad-y-experiencia]}
+- {q: "¿Qué diferencia hay entre una expedición abierta y una privada?", lang: es, expect: [abierta-vs-privada]}
+- {q: "Can we do it as a private trip with our own guide?", lang: en, expect: [abierta-vs-privada]}
+- {q: "¿Siempre hay dos días extra?", lang: es, expect: [dias-extra, dias-extra-no-usados]}
+- {q: "What if we don't use the 2 extra days, do we get them in Mendoza?", lang: en, expect: [dias-extra-no-usados, dias-extra]}
+- {q: "¿Cuántas noches dormimos en el campamento base?", lang: es, expect: [noches-en-campamento-base]}
+- {q: "How many kilometers do we walk each day?", lang: en, expect: [distancias-y-horas-de-caminata]}
+- {q: "¿Cuándo empezamos a caminar?", lang: es, expect: [cuando-empieza-la-caminata]}
+- {q: "¿Qué es el programa de aclimatación extra?", lang: es, expect: [programa-de-aclimatacion-extra-eap]}
+
+# --- qué incluye ------------------------------------------------------------------
+- {q: "¿Qué incluye el precio?", lang: es, expect: [servicios-incluidos]}
+- {q: "What's included in the package?", lang: en, expect: [servicios-incluidos]}
+- {q: "O que está incluído?", lang: pt, expect: [servicios-incluidos]}
+- {q: "¿Qué cosas no están incluidas?", lang: es, expect: [servicios-no-incluidos]}
+- {q: "What do I have to pay separately?", lang: en, expect: [servicios-no-incluidos]}
+- {q: "O que não está incluído no pacote?", lang: pt, expect: [servicios-no-incluidos]}
+- {q: "¿El permiso está incluido?", lang: es, expect: [permiso-precio-y-tramite, servicios-no-incluidos]}
+- {q: "Is the park fee included?", lang: en, expect: [permiso-precio-y-tramite, servicios-no-incluidos]}
+- {q: "¿La última noche en Mendoza la pagan ustedes?", lang: es, expect: [noche-de-regreso, hotel-en-mendoza]}
+- {q: "¿Qué servicios extra se pueden contratar?", lang: es, expect: [servicios-opcionales, como-aumentar-chances-de-cumbre]}
+- {q: "Do you have wifi at base camp?", lang: en, expect: [comunicacion-en-la-montana, servicios-opcionales]}
+- {q: "¿Hay señal de celular o internet en la montaña?", lang: es, expect: [comunicacion-en-la-montana, servicios-opcionales]}
+- {q: "Can I get a hot shower at Plaza de Mulas?", lang: en, expect: [servicios-opcionales, como-aumentar-chances-de-cumbre]}
+- {q: "¿Puedo tener carpa individual?", lang: es, expect: [servicios-opcionales, como-aumentar-chances-de-cumbre, camas-en-la-montana]}
+
+# --- treks ---------------------------------------------------------------------------
+- {q: "¿Hacen el trekking a Plaza Francia?", lang: es, expect: [trek-plaza-francia]}
+- {q: "I only want to hike to the south face viewpoint", lang: en, expect: [trek-plaza-francia]}
+- {q: "Mi pareja no quiere hacer cumbre, ¿puede acompañarme hasta el campamento base?", lang: es, expect: [trek-familiares-a-plaza-de-mulas]}
+- {q: "Can my family hike with me to base camp?", lang: en, expect: [trek-familiares-a-plaza-de-mulas]}
+- {q: "¿Cuánto sale el trekking a Plaza de Mulas?", lang: es, expect: [trek-familiares-a-plaza-de-mulas]}
+
+# --- logística ---------------------------------------------------------------------
+- {q: "¿Qué día tengo que estar en Mendoza?", lang: es, expect: [vuelos-llegada-salida]}
+- {q: "When should I book my return flight?", lang: en, expect: [vuelos-llegada-salida]}
+- {q: "Quando devo chegar em Mendoza?", lang: pt, expect: [vuelos-llegada-salida]}
+- {q: "¿Me sacan ustedes el pasaje de avión?", lang: es, expect: [donde-comprar-vuelos]}
+- {q: "Which airlines fly to Mendoza?", lang: en, expect: [donde-comprar-vuelos]}
+- {q: "¿En qué hotel nos alojamos?", lang: es, expect: [hotel-en-mendoza]}
+- {q: "Where can I leave my suitcase during the climb?", lang: en, expect: [donde-dejar-el-equipaje]}
+- {q: "¿Se duerme en cama o en carpa?", lang: es, expect: [camas-en-la-montana]}
+- {q: "How do you communicate between camps?", lang: en, expect: [comunicacion-en-la-montana]}
+
+# --- permiso, seguro, requisitos -------------------------------------------------------
+- {q: "¿Cómo se tramita el permiso?", lang: es, expect: [permiso-precio-y-tramite, permiso-sin-90-dias]}
+- {q: "Can I buy the permit myself online?", lang: en, expect: [permiso-comprar-directo-al-parque, permiso-sin-90-dias]}
+- {q: "Me anoté tarde, faltan 2 meses, ¿puedo sacar el permiso igual?", lang: es, expect: [permiso-sin-90-dias, permiso-precio-y-tramite]}
+- {q: "¿Es obligatorio el seguro de rescate?", lang: es, expect: [seguro-de-rescate]}
+- {q: "Which insurance do you recommend?", lang: en, expect: [seguro-de-rescate]}
+- {q: "Preciso de seguro?", lang: pt, expect: [seguro-de-rescate]}
+- {q: "¿Necesito visa para entrar a Argentina?", lang: es, expect: [pasaporte-y-visa]}
+- {q: "I'm from India, do I need an invitation letter for the visa?", lang: en, expect: [pasaporte-y-visa]}
+- {q: "¿Puede venir mi hijo de 15 años?", lang: es, expect: [edad-minima]}
+- {q: "Is there a minimum age?", lang: en, expect: [edad-minima]}
+
+# --- equipo ----------------------------------------------------------------------------
+- {q: "¿Tienen lista de equipo?", lang: es, expect: [lista-de-equipo, equipo-personal-obligatorio]}
+- {q: "What gear do I need to bring?", lang: en, expect: [lista-de-equipo, equipo-personal-obligatorio, equipo-comun-que-lleva-la-empresa]}
+- {q: "¿Se puede alquilar el equipo allá?", lang: es, expect: [alquiler-de-equipo]}
+- {q: "How much does it cost to rent all the gear?", lang: en, expect: [alquiler-de-equipo]}
+- {q: "Posso alugar equipamento em Mendoza?", lang: pt, expect: [alquiler-de-equipo]}
+- {q: "¿Qué botas necesito?", lang: es, expect: [botas]}
+- {q: "Which crampons work?", lang: en, expect: [crampones]}
+- {q: "¿De cuántos litros tiene que ser la mochila?", lang: es, expect: [mochila]}
+- {q: "Do I need an ice axe?", lang: en, expect: [piqueta]}
+- {q: "¿Cuánto peso cargo yo?", lang: es, expect: [peso-que-carga-cada-uno, equipo-personal-obligatorio]}
+- {q: "Is the equipment different for the Polish route?", lang: en, expect: [equipo-por-ruta]}
+
+# --- comida ------------------------------------------------------------------------------
+- {q: "Soy vegetariano, ¿hay comida para mí?", lang: es, expect: [menu-vegetariano]}
+- {q: "I'm vegan, can you accommodate?", lang: en, expect: [menu-vegano]}
+- {q: "Soy celíaca", lang: es, expect: [menu-celiaco]}
+- {q: "I'm lactose intolerant", lang: en, expect: [menu-sin-lactosa]}
+- {q: "Do you offer kosher food?", lang: en, expect: [menu-kosher]}
+- {q: "¿Qué se come en la expedición?", lang: es, expect: [menu-regular]}
+- {q: "Tem comida vegetariana?", lang: pt, expect: [menu-vegetariano]}
+
+# --- guías y porteadores --------------------------------------------------------------
+- {q: "¿Cuántos guías van por grupo?", lang: es, expect: [tamano-de-grupo-y-guias]}
+- {q: "What's the maximum group size?", lang: en, expect: [tamano-de-grupo-y-guias]}
+- {q: "¿Los guías son de Mendoza?", lang: es, expect: [guias-locales]}
+- {q: "What certifications do your guides have?", lang: en, expect: [guias-formacion]}
+- {q: "¿Están incluidos los porteadores?", lang: es, expect: [porteadores-incluidos, porteadores-personales]}
+- {q: "Can I hire a porter for my personal gear?", lang: en, expect: [porteadores-personales, cuando-contratar-porteadores, porteadores-incluidos]}
+- {q: "¿Cuándo conocemos a los guías?", lang: es, expect: [cuando-conocemos-a-los-guias]}
+
+# --- preparación y políticas -----------------------------------------------------------
+- {q: "¿Tienen un plan de entrenamiento?", lang: es, expect: [plan-de-entrenamiento]}
+- {q: "Should I take Diamox?", lang: en, expect: [diamox-y-medicamentos]}
+- {q: "¿Cuánta agua hay que tomar?", lang: es, expect: [hidratacion]}
+- {q: "Any tips on what to eat during the climb?", lang: en, expect: [nutricion]}
+- {q: "¿Qué pasa si me quiero bajar antes?", lang: es, expect: [abandono-de-la-expedicion]}
+- {q: "If I quit early, do I get a refund?", lang: en, expect: [abandono-de-la-expedicion]}
+- {q: "¿Qué pasa si alguien se descompone el día de cumbre?", lang: es, expect: [descenso-el-dia-de-cumbre]}
+- {q: "How can I improve my chances of reaching the top?", lang: en, expect: [como-aumentar-chances-de-cumbre, mejor-programa-para-cumbre]}
+
+# --- tanda 2 (nov 2026): más portugués, seguimientos y entradas nuevas ---------------
+- {q: "Somos un grupo que va sin guía, ¿nos venden mulas y carpa en el base?", lang: es, expect: [logistica-sin-guia]}
+- {q: "We want to climb unguided, can we hire your base camp services?", lang: en, expect: [logistica-sin-guia]}
+- {q: "Queremos subir sozinhos, vocês alugam só as mulas?", lang: pt, expect: [logistica-sin-guia]}
+- {q: "¿Se puede hacer el Aconcagua en agosto?", lang: es, expect: [fuera-de-temporada]}
+- {q: "Is it possible to climb in May?", lang: en, expect: [fuera-de-temporada]}
+- {q: "Posso escalar em junho?", lang: pt, expect: [fuera-de-temporada]}
+- {q: "Quanto custa o programa de 14 dias?", lang: pt, expect: [precio-expedicion, programas-cortos-mismo-precio]}
+- {q: "Quais são as formas de pagamento?", lang: pt, expect: [reserva-y-formas-de-pago]}
+- {q: "Qual a diferença entre o programa longo e o rápido?", lang: pt, expect: [extendido-vs-corto, experiencia-y-programa-recomendado]}
+- {q: "Os guias falam inglês?", lang: pt, expect: [tamano-de-grupo-y-guias, guias-formacion]}
+- {q: "Quantas pessoas vão no grupo?", lang: pt, expect: [tamano-de-grupo-y-guias]}
+- {q: "Preciso de visto para a Argentina?", lang: pt, expect: [pasaporte-y-visa]}
+- {q: "Tem banho quente no acampamento?", lang: pt, expect: [servicios-opcionales, como-aumentar-chances-de-cumbre]}
+- {q: "O seguro está incluído?", lang: pt, expect: [seguro-de-rescate, servicios-no-incluidos]}
+- {q: "¿Los vuelos están incluidos?", lang: es, expect: [servicios-no-incluidos, donde-comprar-vuelos]}
+- {q: "Are flights included?", lang: en, expect: [servicios-no-incluidos, donde-comprar-vuelos]}
+- {q: "¿La comida en la montaña está incluida?", lang: es, expect: [servicios-incluidos, menu-regular]}
+- {q: "¿Qué seguro me sirve para el Parque?", lang: es, expect: [seguro-de-rescate]}
+- {q: "¿Cuántos días de cobertura necesita el seguro?", lang: es, expect: [seguro-de-rescate]}
+- {q: "¿Dormimos la última noche en Mendoza?", lang: es, expect: [noche-de-regreso, hotel-en-mendoza]}
+- {q: "¿Los días de mal tiempo se cobran aparte?", lang: es, expect: [dias-extra, dias-extra-no-usados]}
+- q: "¿y para el de 12 días?"
+  lang: es
+  context:
+    - {role: user, text: "¿Cuál es el itinerario del 18+2?"}
+    - {role: assistant, text: "Día 1 Mendoza, día 2 Penitentes, día 3 Confluencia..."}
+  expect: [itinerario-12-2]
+- q: "and do you have something for vegans?"
+  lang: en
+  context:
+    - {role: user, text: "What kind of food do you serve on the mountain?"}
+    - {role: assistant, text: "Breakfast, lunch and dinner are included, prepared by our chefs at base camp."}
+  expect: [menu-vegano]
+- q: "¿y si lo saco yo?"
+  lang: es
+  context:
+    - {role: user, text: "¿Cuánto sale el permiso?"}
+    - {role: assistant, text: "Con Acomara va de USD 650 a USD 1.400 según nacionalidad, ruta y fecha."}
+  expect: [permiso-precio-y-tramite, permiso-comprar-directo-al-parque, permiso-sin-90-dias]
+- q: "E a seguradora, qual vocês recomendam?"
+  lang: pt
+  context:
+    - {role: user, text: "O que não está incluído?"}
+    - {role: assistant, text: "Não estão incluídos voos, permissão do parque, seguro de resgate e equipamento pessoal."}
+  expect: [seguro-de-rescate]
+- q: "¿y cuántos guías van?"
+  lang: es
+  context:
+    - {role: user, text: "¿De cuántas personas son los grupos?"}
+    - {role: assistant, text: "El máximo es 11 escaladores por grupo."}
+  expect: [tamano-de-grupo-y-guias]

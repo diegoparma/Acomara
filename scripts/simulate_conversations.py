@@ -73,6 +73,46 @@ SCENARIOS: dict[str, list[str]] = {
         "Nunca estuve en altura, ¿qué programa me conviene?",
         "¿Y cuánto sale?",
     ],
+    # Human voice: the reply should mirror how the client writes.
+    "usted": [
+        "Buenas tardes. Quisiera saber si ustedes organizan la expedición al Aconcagua para una persona de 58 años.",
+        "¿Usted me podría indicar qué incluye el precio?",
+        "Le agradezco. ¿Y el seguro de rescate lo tengo que contratar yo?",
+    ],
+    "cliente_corto": [
+        "info aconcagua",
+        "precio?",
+        "y q incluye",
+        "ok",
+        "fechas enero?",
+    ],
+    "historia_larga": [
+        "Hola! Soy Martina, de Rosario. Hace dos años hice el Lanín y el año pasado subí al Kilimanjaro con mi hermano, "
+        "y ahora queremos ir por el Aconcagua en enero o febrero. Él corre maratones y yo hago trekking casi todos los findes. "
+        "¿Qué nos recomendás?",
+        "Genial. ¿Y el equipo lo podemos alquilar allá?",
+        "Perfecto, lo voy a hablar con él y te aviso",
+    ],
+    "portugues": [
+        "Oi! Quero fazer o Aconcágua em dezembro, quanto custa?",
+        "E o que está incluído?",
+        "Legal, obrigado! Vou ver com minha esposa",
+    ],
+    "insistente": [
+        "Hola, quiero ir al Aconcagua",
+        "¿Tienen lugar para el 5/12?",
+        "Pero ¿hay lugar o no?",
+        "¿Me podés confirmar si hay cupo?",
+    ],
+    "medico": [
+        "Hola, tengo hipertensión controlada, ¿puedo hacer el Aconcagua?",
+        "¿Conviene tomar Diamox para la altura?",
+    ],
+    "nombre": [
+        "Hi, I'm Wes from Australia. Is the permit included in the price?",
+        "What about the rescue insurance?",
+        "Great, thanks. Regards, Wes",
+    ],
 }
 
 # Facts that must hold (from docs/knowledge/datos-clave.md). Keyed by
@@ -93,7 +133,28 @@ FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
     ("fechas_y_temporada", 0): {"must": [r"(?i)nov"]},
     ("fechas_y_temporada", 1): {"must": [r"14\+2", r"18\+2", r"videollamada", r"disponibilidad"], "must_not": [r"20\d{2}/\d{2}"]},
     ("pareja", 1): {"must": [_PRICE, r"videollamada"], "must_not": [_OLD_PRICE]},
+    ("fechas_y_temporada", 2): {"must": [r"noviembre a marzo"]},
+    ("medico", 0): {"must": [r"m[eé]dic"], "must_not": [r"\bKB\b|protocolo m[eé]dico", r"\bpod[eé]s (ir|subir|hacerlo)\b"]},
+    ("medico", 1): {"must": [r"m[eé]dic"], "must_not": [r"\b(te|le) (recomiendo|conviene) tomar\b|\btom[aá]\b"]},
+    ("cliente_corto", 1): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
+    ("portugues", 0): {"must": [_PRICE], "must_not": [_OLD_PRICE, r"\b(?:usted|querés|quieres)\b"]},
+    ("usted", 2): {"must": [r"no (est[aá] )?incluid|aparte|por separado|obligatori"]},
+    ("insistente", 3): {"must": [r"asesor|confirm"], "must_not": [r"\b(s[ií],? hay (lugar|cupo)|tenemos lugar|quedan lugares)\b"]},
+    ("nombre", 0): {"must": [r"not included|separate|isn't included"]},
 }
+
+# Signs of a person vs a template, counted over every model reply.
+_OPENER = re.compile(
+    r"^\s*(?:¡\s*)?(genial|perfecto|excelente|buen[ií]simo|b[aá]rbaro|dale|claro|great|perfect|awesome|sure|[oó]timo|perfeito|legal)\b",
+    re.IGNORECASE,
+)
+_EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF]")
+_TUTEO = re.compile(r"\b(quer[eé]s|ten[eé]s|pod[eé]s|contame|fijate|pasame|decime|avisame)\b", re.IGNORECASE)
+_USTED_CLIENT = re.compile(r"\b(usted|ustedes podr[ií]an|le agradezco|quisiera)\b", re.IGNORECASE)
+_PARAPHRASE = re.compile(r"^\s*(entiendo que|me pregunt[aá]s|you(?:'re| are) asking|i understand)", re.IGNORECASE)
+# Requests and offers that are not questions: "pasame tu email", "si querés…".
+_ASK = re.compile(r"\b(?:pasame|p[aá]seme|send me|me passa|si quer[eé]s|si quiere|if you'?d like|se quiser)\b", re.IGNORECASE)
+_APOLOGY = re.compile(r"disculp|lamento|perd[oó]n|sorry|apologi|desculp", re.IGNORECASE)
 
 # What gives a reply away as a bot, checked on every reply.
 TELLS = {
@@ -103,7 +164,7 @@ TELLS = {
         r"hay algo m[aá]s en (lo )?que|no dudes en|estoy aqu[ií] para|anything else i can help|feel free to",
         re.IGNORECASE,
     ),
-    "mentions_docs": re.compile(r"\bFAQ\b|documentaci[oó]n|base de (datos|conocimiento)", re.IGNORECASE),
+    "mentions_docs": re.compile(r"\bFAQ\b|\bKB\b|documentaci[oó]n|base de (datos|conocimiento)", re.IGNORECASE),
     "asesor_humano": re.compile(r"asesor humano|human advisor", re.IGNORECASE),
 }
 # Claims the client already gave an email; checked only while they haven't.
@@ -200,6 +261,20 @@ def run(only: str | None) -> dict:
         "identical_replies": 0,
         "phantom_email": 0,
         "fact_checks": {"passed": 0, "failed": []},
+        "style": {
+            "replies": 0,
+            "ends_with_question": 0,
+            "same_opener_as_previous": 0,
+            "opener_used": 0,
+            "more_than_one_emoji": 0,
+            "paraphrase_opener": 0,
+            "apology": 0,
+            "tuteo_after_usted": 0,
+            "stacked_asks": 0,
+            "name_known": 0,
+            "name_used": 0,
+            "chars": [],
+        },
     }
     seen_sentences: dict[str, int] = {}
     for name, turns in SCENARIOS.items():
@@ -209,7 +284,10 @@ def run(only: str | None) -> dict:
         conversation_id = f"sim-{name}"
         transcript = []
         client_gave_email = False
+        client_said_usted = False
+        previous_opener = None
         for i, text in enumerate(turns):
+            client_said_usted = client_said_usted or bool(_USTED_CLIENT.search(text))
             client_gave_email = client_gave_email or bool(CLIENT_EMAIL.search(text))
             before = len(usage)
             resp = client.post(
@@ -247,6 +325,28 @@ def run(only: str | None) -> dict:
                     seen_sentences[key] = seen_sentences.get(key, 0) + 1
                     if seen_sentences[key] == 2:
                         results["identical_replies"] += 1
+            style = results["style"]
+            if reply.strip() and not reply.startswith("[HTTP"):
+                style["replies"] += 1
+                style["chars"].append(len(reply))
+                style["ends_with_question"] += reply.rstrip().endswith("?")
+                opener = (_OPENER.match(reply) or [None, None])[1]
+                opener = opener.lower() if opener else None
+                style["opener_used"] += bool(opener)
+                style["same_opener_as_previous"] += bool(opener and opener == previous_opener)
+                previous_opener = opener
+                style["more_than_one_emoji"] += len(_EMOJI.findall(reply)) > 1
+                style["paraphrase_opener"] += bool(_PARAPHRASE.search(reply))
+                asks = sum(
+                    1 for sentence in re.split(r"(?<=[.!?])\s+|\n+", reply) if "?" in sentence or _ASK.search(sentence)
+                )
+                style["stacked_asks"] += asks >= 2
+                style["apology"] += bool(_APOLOGY.search(reply))
+                style["tuteo_after_usted"] += bool(client_said_usted and _TUTEO.search(reply))
+                known_name = session.store.get(conversation_id, {}).get("customer_name")
+                if known_name:
+                    style["name_known"] += 1
+                    style["name_used"] += known_name.lower() in reply.lower()
             check = FACT_CHECKS.get((name, i))
             if check:
                 problems = [f"falta /{rx}/" for rx in check.get("must", []) if not re.search(rx, reply, re.IGNORECASE)]
@@ -273,6 +373,11 @@ def run(only: str | None) -> dict:
         "avg_input_per_call": round(total_in / calls) if calls else None,
         "avg_output_per_call": round(total_out / calls) if calls else None,
     }
+    chars = results["style"].pop("chars")
+    replies = results["style"]["replies"]
+    results["style"]["avg_chars"] = round(sum(chars) / len(chars)) if chars else None
+    results["style"]["min_max_chars"] = [min(chars), max(chars)] if chars else None
+    results["style"]["pct_ends_with_question"] = round(100 * results["style"]["ends_with_question"] / replies) if replies else None
     print("\n=== Resumen ===")
     summary_keys = (
         "fact_checks",
@@ -282,6 +387,7 @@ def run(only: str | None) -> dict:
         "email_asked_twice_in_one_message",
         "identical_replies",
         "phantom_email",
+        "style",
         "usage",
     )
     print(json.dumps({k: results[k] for k in summary_keys}, indent=2, ensure_ascii=False))

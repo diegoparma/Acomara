@@ -82,13 +82,23 @@ from orchestrator.sales_rules import apply_video_call_close, extended_alternativ
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
+    client_messages,
+    client_uses_usted,
+    extract_customer_name,
     history_to_messages,
     humanize_reply,
+    personalize_welcome,
+    recent_assistant_replies,
+    split_single_paragraph,
+    style_hints,
     trim_to_last_sentence,
 )
+from orchestrator.usted import to_usted
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
+from orchestrator import kb_retrieval
+from orchestrator import live_facts
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
@@ -162,6 +172,9 @@ class ReplyDecision:
     outbound_safety_blocked: bool = False
 
 
+# A client who thanks several times gets a different short answer each time.
+THANKS_REPLY_VARIANTS = 4
+
 # i18n: Internationalization layer for fixed phrases
 I18N_PHRASES = {
     "es": {
@@ -179,6 +192,8 @@ I18N_PHRASES = {
         "repeat_prefix": "Como te decía,",
         "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
         "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy.",
+        "thanks_reply_3": "De nada 🙌",
+        "thanks_reply_4": "Dale, cuando quieras.",
         "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
         "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
         "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
@@ -200,6 +215,8 @@ I18N_PHRASES = {
         "repeat_prefix": "As I mentioned,",
         "thanks_reply_1": "You're welcome! Message me here anytime.",
         "thanks_reply_2": "My pleasure! If anything else comes up, I'm here.",
+        "thanks_reply_3": "No worries 🙌",
+        "thanks_reply_4": "Anytime!",
         "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
         "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
         "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
@@ -221,6 +238,8 @@ I18N_PHRASES = {
         "repeat_prefix": "Como te falei,",
         "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
         "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui.",
+        "thanks_reply_3": "De nada 🙌",
+        "thanks_reply_4": "Por nada, qualquer coisa me chama.",
         "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
         "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
         "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
@@ -522,7 +541,7 @@ _OUT_OF_SEASON_MONTHS = range(4, 11)
 # English "may" only counts as the month next to a date-like context
 # ("in May", "May 12", "12th of May"), never as the modal verb ("May I...").
 _MAY_MONTH_RE = re.compile(
-    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until)\s+may\b"
+    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until|about|for)\s+may\b"
     r"|\bmay\s+\d"
     r"|\d(?:st|nd|rd|th)?\s+(?:of\s+)?may\b"
 )
@@ -555,6 +574,25 @@ _TRIP_INTENT_TOKENS = (
 )
 
 
+_SEASON_MONTH_ALT = "|".join(sorted(set(OUT_OF_SEASON_MONTH_TOKENS) | {"may"}, key=len, reverse=True))
+# "¿Y se puede ir en julio?", "Can we go in June?", "Dá pra ir em julho?":
+# a travel verb with an out-of-season month within three words after it.
+_TRAVEL_VERB_NEAR_MONTH_RE = re.compile(
+    r"\b(?:ir|irnos|vamos|viajar|venir|hacerlo|hacerla|subirlo|subir|go|going|travel|come|visit|climb|do it|fazer|vir)\b"
+    r"(?:\W+\w+){0,3}?\W+(?:" + _SEASON_MONTH_ALT + r")\b"
+)
+# "¿Y en julio?", "What about June?", "¿Qué tal octubre?": a short question
+# about a month, in a sales chat, is a question about going then.
+_SHORT_MONTH_QUESTION_RE = re.compile(r"\b(?:" + _SEASON_MONTH_ALT + r")\b")
+
+
+def _asks_about_a_month(normalized: str) -> bool:
+    if _TRAVEL_VERB_NEAR_MONTH_RE.search(normalized):
+        return True
+    words = re.findall(r"\w+", normalized)
+    return "?" in normalized and len(words) <= 6 and bool(_SHORT_MONTH_QUESTION_RE.search(normalized))
+
+
 def mentions_out_of_season(text: str) -> bool:
     """Return True if the user message references an out-of-season month
     together with an expedition/trip intent. Conservative on purpose."""
@@ -563,7 +601,7 @@ def mentions_out_of_season(text: str) -> bool:
     lowered = text.lower()
     normalized = unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
 
-    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS)
+    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS) or _asks_about_a_month(normalized)
     if not has_intent:
         return False
 
@@ -742,8 +780,11 @@ def load_system_prompt() -> str:
     # Core facts go in the fixed system prompt (cacheable) so the model cannot
     # contradict them between runs; the permit was "included" in one run and
     # "not included" in the next (simulation 2026-10-08).
-    if KEY_FACTS_PATH.exists():
-        prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{KEY_FACTS_PATH.read_text(encoding='utf-8')}"
+    # Volatile facts come from Fernando's sheet when NICO_FACTS_CSV_URL is set
+    # (orchestrator/live_facts.py); otherwise this is datos-clave.md as before.
+    key_facts = live_facts.key_facts_text(KEY_FACTS_PATH)
+    if key_facts:
+        prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{key_facts}"
     return prompt
 
 
@@ -992,12 +1033,7 @@ def retrieve_top_k(
     top_k: int,
 ) -> list[dict[str, Any]]:
     emb = client.embeddings.create(model=embed_model, input=query_text).data[0].embedding
-    scored: list[dict[str, Any]] = []
-    for row in rows:
-        score = cosine(emb, row["embedding"])
-        scored.append({"score": score, **row})
-    scored.sort(key=lambda x: x["score"], reverse=True)
-    return scored[:top_k]
+    return kb_retrieval.rank(rows, [query_text], [emb], top_k, mode=retrieval_mode())
 
 
 def build_contextual_query(query_text: str, recent_turns: Any, max_chars: int = 700) -> str:
@@ -1035,14 +1071,20 @@ def retrieve_with_context(
     if contextual == query_text:
         return retrieve_top_k(client, embed_model, rows, query_text, top_k)
     data = client.embeddings.create(model=embed_model, input=[query_text, contextual]).data
-    best: dict[Any, dict[str, Any]] = {}
-    for item in data:
-        for row in rows:
-            score = cosine(item.embedding, row["embedding"])
-            key = row.get("id", id(row))
-            if key not in best or score > best[key]["score"]:
-                best[key] = {"score": score, **row}
-    return sorted(best.values(), key=lambda x: x["score"], reverse=True)[:top_k]
+    vectors = [item.embedding for item in data]
+    return kb_retrieval.rank(rows, [query_text, contextual], vectors, top_k, mode=retrieval_mode())
+
+
+def retrieval_mode() -> str:
+    """dense (default) or hybrid (embeddings + keywords); see orchestrator/kb_retrieval.py."""
+    mode = str(_env("RETRIEVAL_MODE", "dense") or "dense").strip().lower()
+    return mode if mode in ("dense", "hybrid") else "dense"
+
+
+def index_embed_model(rows: list[dict[str, Any]], configured: str | None) -> str:
+    """Queries must be embedded with the model that built the index; the index says which."""
+    built_with = next((r.get("embed_model") for r in rows if r.get("embed_model")), None)
+    return built_with or configured or "text-embedding-3-large"
 
 
 def hits_to_context(hits: list[dict[str, Any]]) -> str:
@@ -1163,6 +1205,10 @@ def generate_reply(
         if is_whatsapp
         else "Mantén la respuesta corta: máximo 3 líneas y 450 caracteres."
     )
+    hints = style_hints(
+        msg["text"], recent_turns, customer_name=session_vars.get("customer_name"), language=user_lang
+    )
+    style_block = ("\n\nCómo escribir este mensaje:\n" + "\n".join(f"- {h}" for h in hints)) if hints else ""
 
     user_prompt = (
         "Fecha de hoy (Argentina): {today}\n"
@@ -1191,6 +1237,7 @@ def generate_reply(
         "Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n"
         "- No pidas el email si ya lo pediste en esta conversación.\n"
         "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
+        "{style_block}"
     ).format(
         today=today.isoformat(),
         channel=msg["channel"],
@@ -1201,6 +1248,7 @@ def generate_reply(
         context=context,
         lang_instruction=lang_instruction,
         response_length_instruction=response_length_instruction,
+        style_block=style_block,
     )
 
     # Optional: groups calls so the fixed system prompt hits OpenAI's prompt
@@ -1225,6 +1273,7 @@ def generate_reply(
         reply,
         channel="whatsapp" if is_whatsapp else "other",
         already_spoke=assistant_already_spoke(recent_turns),
+        previous_replies=recent_assistant_replies(recent_turns),
     )
 
 
@@ -1261,10 +1310,15 @@ def choose_reply_bubbles(reply: str, can_emit_multi: bool, is_opening: bool) -> 
 
     People send "Gracias!" and the answer as two messages. Paragraphs become
     bubbles when there are 2-3 of them; a longer list stays in one message.
+    A single paragraph is split only at a short opening reaction or before a
+    closing question that follows a long answer.
     """
     if not can_emit_multi or not (reply or "").strip():
         return []
     parts = split_reply_into_messages(reply)
+    if len(parts) == 1:
+        # One paragraph: a short reaction or a closing question can go apart.
+        parts = split_single_paragraph(parts[0])
     if is_opening or 2 <= len(parts) <= MAX_REPLY_BUBBLES:
         return parts
     return []
@@ -1462,6 +1516,9 @@ _PURE_GREETING_TOKENS: frozenset[str] = frozenset({
     "buenas", "buen", "dia", "buenos", "dias",
     "good", "morning", "afternoon", "evening",
     "bom", "boa", "tarde", "noite",
+    # "Buenas tardes", "Hola, ¿cómo estás?", "Oi, tudo bem?" are greetings too.
+    "tardes", "noches", "holaa", "holi", "como", "estas", "esta", "andas", "anda", "va", "que", "tal",
+    "todo", "bien", "how", "are", "you", "tudo", "bem", "vai",
 })
 
 
@@ -1720,18 +1777,21 @@ def _is_program_options_followup_intent(normalized_text: str) -> bool:
 
 
 def _first_program_options_reply(lang: str) -> str:
+    # Fernando's rule: the 12+2 and 14+2 are only for people who have been
+    # above 6,000 m, so the first answer recommends the 18+2 and asks.
     if lang == "en":
         return (
-            "I recommend starting with two options:\n"
-            "1. 18+2 (highly recommended)\n"
-            "2. 12+2 (recommended)\n\n"
-            "There are other alternatives as well. If you'd like, I can list them in detail."
+            "The one we recommend is the 18+2: it has the most acclimatization days and costs the same as the shorter ones.\n"
+            "The 12+2 and 14+2 are only for people who have already been above 6,000 m. Have you been at high altitude before?"
+        )
+    if lang == "pt":
+        return (
+            "O que recomendamos é o 18+2: tem mais dias de aclimatação e custa o mesmo que os mais curtos.\n"
+            "O 12+2 e o 14+2 são só para quem já esteve acima de 6.000 m. Você já esteve em altitude?"
         )
     return (
-        "Para empezar, te recomiendo estas dos opciones:\n"
-        "1. 18+2 (muy recomendada)\n"
-        "2. 12+2 (recomendada)\n\n"
-        "También hay otras alternativas. Si querés, te las paso en detalle."
+        "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\n"
+        "El 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Estuviste en altura alguna vez?"
     )
 
 
@@ -1846,13 +1906,15 @@ def ensure_runtime() -> dict[str, Any]:
         app.config["INDEX_ROWS"] = rows
 
     system_prompt = app.config.get("SYSTEM_PROMPT")
-    if system_prompt is None:
+    facts_revision = live_facts.revision()
+    if system_prompt is None or app.config.get("SYSTEM_PROMPT_FACTS_REVISION") != facts_revision:
         system_prompt = load_system_prompt()
         app.config["SYSTEM_PROMPT"] = system_prompt
+        app.config["SYSTEM_PROMPT_FACTS_REVISION"] = facts_revision
 
     return {
         "api_key": api_key,
-        "embed_model": _env("OPENAI_EMBED_MODEL", "text-embedding-3-large"),
+        "embed_model": index_embed_model(rows, _env("OPENAI_EMBED_MODEL", "text-embedding-3-large")),
         "chat_model": _env("OPENAI_CHAT_MODEL", "gpt-5.4"),
         "chat_model_from_request": str(_env("OPENAI_CHAT_MODEL_FROM_REQUEST", "false") or "false")
         .strip()
@@ -2088,7 +2150,21 @@ def audit_dashboard() -> Any:
 @app.get("/version")
 def version() -> Any:
     payload = build_version_payload()
-    return jsonify(build_safe_version_response(payload))
+    response = build_safe_version_response(payload)
+    response["facts"] = live_facts.status()
+    return jsonify(response)
+
+
+@app.route("/cron/facts-reminder", methods=["GET", "POST"])
+def facts_reminder() -> Any:
+    """Weekly email to Fernando with expired / expiring sheet facts (Vercel cron)."""
+    load_local_env()
+    cron_secret = _env("CRON_SECRET")
+    bearer = request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+    if not ((cron_secret and bearer == cron_secret) or (_env("ORCHESTRATOR_API_KEY") and _is_authorized_for_audit())):
+        return auth_error("Invalid or missing API key for facts reminder.")
+    force = _parse_bool_query(request.args.get("force"), default=False)
+    return jsonify(live_facts.send_expiry_reminder(force=force))
 
 
 # ---------------------------------------------------------------------------
@@ -2203,6 +2279,12 @@ def process_inbound_message(
         if not session_vars.get("email_captured_at_ts"):
             session_vars["email_captured_at_ts"] = int(time.time())
         session_vars["email_requested"] = True
+
+    # Fix #4: remember the name the client introduces or signs with.
+    if not session_vars.get("customer_name"):
+        customer_name = extract_customer_name(msg.text)
+        if customer_name:
+            session_vars["customer_name"] = customer_name
 
     # Check CRM client status if we have an email
     if context.extracted_email and not session_vars.get("crm_client_found"):
@@ -2382,10 +2464,12 @@ def process_inbound_message(
         if session_vars.get("conversation_turn_count") == 1 and (
             _is_pure_greeting(msg.text) or is_generic_opening(msg.text)
         ):
-            decision.reply = get_phrase("opening_welcome", lang)
+            decision.reply = personalize_welcome(
+                get_phrase("opening_welcome", lang), msg.text, session_vars.get("customer_name")
+            )
         elif is_thanks_only(msg.text):
             thanks_count = int(session_vars.get("thanks_reply_count") or 0)
-            decision.reply = get_phrase(f"thanks_reply_{thanks_count % 2 + 1}", lang)
+            decision.reply = get_phrase(f"thanks_reply_{thanks_count % THANKS_REPLY_VARIANTS + 1}", lang)
             session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
@@ -2436,6 +2520,10 @@ def process_inbound_message(
                 decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
     decision.reply = format_whatsapp_departure_dates(decision.reply, msg.channel)
+    if get_session_language(session_vars, msg.text) == "es" and client_uses_usted(
+        [*client_messages(session_vars.get("recent_turns")), msg.text]
+    ):
+        decision.reply = to_usted(decision.reply)
 
     # Outbound safety filter: never send credential-like content.
     effective_lang = get_session_language(session_vars, msg.text)

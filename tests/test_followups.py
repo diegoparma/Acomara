@@ -33,6 +33,7 @@ from orchestrator.departures import (  # noqa: E402
 from orchestrator.humanize import append_recent_turns  # noqa: E402
 from orchestrator.policies import drop_repeated_email_ask  # noqa: E402
 from orchestrator.server import (  # noqa: E402
+    apply_out_of_season_policy,
     OUTBOUND_DUPLICATE_BURST_SECONDS,
     apply_email_ack_or_request_policy,
     asks_if_bot,
@@ -120,6 +121,38 @@ class EmailAskedOnceTests(unittest.TestCase):
         session = {"conversation_turn_count": 3}
         out = apply_email_ack_or_request_policy("Sale USD 6.990.", session, None, "es")
         self.assertIn("pasame tu email", out)
+
+    def test_ask_replaces_a_closing_question(self):
+        session = {"conversation_turn_count": 3}
+        out = apply_email_ack_or_request_policy("Enero es buena época. ¿Cuántos son?", session, None, "es")
+        self.assertEqual(
+            out,
+            "Enero es buena época.\n\nSi querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+        )
+        self.assertTrue(session["email_requested"])
+
+    def test_a_reply_that_is_only_a_question_is_kept(self):
+        out = apply_email_ack_or_request_policy("¿Para cuándo lo pensás?", {"conversation_turn_count": 3}, None, "es")
+        self.assertTrue(out.startswith("¿Para cuándo lo pensás?\n\n"))
+
+    def test_a_question_with_data_is_kept(self):
+        session = {"conversation_turn_count": 4}
+        out = apply_email_ack_or_request_policy("Hay dos salidas. ¿Te sirve la del 5/12?", session, None, "es")
+        self.assertTrue(out.startswith("Hay dos salidas. ¿Te sirve la del 5/12?\n\n"))
+
+
+class OutOfSeasonOfferTests(unittest.TestCase):
+    def test_warning_drops_its_offer_when_the_reply_already_offers(self):
+        session = {}
+        reply = "Las salidas son de noviembre a febrero.\n\nSi querés, pasame tu email y te mando el detalle completo con precios y fechas."
+        out = apply_out_of_season_policy(reply, "Quiero hacer la expedición en julio", session, "es")
+        self.assertTrue(out.startswith("Ojo: las expediciones al Aconcagua son solo de noviembre a marzo"))
+        self.assertNotIn("próxima temporada", out)
+        self.assertEqual(out.count("Si querés"), 1)
+
+    def test_warning_keeps_its_offer_otherwise(self):
+        out = apply_out_of_season_policy("Las salidas son de noviembre a febrero.", "Quiero hacer la expedición en julio", {}, "es")
+        self.assertIn("Si querés te paso las fechas de la próxima temporada.", out)
 
 
 class BotQuestionTests(unittest.TestCase):

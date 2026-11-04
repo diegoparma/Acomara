@@ -119,6 +119,47 @@ class ConversationFlowTests(unittest.TestCase):
         self.assertEqual(stored_turns[-1], {"role": "assistant", "text": second})
         self.assertEqual(len(stored_turns), 6)
 
+    def test_client_name_is_remembered_and_offered_to_the_model(self):
+        self.model.replies = ["The permit is not included, we arrange it at no extra cost.", "The insurance is separate too."]
+        self.store["conv-flow"] = {"conversation_turn_count": 5, "conversation_language": "en"}
+        self._send("Hi, I'm Wes from Australia. Is the permit included?")
+        self.assertEqual(self.store["conv-flow"]["customer_name"], "Wes")
+        self._send("What about the rescue insurance?")
+        self.assertIn("se llama Wes", self.model.calls[1][-1]["content"])
+
+    def test_fixed_phrases_follow_a_client_who_writes_with_usted(self):
+        self.model.replies = ["Incluye hotel en Mendoza, comidas en la montaña, mulas y guías.", "Incluye hotel y comidas."]
+        self.store["conv-flow"] = {
+            "conversation_turn_count": 2,
+            "conversation_language": "es",
+            "recent_turns": [{"role": "user", "text": "Buenas tardes, quisiera saber si organizan la expedición."}],
+        }
+        reply = self._text(self._send("¿Usted me podría indicar qué incluye el precio?"))
+        self.assertIn("páseme su email", reply)
+        self.assertNotIn("pasame tu email", reply)
+
+    def test_fixed_phrases_stay_in_vos_otherwise(self):
+        self.model.replies = ["Incluye hotel en Mendoza, comidas en la montaña, mulas y guías."]
+        self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}
+        reply = self._text(self._send("¿Qué incluye el precio?"))
+        self.assertIn("pasame tu email", reply)
+
+    def test_welcome_answers_the_clients_greeting(self):
+        reply = self._text(self._send("Buenas tardes"))
+        self.assertTrue(reply.startswith("¡Buenas tardes! Gracias por escribirnos."), reply)
+        self.assertEqual(self.model.calls, [])
+
+    def test_how_are_you_first_message_gets_the_welcome(self):
+        reply = self._text(self._send("Hola, ¿cómo estás?"))
+        self.assertTrue(reply.startswith("¡Hola! Todo bien por acá."), reply)
+        self.assertEqual(self.model.calls, [])
+
+    def test_casual_out_of_season_question_gets_the_warning(self):
+        self.model.replies = ["Las salidas son de noviembre a febrero."]
+        self.store["conv-flow"] = {"conversation_turn_count": 6, "conversation_language": "es", "email_requested": True}
+        reply = self._text(self._send("¿Y se puede ir en julio?"))
+        self.assertTrue(reply.startswith("Ojo: las expediciones al Aconcagua son solo de noviembre a marzo"), reply)
+
     def test_email_with_a_question_gets_both_bubbles(self):
         self.model.replies = ["El 18+2 sale USD 6.990, sujeto a disponibilidad."]
         self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}
@@ -145,6 +186,10 @@ class ConversationFlowTests(unittest.TestCase):
         self.assertTrue(bot.startswith("Soy el asistente digital"))
         self.assertEqual(self.model.calls, [])
         self.assertEqual(self._text(self._send("Gracias de nuevo")), "¡Un placer! Si te surge otra duda, acá estoy.")
+        # Four different answers before any repeats.
+        later = [self._text(self._send(text)) for text in ("Muchas gracias", "Gracias!", "Mil gracias")]
+        self.assertEqual(len({thanks, "¡Un placer! Si te surge otra duda, acá estoy.", *later[:2]}), 4)
+        self.assertEqual(later[2], thanks)
 
 
     def test_fernando_rules_in_the_real_flow(self):

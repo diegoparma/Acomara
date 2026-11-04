@@ -19,8 +19,8 @@ Nico tiene acceso a una base de conocimiento propia de Acomara con toda la infor
 |------|---------------------|
 | **Programas** | Opciones 18+2, 14+2, 12+2 y Ruta Polaca 17+2 — descripción, diferencias, a quién conviene cada uno |
 | **Rutas** | Ruta Normal y Glaciar Polaco 360° — altitudes, campamentos, perfil de dificultad |
-| **Precios** | USD 6.990 estándar / USD 5.990 promocional (según evidencia publicada, siempre aclarando "sujeto a disponibilidad") |
-| **Temporada y fechas** | Noviembre a marzo — fechas de salida publicadas |
+| **Precios** | USD 7.250 regular / promoción entre USD 5.990 y USD 6.390 según la fecha (lo confirma un asesor). Fuente única: `docs/knowledge/fuente/valores.yaml` |
+| **Temporada y fechas** | Salidas de noviembre a febrero (temporada 2026/27) — fechas programadas en `docs/knowledge/fuente/salidas.yaml` |
 | **Qué incluye** | Servicios incluidos en el programa vs. opcionales (porteadores, EAP, WiFi, traslados privados, etc.) |
 | **Permisos y seguros** | Permiso de parque, cobertura de rescate y evacuación |
 | **Equipamiento** | Qué llevar, qué alquilar, listas de gear |

@@ -51,6 +51,39 @@ class OutOfSeasonFalsePositiveTests(unittest.TestCase):
                 self.assertFalse(mentions_out_of_season(text))
 
 
+class OutOfSeasonCasualQuestionTests(unittest.TestCase):
+    """Clients rarely say "expedición": "¿y se puede ir en julio?" is enough."""
+
+    def test_travel_verb_or_short_question_about_a_month(self):
+        for text in (
+            "¿Y se puede ir en julio?",
+            "Podemos ir en agosto?",
+            "queremos viajar en septiembre",
+            "Can we go in June?",
+            "Could we come in early may?",
+            "Is July possible?",
+            "What about May?",
+            "Dá pra ir em julho?",
+            "¿y en mayo?",
+            "¿Qué tal octubre?",
+        ):
+            with self.subTest(text=text):
+                self.assertTrue(mentions_out_of_season(text))
+
+    def test_months_that_are_not_about_going(self):
+        for text in (
+            "Nací en julio",
+            "Me caso en junio, después vemos",
+            "En agosto empiezo a entrenar para ir en enero",
+            "En julio fui al Lanín y en agosto al Champaquí, ¿me sirve para el 18+2?",
+            "May I ask something?",
+            "¿Y en enero?",
+            "Can we go in December?",
+        ):
+            with self.subTest(text=text):
+                self.assertFalse(mentions_out_of_season(text))
+
+
 class OutOfSeasonTruePositiveTests(unittest.TestCase):
     def test_english_may_as_month(self):
         for text in ("expedition in may", "climb on May 12", "expedition 12th of May"):
