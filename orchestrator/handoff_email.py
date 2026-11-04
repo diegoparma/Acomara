@@ -11,6 +11,11 @@ from urllib.request import Request, urlopen
 LOGGER = logging.getLogger(__name__)
 
 
+def _brand(runtime: dict[str, Any]) -> str:
+    """Tag at the start of every subject; the server sets it from the tenant (Acomara)."""
+    return str(runtime.get("brand_name") or "Nico")
+
+
 def _http_json(
     method: str,
     url: str,
@@ -58,7 +63,7 @@ def send_handoff_email(
     def sanitize_for_email(text: str) -> str:
         return text.replace("\r", "").replace("\n", " ")
 
-    subject = f"[Acomara] Solicitud de asesor humano - {msg['conversation_id']}"
+    subject = f"[{_brand(runtime)}] Solicitud de asesor humano - {msg['conversation_id']}"
     text_body = "\n".join(
         [
             "Un cliente solicito contacto con asesor humano.",
@@ -143,7 +148,7 @@ def send_compromised_email_alert(
 ) -> tuple[bool, int, dict[str, Any]]:
     """Send alert to admin when the conversation looks automated (paused)."""
     reason = str(session_vars.get("bot_signal") or "sin detalle")
-    subject = f"[ACOMARA SECURITY] Posible bot - {msg['conversation_id']}"
+    subject = f"[{_brand(runtime).upper()} SECURITY] Posible bot - {msg['conversation_id']}"
     text_body = "\n".join(
         [
             "⚠️ ALERTA DE SEGURIDAD",
@@ -233,7 +238,7 @@ def send_new_lead_email(
     session_vars: dict[str, Any],
 ) -> tuple[bool, int, dict[str, Any]]:
     """Tell the advisor a lead shared their email. Nico keeps the conversation."""
-    subject = f"[Acomara] Nuevo lead con email - {email}"
+    subject = f"[{_brand(runtime)}] Nuevo lead con email - {email}"
     text_body = "\n".join(
         [
             "Un cliente compartio su email. Nico sigue atendiendo la conversacion.",

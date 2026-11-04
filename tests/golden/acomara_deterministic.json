@@ -1,0 +1,2802 @@
+{
+ "blocked_reply": {
+  "en": "I can't share credentials or access data through this channel. A human advisor will continue with secure onboarding steps.",
+  "es": "No puedo compartir credenciales ni datos de acceso por este canal. Un asesor humano continuara con los pasos seguros.",
+  "pt": "Nao posso compartilhar credenciais ou dados de acesso por este canal. Um consultor humano continuara com os passos seguros."
+ },
+ "dates": {
+  "by_program": {
+   "12+2": [
+    "2027-01-10",
+    "2027-01-24"
+   ],
+   "14+2": [
+    "2026-12-05",
+    "2026-12-20",
+    "2027-01-08"
+   ],
+   "18+2": [
+    "2026-11-14",
+    "2026-11-22",
+    "2026-12-04",
+    "2026-12-18",
+    "2027-01-02",
+    "2027-01-15",
+    "2027-02-01"
+   ]
+  },
+  "clarified": "Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n",
+  "filtered": "Fechas de salida temporada 2026/27\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n"
+ },
+ "messages": {
+  "/reset": {
+   "asks_bot": false,
+   "command": "/reset",
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Are you a robot?": {
+   "asks_bot": true,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Buenas tardes, quiero info del Aconcagua": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": true,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Can I talk to a real person?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": true,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Cuánto sale cancelar la reserva?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "English please": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": "en",
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Estou falando com uma pessoa?": {
+   "asks_bot": true,
+   "command": null,
+   "detect": "pt",
+   "detect_confident": "pt",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "pt",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Gostaria de saber sobre a expedição": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "pt",
+   "detect_confident": "pt",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": true,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "pt",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Gracias!": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": true,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Hi": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": true,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Hi, I'm interested in climbing Aconcagua": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": true,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Hola": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": true,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "I'd like to climb in May": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": true,
+   "out_of_season_policy_en": [
+    "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_es": [
+    "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_pt": [
+    "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Is the 12+2 ok for me? I climbed Mont Blanc": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": "To be honest, the 12+2 is only for people who have already been above 6,000 m, are very well trained and arrive acclimatized. Mont Blanc (4,806 m) doesn't reach that altitude. I'd recommend the 18+2: same price, more days to acclimatize, and that's what raises your summit chances the most.",
+   "short_program_es": "Te soy sincero: el 12+2 es solo para quien ya estuvo arriba de los 6.000 m, está muy entrenado y llega aclimatado. El Mont Blanc (4.806 m) no llega a esa altura. Te recomiendo el 18+2: cuesta lo mismo y tiene más días para aclimatar, que es lo que más sube las chances de cumbre.",
+   "short_program_pt": "Sendo sincero: o 12+2 é só para quem já esteve acima de 6.000 m, está muito bem treinado e chega aclimatado. El Mont Blanc (4.806 m) não chega a essa altitude. Recomendo o 18+2: custa o mesmo e tem mais dias para aclimatar, o que mais aumenta as chances de cume.",
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "May I ask about the expedition?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Me interesa la del 5/12": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": "The 5/12 departure is the 14+2, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on 4/12.",
+   "extended_note_es": "La del 5/12 es del 14+2, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el 4/12.",
+   "extended_note_pt": "A saída de 5/12 é do 14+2, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em 4/12.",
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. The 5/12 departure is the 14+2, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on 4/12. An advisor will confirm availability for whichever date you choose.\n\nIf you'd like, we can set up a short video call and go over it together: tell me a day, a time and your city, and send me your email so I can share the details.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ],
+   "video_close_es": [
+    "Perfecto. La del 5/12 es del 14+2, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el 4/12. La disponibilidad de la fecha que elijas te la confirma un asesor.\n\nSi querés, armamos una videollamada corta y lo vemos juntos: decime día, hora y desde qué ciudad me escribís, y pasame tu email así te mando el detalle.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ],
+   "video_close_pt": [
+    "Perfecto. A saída de 5/12 é do 14+2, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em 4/12. A disponibilidade da data que você escolher um consultor te confirma.\n\nSe quiser, marcamos uma videochamada rápida e vemos juntos: me diz dia, horário e de que cidade você fala, e me passa seu email para eu te mandar o detalhe.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ]
+  },
+  "Me sirve el 14+2? Hice el Kilimanjaro": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": "To be honest, the 14+2 is only for people who have already been above 6,000 m, are very well trained and arrive acclimatized. Kilimanjaro (5,895 m) doesn't reach that altitude. I'd recommend the 18+2: same price, more days to acclimatize, and that's what raises your summit chances the most.",
+   "short_program_es": "Te soy sincero: el 14+2 es solo para quien ya estuvo arriba de los 6.000 m, está muy entrenado y llega aclimatado. El Kilimanjaro (5.895 m) no llega a esa altura. Te recomiendo el 18+2: cuesta lo mismo y tiene más días para aclimatar, que es lo que más sube las chances de cumbre.",
+   "short_program_pt": "Sendo sincero: o 14+2 é só para quem já esteve acima de 6.000 m, está muito bem treinado e chega aclimatado. El Kilimanjaro (5.895 m) não chega a essa altitude. Recomendo o 18+2: custa o mesmo e tem mais dias para aclimatar, o que mais aumenta as chances de cume.",
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Me sirve el 14+2? Subí el Chimborazo": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Olá": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": true,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Posso fazer o 14+2?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": "To be honest, the 14+2 is only for people who have already been above 6,000 m, are very well trained and arrive acclimatized. I'd recommend the 18+2: same price, more days to acclimatize, and that's what raises your summit chances the most.",
+   "short_program_es": "Te soy sincero: el 14+2 es solo para quien ya estuvo arriba de los 6.000 m, está muy entrenado y llega aclimatado. Te recomiendo el 18+2: cuesta lo mismo y tiene más días para aclimatar, que es lo que más sube las chances de cumbre.",
+   "short_program_pt": "Sendo sincero: o 14+2 é só para quem já esteve acima de 6.000 m, está muito bem treinado e chega aclimatado. Recomendo o 18+2: custa o mesmo e tem mais dias para aclimatar, o que mais aumenta as chances de cume.",
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Queremos ir en julio al Aconcagua": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": true,
+   "out_of_season_policy_en": [
+    "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_es": [
+    "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_pt": [
+    "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Quero falar com um atendente": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "pt",
+   "detect_confident": "pt",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": true,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "pt",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Quiero hablar con un asesor": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": true,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Quiero reservar el 18+2": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto.\n\nIf you'd like, we can set up a short video call and go over it together: tell me a day, a time and your city, and send me your email so I can share the details.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ],
+   "video_close_es": [
+    "Perfecto.\n\nSi querés, armamos una videollamada corta y lo vemos juntos: decime día, hora y desde qué ciudad me escribís, y pasame tu email así te mando el detalle.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ],
+   "video_close_pt": [
+    "Perfecto.\n\nSe quiser, marcamos uma videochamada rápida e vemos juntos: me diz dia, horário e de que cidade você fala, e me passa seu email para eu te mandar o detalhe.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ]
+  },
+  "Salida el 15/05": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": true,
+   "out_of_season_policy_en": [
+    "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_es": [
+    "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_pt": [
+    "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Salida el 5/12": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": "The 5/12 departure is the 14+2, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on 4/12.",
+   "extended_note_es": "La del 5/12 es del 14+2, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el 4/12.",
+   "extended_note_pt": "A saída de 5/12 é do 14+2, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em 4/12.",
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. The 5/12 departure is the 14+2, which is for people who have already been above 6,000 m. If that's not you, the 18+2 is a better fit at the same price: the closest departure is on 4/12. An advisor will confirm availability for whichever date you choose.\n\nIf you'd like, we can set up a short video call and go over it together: tell me a day, a time and your city, and send me your email so I can share the details.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ],
+   "video_close_es": [
+    "Perfecto. La del 5/12 es del 14+2, que es para quien ya estuvo arriba de los 6.000 m. Si no es tu caso, te conviene el 18+2, que cuesta lo mismo: la salida más cercana es el 4/12. La disponibilidad de la fecha que elijas te la confirma un asesor.\n\nSi querés, armamos una videollamada corta y lo vemos juntos: decime día, hora y desde qué ciudad me escribís, y pasame tu email así te mando el detalle.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ],
+   "video_close_pt": [
+    "Perfecto. A saída de 5/12 é do 14+2, que é para quem já esteve acima de 6.000 m. Se não for o seu caso, o 18+2 é melhor e custa o mesmo: a saída mais próxima é em 4/12. A disponibilidade da data que você escolher um consultor te confirma.\n\nSe quiser, marcamos uma videochamada rápida e vemos juntos: me diz dia, horário e de que cidade você fala, e me passa seu email para eu te mandar o detalhe.",
+    {
+     "email_requested": true,
+     "proactive_email_capture_pending": true,
+     "video_call_offered": true
+    }
+   ]
+  },
+  "Somos 4-6 personas para la expedición": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Thanks so much for the info": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": true,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": true,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "Viagem em setembro": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": true,
+   "out_of_season_policy_en": [
+    "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_es": [
+    "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "out_of_season_policy_pt": [
+    "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.\n\nRespuesta.",
+    {
+     "out_of_season_warned": true
+    }
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "What options do you have?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "en",
+   "detect_confident": "en",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    "I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n\nThere are other alternatives as well. If you'd like, I can list them in detail.",
+    {
+     "program_options_stage": 1
+    },
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    "Para empezar, te recomiendo estas dos opciones:\n1. 18+2 (muy recomendada)\n2. 12+2 (recomendada)\n\nTambién hay otras alternativas. Si querés, te las paso en detalle.",
+    {
+     "program_options_stage": 1
+    },
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    "Para empezar, te recomiendo estas dos opciones:\n1. 18+2 (muy recomendada)\n2. 12+2 (recomendada)\n\nTambién hay otras alternativas. Si querés, te las paso en detalle.",
+    {
+     "program_options_stage": 1
+    },
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "en",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "en español por favor": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": "es",
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "mi mail es juan@example.com": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "quiero hablar con mi esposa": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "¿Cuáles son las otras opciones?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    "I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n\nThere are other alternatives as well. If you'd like, I can list them in detail.",
+    {
+     "program_options_stage": 1
+    },
+    "The other alternatives are:\n1. 14+2\n2. 17+2",
+    {
+     "program_options_stage": 2
+    }
+   ],
+   "options_es": [
+    "Para empezar, te recomiendo estas dos opciones:\n1. 18+2 (muy recomendada)\n2. 12+2 (recomendada)\n\nTambién hay otras alternativas. Si querés, te las paso en detalle.",
+    {
+     "program_options_stage": 1
+    },
+    "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+    {
+     "program_options_stage": 2
+    }
+   ],
+   "options_pt": [
+    "Para empezar, te recomiendo estas dos opciones:\n1. 18+2 (muy recomendada)\n2. 12+2 (recomendada)\n\nTambién hay otras alternativas. Si querés, te las paso en detalle.",
+    {
+     "program_options_stage": 1
+    },
+    "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+    {
+     "program_options_stage": 2
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "¿Diferencia entre el 14+2 y el 18+2?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "¿Qué fechas tienen?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "¿Qué opciones tienen?": {
+   "asks_bot": false,
+   "command": null,
+   "detect": "es",
+   "detect_confident": "es",
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    "I recommend starting with two options:\n1. 18+2 (highly recommended)\n2. 12+2 (recommended)\n\nThere are other alternatives as well. If you'd like, I can list them in detail.",
+    {
+     "program_options_stage": 1
+    },
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    "Para empezar, te recomiendo estas dos opciones:\n1. 18+2 (muy recomendada)\n2. 12+2 (recomendada)\n\nTambién hay otras alternativas. Si querés, te las paso en detalle.",
+    {
+     "program_options_stage": 1
+    },
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    "Para empezar, te recomiendo estas dos opciones:\n1. 18+2 (muy recomendada)\n2. 12+2 (recomendada)\n\nTambién hay otras alternativas. Si querés, te las paso en detalle.",
+    {
+     "program_options_stage": 1
+    },
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  },
+  "¿Sos un bot?": {
+   "asks_bot": true,
+   "command": null,
+   "detect": "es",
+   "detect_confident": null,
+   "explicit_pref": null,
+   "extended_note_en": null,
+   "extended_note_es": null,
+   "extended_note_pt": null,
+   "generic_opening": false,
+   "greeting": false,
+   "handoff": false,
+   "options_en": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_es": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "options_pt": [
+    null,
+    {},
+    null,
+    {
+     "program_options_stage": 1
+    }
+   ],
+   "out_of_season": false,
+   "out_of_season_policy_en": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_es": [
+    "Respuesta.",
+    {}
+   ],
+   "out_of_season_policy_pt": [
+    "Respuesta.",
+    {}
+   ],
+   "session_lang": "es",
+   "short_program_en": null,
+   "short_program_es": null,
+   "short_program_pt": null,
+   "thanks": false,
+   "video_close_en": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_es": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ],
+   "video_close_pt": [
+    "Perfecto. ¿Querés que te cuente más?",
+    {}
+   ]
+  }
+ },
+ "paused": {
+  "human_handoff_in_progress": "I've passed your request to an advisor, they'll message you here shortly.",
+  "proactive_email_request": "Send me your email whenever you can and we'll continue.",
+  "suspicious": "Great! We'll be in touch shortly."
+ },
+ "phrases": {
+  "None": {
+   "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
+   "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
+   "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
+   "handoff_ask_email": "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?",
+   "handoff_executed": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
+   "handoff_pending": "Me falta tu email para pasarte con el asesor. ¿Cuál es?",
+   "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
+   "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
+   "paused_handoff": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
+   "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+   "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
+   "paused_suspicious": "Perfecto, te escribimos en breve.",
+   "proactive_email_check_failed": "Gracias, ya me quedó tu email. Si en algún momento querés hablar con un asesor, avisame.",
+   "proactive_email_request": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+   "proactive_email_saved": "Genial, ya me quedó tu email. Si después querés hablar con un asesor, avisame y te paso.",
+   "repeat_prefix": "Como te decía,",
+   "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
+   "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
+   "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy."
+  },
+  "en": {
+   "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
+   "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
+   "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
+   "handoff_ask_email": "Sure, I'll put you in touch with one of our advisors. What's your email so they can reach you?",
+   "handoff_executed": "Done, I've passed your request to one of our advisors. They'll message you here shortly 🙌",
+   "handoff_pending": "I just need your email to pass you to the advisor. What is it?",
+   "opening_welcome": "Hi! Thanks for reaching out. How can I help?\n\nIf it's useful, besides answering here I can email you all the info: prices, dates, services, gear list and recommendations.",
+   "out_of_season": "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.",
+   "paused_handoff": "I've passed your request to an advisor, they'll message you here shortly.",
+   "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
+   "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
+   "paused_suspicious": "Great! We'll be in touch shortly.",
+   "proactive_email_check_failed": "Thanks, got your email. If you'd like to talk to an advisor at some point, just let me know.",
+   "proactive_email_request": "If you'd like, send me your email and I'll share the full details with prices and dates.",
+   "proactive_email_saved": "Great, got your email. If you want to talk to an advisor later, just let me know.",
+   "repeat_prefix": "As I mentioned,",
+   "reset_acknowledge": "Conversation restarted. How can I help you?",
+   "thanks_reply_1": "You're welcome! Message me here anytime.",
+   "thanks_reply_2": "My pleasure! If anything else comes up, I'm here."
+  },
+  "es": {
+   "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
+   "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
+   "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
+   "handoff_ask_email": "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?",
+   "handoff_executed": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
+   "handoff_pending": "Me falta tu email para pasarte con el asesor. ¿Cuál es?",
+   "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
+   "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
+   "paused_handoff": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
+   "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+   "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
+   "paused_suspicious": "Perfecto, te escribimos en breve.",
+   "proactive_email_check_failed": "Gracias, ya me quedó tu email. Si en algún momento querés hablar con un asesor, avisame.",
+   "proactive_email_request": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+   "proactive_email_saved": "Genial, ya me quedó tu email. Si después querés hablar con un asesor, avisame y te paso.",
+   "repeat_prefix": "Como te decía,",
+   "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
+   "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
+   "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy."
+  },
+  "fr": {
+   "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
+   "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
+   "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
+   "handoff_ask_email": "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?",
+   "handoff_executed": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
+   "handoff_pending": "Me falta tu email para pasarte con el asesor. ¿Cuál es?",
+   "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
+   "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
+   "paused_handoff": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
+   "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
+   "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
+   "paused_suspicious": "Perfecto, te escribimos en breve.",
+   "proactive_email_check_failed": "Gracias, ya me quedó tu email. Si en algún momento querés hablar con un asesor, avisame.",
+   "proactive_email_request": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+   "proactive_email_saved": "Genial, ya me quedó tu email. Si después querés hablar con un asesor, avisame y te paso.",
+   "repeat_prefix": "Como te decía,",
+   "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
+   "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
+   "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy."
+  },
+  "missing_key": "[no_such_key]",
+  "pt": {
+   "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
+   "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
+   "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
+   "handoff_ask_email": "Claro, vou te passar para um consultor da equipe. Qual é o seu email para ele entrar em contato?",
+   "handoff_executed": "Pronto, já passei sua consulta para um consultor da equipe. Ele te escreve por aqui em breve 🙌",
+   "handoff_pending": "Só falta seu email para te passar para o consultor. Qual é?",
+   "opening_welcome": "Olá! Obrigado por escrever. Como posso te ajudar?\n\nSe for útil, além de responder por aqui te mando por email todas as informações: preços, datas, serviços, lista de equipamentos e recomendações.",
+   "out_of_season": "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.",
+   "paused_handoff": "Já passei sua consulta para um consultor, ele te escreve por aqui em breve.",
+   "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
+   "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
+   "paused_suspicious": "Perfeito, vamos te escrever em breve.",
+   "proactive_email_check_failed": "Obrigado, já anotei seu email. Se em algum momento quiser falar com um consultor, é só me avisar.",
+   "proactive_email_request": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+   "proactive_email_saved": "Ótimo, já anotei seu email. Se depois quiser falar com um consultor, é só me avisar.",
+   "repeat_prefix": "Como te falei,",
+   "reset_acknowledge": "Conversa reiniciada. Como posso te ajudar?",
+   "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
+   "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui."
+  }
+ },
+ "user_prompts": [
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: whatsapp\nConversation ID: conv-golden\nCliente pregunta:\nHola\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"es\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responde en español.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: whatsapp\nConversation ID: conv-golden\nCliente pregunta:\nHi\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"en\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Respond in English.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: whatsapp\nConversation ID: conv-golden\nCliente pregunta:\nOlá\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"es\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responde en español.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: whatsapp\nConversation ID: conv-golden\nCliente pregunta:\nBuenas tardes, quiero info del Aconcagua\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"es\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responde en español.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: whatsapp\nConversation ID: conv-golden\nCliente pregunta:\nHi, I'm interested in climbing Aconcagua\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"en\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Respond in English.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: whatsapp\nConversation ID: conv-golden\nCliente pregunta:\nGostaria de saber sobre a expedição\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"pt\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responda em português.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: email\nConversation ID: conv-golden\nCliente pregunta:\nHola\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"es\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responde en español.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta corta: máximo 3 líneas y 450 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: email\nConversation ID: conv-golden\nCliente pregunta:\nHi\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"en\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Respond in English.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta corta: máximo 3 líneas y 450 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: email\nConversation ID: conv-golden\nCliente pregunta:\nOlá\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"es\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responde en español.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta corta: máximo 3 líneas y 450 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: email\nConversation ID: conv-golden\nCliente pregunta:\nBuenas tardes, quiero info del Aconcagua\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"es\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responde en español.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta corta: máximo 3 líneas y 450 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: email\nConversation ID: conv-golden\nCliente pregunta:\nHi, I'm interested in climbing Aconcagua\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"en\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Respond in English.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta corta: máximo 3 líneas y 450 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos.",
+  "Fecha de hoy (Argentina): 2026-11-04\nCanal: email\nConversation ID: conv-golden\nCliente pregunta:\nGostaria de saber sobre a expedição\n\nVariables de sesion actuales:\n{\"conversation_turn_count\": 2, \"email_requested\": true, \"conversation_language\": \"pt\"}\n\n\n👥 PROSPECTO DESCONOCIDO: Este cliente no está registrado en nuestro sistema.\n\nEvidencia interna recuperada:\nID: faq-007\nTOPIC: general\nQUESTION: ¿Qué fechas tienen?\nANSWER: Fechas de salida temporada 2026/27 (noviembre y diciembre de 2026; enero y febrero de 2027)\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n\nSIMILARITY: 0.9000\n\nInstrucciones CRÍTICAS:\n- Responda em português.\n- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación (si ya le diste un precio o una fecha, podés repetirlo).\n- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. Decir que no lo tenés es el último recurso.\n- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n- Mantén la respuesta corta: máximo 3 líneas y 450 caracteres.\n- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n- No pidas el email si ya lo pediste en esta conversación.\n- Nunca menciones FAQ, documentación, evidencia ni base de datos."
+ ],
+ "whatsapp": [
+  [
+   "Fechas de salida temporada 2026/27\n*18+2 días - Ruta Normal* _(extendido)_\nNov 14, 22 · Dic 4, 18 · Ene 2, 15 · Feb 1\n*14+2 días - Ascenso Rápido*\nDic 5, 20 · Ene 8\n*12+2 días - Ascenso Extremo*\nEne 10, 24",
+   "Fechas de salida temporada 2026/27\n18+2 días | Ruta Normal (Extendido)\nNoviembre: 14 | 22\nDiciembre: 4 | 18\nEnero: 2 | 15\nFebrero: 1\n14+2 días | Ascenso Rápido\nDiciembre: 5 | 20\nEnero: 8\n12+2 días | Ascenso Extremo\nEnero: 10 | 24\n"
+  ],
+  [
+   "Estas son las salidas: Extendido (18+2 días) Noviembre 14, 22; Diciembre 4, 18; Rápido (14+2 días) Diciembre 5, 20.",
+   "Estas son las salidas: Extendido (18+2 días) Noviembre 14, 22; Diciembre 4, 18; Rápido (14+2 días) Diciembre 5, 20."
+  ],
+  [
+   "Las fechas son:\n*18+2 días - Ruta Normal* _(extendido)_\nNov 14, 22 · Dic 4, 18",
+   "Las fechas son:\n18+2 DÍAS | RUTA NORMAL (EXTENDIDO)\n- Noviembre: 14 | 22\n- Diciembre: 4 | 18"
+  ],
+  [
+   "No hay fechas en esta respuesta.",
+   "No hay fechas en esta respuesta."
+  ]
+ ]
+}

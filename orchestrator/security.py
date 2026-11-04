@@ -12,6 +12,7 @@ def check_email_reputation(
     email: str,
     api_key: str,
     timeout: int = 10,
+    user_agent: str = "Nico-SalesAgent/1.0",
 ) -> tuple[bool, bool]:
     """
     Check email reputation against Have I Been Pwned API v3.
@@ -38,7 +39,7 @@ def check_email_reputation(
         )
 
         headers = {
-            "User-Agent": "Acomara-SalesAgent/1.0",
+            "User-Agent": user_agent,
             "hibp-api-key": api_key,
             "Accept": "application/json",
         }

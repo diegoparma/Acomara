@@ -13,7 +13,7 @@ MVP flow:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 import json
 import math
 import os
@@ -71,14 +71,6 @@ from orchestrator.session_client import (
 from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
-from orchestrator.crm_client_status import check_client_status
-from orchestrator.departures import (
-    clarify_season_years,
-    ensure_departure_hit,
-    filter_past_departures,
-    season_departures,
-)
-from orchestrator.sales_rules import apply_video_call_close, extended_alternative_note, short_program_reply
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
@@ -86,14 +78,24 @@ from orchestrator.humanize import (
     humanize_reply,
     trim_to_last_sentence,
 )
-from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
-from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
-from orchestrator.caja_interno import internal_reply
+from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID as _ENGINE_DEFAULT_AGENT_ID, human_replied_recently
+from orchestrator.conversation_audit import DEFAULT_ORG_ID as _ENGINE_DEFAULT_ORG_ID, run_conversation_audit
+from nico_core import get_tenant
+from nico_core.hooks import CloseContext, first_fixed_reply
+from nico_core.prompt import build_user_prompt
+from nico_core.program_guide import program_options_reply
+from nico_core.season import mentions_off_season, numeric_date_is_off_season
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
-SYSTEM_PROMPT_PATH = ROOT / "docs" / "sales-agent" / "02-system-prompt.md"
-KEY_FACTS_PATH = ROOT / "docs" / "knowledge" / "datos-clave.md"
+TENANT = get_tenant()
+# Adapters and ids from the tenant (module names kept: tests patch them).
+check_client_status = TENANT.integrations.crm_lookup
+internal_reply = TENANT.integrations.internal_router
+DEFAULT_ORG_ID = TENANT.integrations.openbsp_organization_id or _ENGINE_DEFAULT_ORG_ID
+DEFAULT_NICO_AGENT_ID = TENANT.integrations.agent_id or _ENGINE_DEFAULT_AGENT_ID
+INDEX_PATH = TENANT.knowledge.resolve(TENANT.knowledge.index_path)
+SYSTEM_PROMPT_PATH = TENANT.knowledge.resolve(TENANT.knowledge.system_prompt_path)
+KEY_FACTS_PATH = TENANT.knowledge.resolve(TENANT.knowledge.key_facts_path)
 
 app = Flask(__name__)
 
@@ -162,72 +164,10 @@ class ReplyDecision:
     outbound_safety_blocked: bool = False
 
 
-# i18n: Internationalization layer for fixed phrases
-I18N_PHRASES = {
-    "es": {
-        "reset_acknowledge": "Conversación reiniciada. ¿En qué te puedo ayudar?",
-        "handoff_ask_email": "Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?",
-        "handoff_executed": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
-        "handoff_pending": "Me falta tu email para pasarte con el asesor. ¿Cuál es?",
-        "proactive_email_request": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
-        "proactive_email_saved": "Genial, ya me quedó tu email. Si después querés hablar con un asesor, avisame y te paso.",
-        "proactive_email_check_failed": "Gracias, ya me quedó tu email. Si en algún momento querés hablar con un asesor, avisame.",
-        "paused_handoff": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
-        "paused_suspicious": "Perfecto, te escribimos en breve.",
-        "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
-        "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
-        "repeat_prefix": "Como te decía,",
-        "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
-        "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy.",
-        "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
-        "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
-        "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
-        "out_of_season": "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.",
-        "opening_welcome": "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.",
-    },
-    "en": {
-        "reset_acknowledge": "Conversation restarted. How can I help you?",
-        "handoff_ask_email": "Sure, I'll put you in touch with one of our advisors. What's your email so they can reach you?",
-        "handoff_executed": "Done, I've passed your request to one of our advisors. They'll message you here shortly 🙌",
-        "handoff_pending": "I just need your email to pass you to the advisor. What is it?",
-        "proactive_email_request": "If you'd like, send me your email and I'll share the full details with prices and dates.",
-        "proactive_email_saved": "Great, got your email. If you want to talk to an advisor later, just let me know.",
-        "proactive_email_check_failed": "Thanks, got your email. If you'd like to talk to an advisor at some point, just let me know.",
-        "paused_handoff": "I've passed your request to an advisor, they'll message you here shortly.",
-        "paused_suspicious": "Great! We'll be in touch shortly.",
-        "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
-        "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
-        "repeat_prefix": "As I mentioned,",
-        "thanks_reply_1": "You're welcome! Message me here anytime.",
-        "thanks_reply_2": "My pleasure! If anything else comes up, I'm here.",
-        "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
-        "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
-        "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
-        "out_of_season": "Heads up: Aconcagua expeditions only run from November to March (Southern Hemisphere season), so we don't have departures on that date. If you'd like, I can share the dates for next season.",
-        "opening_welcome": "Hi! Thanks for reaching out. How can I help?\n\nIf it's useful, besides answering here I can email you all the info: prices, dates, services, gear list and recommendations.",
-    },
-    "pt": {
-        "reset_acknowledge": "Conversa reiniciada. Como posso te ajudar?",
-        "handoff_ask_email": "Claro, vou te passar para um consultor da equipe. Qual é o seu email para ele entrar em contato?",
-        "handoff_executed": "Pronto, já passei sua consulta para um consultor da equipe. Ele te escreve por aqui em breve 🙌",
-        "handoff_pending": "Só falta seu email para te passar para o consultor. Qual é?",
-        "proactive_email_request": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
-        "proactive_email_saved": "Ótimo, já anotei seu email. Se depois quiser falar com um consultor, é só me avisar.",
-        "proactive_email_check_failed": "Obrigado, já anotei seu email. Se em algum momento quiser falar com um consultor, é só me avisar.",
-        "paused_handoff": "Já passei sua consulta para um consultor, ele te escreve por aqui em breve.",
-        "paused_suspicious": "Perfeito, vamos te escrever em breve.",
-        "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
-        "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
-        "repeat_prefix": "Como te falei,",
-        "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
-        "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui.",
-        "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
-        "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
-        "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
-        "out_of_season": "Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas. Se quiser, te passo as datas da próxima temporada.",
-        "opening_welcome": "Olá! Obrigado por escrever. Como posso te ajudar?\n\nSe for útil, além de responder por aqui te mando por email todas as informações: preços, datas, serviços, lista de equipamentos e recomendações.",
-    },
-}
+# i18n: fixed phrases come from the tenant config (tenants/<slug>/).
+I18N_PHRASES = TENANT.phrases
+# Words of the tenant's trade that also tell the language ("summit" → en).
+_HINTS = TENANT.language_hints
 
 
 def detect_language_from_text(text: str) -> str:
@@ -268,10 +208,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "regards",
         "thanks",
         "thank you",
-        "summit",
-        "expedition",
-        "ascent",
-    )
+    ) + _HINTS.strong.get("en", ())
     strong_pt_tokens = (
         "gostaria",
         "obrigado",
@@ -286,7 +223,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         # and "español". The standalone "olá" greeting is too short to lock
         # the language on its own; it is handled via word-boundary keyword_count
         # below and the < 20-char fallback in detect_language_confident.
-    )
+    ) + _HINTS.strong.get("pt", ())
     strong_es_tokens = (
         "quiero",
         "quisiera",
@@ -297,7 +234,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "podrias",
         "podria",
         "gracias",
-    )
+    ) + _HINTS.strong.get("es", ())
 
     for tok in strong_en_tokens:
         if tok in normalized_text:
@@ -337,10 +274,9 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "necesito",
         "tengo",
         "me interesa",
-        "ascenso",
-        # NOTE: do not add "aconcagua" — it is a proper noun used in every
-        # language and made English messages tie with Spanish.
-    )
+        # NOTE: tenants must not add proper nouns ("aconcagua"): they are used
+        # in every language and made English messages tie with Spanish.
+    ) + _HINTS.keywords.get("es", ())
     pt_keywords = (
         "oi",
         "ola",
@@ -357,7 +293,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "preciso",
         "tenho",
         "estou",
-    )
+    ) + _HINTS.keywords.get("pt", ())
     en_keywords = (
         "hello",
         "hi",
@@ -370,9 +306,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "i want",
         "i need",
         "interested",
-        "expedition",
-        "route",
-    )
+    ) + _HINTS.keywords.get("en", ())
 
     es_count = keyword_count(es_keywords)
     pt_count = keyword_count(pt_keywords)
@@ -386,19 +320,18 @@ def _detect_language_with_evidence(text: str) -> str | None:
     es_stopwords = {
         "de", "la", "el", "que", "en", "y", "por", "para", "con", "una", "un",
         "hola", "buenas", "aun", "ninguna", "te", "me", "quiero", "necesito",
-    }
+    } | set(_HINTS.stopwords.get("es", ()))
     pt_stopwords = {
         "de", "do", "da", "que", "em", "e", "por", "para", "com", "uma", "um",
         "oi", "ola", "voce", "nao", "sim", "quero", "gostaria", "pergunta",
-    }
+    } | set(_HINTS.stopwords.get("pt", ()))
     en_stopwords = {
         "the", "and", "for", "with", "to", "from", "please", "hello", "hi", "thanks",
         "i", "you", "we", "can", "do", "have", "sir", "week", "next", "my",
         "is", "are", "it", "what", "how", "will", "am", "this", "that", "of",
         "if", "now", "about", "because", "only", "any", "there", "your", "be",
-        "would", "should", "price", "yes", "appreciate", "available", "climb",
-        "climbing",
-    }
+        "would", "should", "price", "yes", "appreciate", "available",
+    } | set(_HINTS.stopwords.get("en", ()))
     es_word_score = len(word_set & es_stopwords)
     pt_word_score = len(word_set & pt_stopwords)
     en_word_score = len(word_set & en_stopwords)
@@ -447,16 +380,16 @@ def detect_language_confident(text: str) -> str | None:
     strong_en_tokens = (
         "i would", "i'd like", "i want", "i need", "i'm interested",
         "interested in", "could you", "please send", "regards",
-        "thank you", "summit", "expedition", "ascent",
-    )
+        "thank you",
+    ) + _HINTS.strong.get("en", ())
     strong_pt_tokens = (
         "gostaria", "obrigado", "obrigada", "quero fazer", "quero saber",
         "este passeio", "qual e", "tem alguma", "voce", "para mim",
-    )
+    ) + _HINTS.strong.get("pt", ())
     strong_es_tokens = (
         "quiero", "quisiera", "necesito", "me interesa", "buenos dias",
         "buenas tardes", "podrias", "podria", "gracias", "por favor",
-    )
+    ) + _HINTS.strong.get("es", ())
 
     for tok in strong_en_tokens:
         if tok in normalized_text:
@@ -509,73 +442,21 @@ def detect_explicit_language_preference(text: str) -> str | None:
     return None
 
 
-# Months treated as out-of-Aconcagua-season (April-October).
-OUT_OF_SEASON_MONTH_TOKENS = (
-    # English ("may" is handled separately: it is also a modal verb)
-    "april", "june", "july", "august", "september", "october",
-    # Spanish (normalized: no accents)
-    "abril", "mayo", "junio", "julio", "agosto", "septiembre", "setiembre", "octubre",
-    # Portuguese
-    "maio", "junho", "julho", "agosto", "setembro", "outubro",
-)
-_OUT_OF_SEASON_MONTHS = range(4, 11)
-# English "may" only counts as the month next to a date-like context
-# ("in May", "May 12", "12th of May"), never as the modal verb ("May I...").
-_MAY_MONTH_RE = re.compile(
-    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until)\s+may\b"
-    r"|\bmay\s+\d"
-    r"|\d(?:st|nd|rd|th)?\s+(?:of\s+)?may\b"
-)
-# Numeric day/month pairs (27/05, 05-27, 15/05/2027). Ranges followed by a
-# unit ("4-6 personas", "5-7 dias") are quantities, not dates.
-_NUMERIC_DATE_RE = re.compile(
-    r"\b(\d{1,2})[/-](\d{1,2})\b(?!\s*(?:personas?|pessoas?|people|persons?|pax|dias?|days?"
-    r"|noches?|noites?|nights?|semanas?|weeks?|horas?|hours?|km|kg|anos?|years?))"
-)
+# Out-of-season detection lives in nico_core.season; the tenant says which
+# months it operates (Acomara: November-March). Names kept for callers.
+_OUT_OF_SEASON_MONTHS = TENANT.season.off_months if TENANT.season else frozenset()
+OUT_OF_SEASON_MONTH_TOKENS = TENANT.season.off_month_tokens if TENANT.season else ()
+_TRIP_INTENT_TOKENS = TENANT.season.trip_intent_tokens if TENANT.season else ()
 
 
 def _numeric_date_is_out_of_season(first: int, second: int) -> bool:
-    """True only when every valid reading (DD/MM and MM/DD) lands in Apr-Oct.
-
-    "5/12" is 5 December for a Spanish/Portuguese speaker, a real departure,
-    so an ambiguous pair must not trigger the out-of-season warning.
-    """
-    months = []
-    if 1 <= second <= 12 and 1 <= first <= 31:
-        months.append(second)  # DD/MM
-    if 1 <= first <= 12 and 1 <= second <= 31:
-        months.append(first)  # MM/DD
-    return bool(months) and all(m in _OUT_OF_SEASON_MONTHS for m in months)
-_TRIP_INTENT_TOKENS = (
-    "tour", "expedicion", "expedición", "expedition", "trek", "trekking",
-    "ascen", "subir", "climb", "summit", "viaje", "viagem", "paseo",
-    "passeio", "passei", "passe", "salida", "departure", "saida", "saída",
-    "aconcagua", "montaña", "montanha", "mountain", "alta montaña",
-    "alta montanha", "fecha", "data", "date",
-)
+    return numeric_date_is_off_season(first, second, _OUT_OF_SEASON_MONTHS)
 
 
 def mentions_out_of_season(text: str) -> bool:
     """Return True if the user message references an out-of-season month
     together with an expedition/trip intent. Conservative on purpose."""
-    if not text:
-        return False
-    lowered = text.lower()
-    normalized = unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
-
-    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS)
-    if not has_intent:
-        return False
-
-    for tok in OUT_OF_SEASON_MONTH_TOKENS:
-        if re.search(r"\b" + re.escape(tok) + r"\b", normalized):
-            return True
-    if _MAY_MONTH_RE.search(normalized):
-        return True
-    for match in _NUMERIC_DATE_RE.finditer(normalized):
-        if _numeric_date_is_out_of_season(int(match.group(1)), int(match.group(2))):
-            return True
-    return False
+    return mentions_off_season(text, TENANT.season)
 
 
 def get_session_language(session_vars: dict[str, Any] | None, fallback_text: str = "") -> str:
@@ -734,15 +615,12 @@ def load_index(path: Path) -> list[dict[str, Any]]:
 
 def load_system_prompt() -> str:
     if not SYSTEM_PROMPT_PATH.exists():
-        return (
-            "Eres un asistente comercial de expediciones al Aconcagua. "
-            "Responde con precision y no inventes datos."
-        )
+        return TENANT.knowledge.fallback_system_prompt
     prompt = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
     # Core facts go in the fixed system prompt (cacheable) so the model cannot
     # contradict them between runs; the permit was "included" in one run and
     # "not included" in the next (simulation 2026-10-08).
-    if KEY_FACTS_PATH.exists():
+    if KEY_FACTS_PATH is not None and KEY_FACTS_PATH.exists():
         prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{KEY_FACTS_PATH.read_text(encoding='utf-8')}"
     return prompt
 
@@ -1118,8 +996,8 @@ def log_llm_usage(conversation_id: str, model: str, usage: Any) -> dict[str, Any
     return record
 
 
-# Argentina has no DST: Mendoza is UTC-3 all year.
-ARGENTINA_TZ = timezone(timedelta(hours=-3), "ART")
+# The tenant's time zone (Acomara: Mendoza, UTC-3 all year). Name kept for callers.
+ARGENTINA_TZ = TENANT.locale.tz
 
 
 def today_in_argentina(now: datetime | None = None) -> date:
@@ -1137,70 +1015,33 @@ def generate_reply(
     history_turns: int = DEFAULT_HISTORY_TURNS,
 ) -> str:
     today = today or today_in_argentina()
-    # Past departures are removed here: the small model dropped future ones when asked to.
+    rewrite = TENANT.hooks.rewrite_evidence
     context = hits_to_context(
-        [{**h, "answer": clarify_season_years(filter_past_departures(str(h.get("answer") or ""), today))} for h in hits]
+        [{**h, "answer": rewrite(str(h.get("answer") or ""), today)} for h in hits] if rewrite else hits
     )
     user_lang = get_session_language(session_vars, msg["text"])
-
-    lang_instruction = {
-        "es": "Responde en español.",
-        "en": "Respond in English.",
-        "pt": "Responda em português.",
-    }.get(user_lang, "Respond in the user's language.")
 
     crm_client_context = build_crm_client_context(session_vars)
 
     # Override conversation_language in the dumped state so the LLM does not
-    # see a stale/contradictory signal vs the explicit lang_instruction.
+    # see a stale/contradictory signal vs the explicit language instruction.
     session_vars_for_llm = {key: session_vars[key] for key in _SESSION_KEYS_FOR_LLM if key in session_vars}
     session_vars_for_llm["conversation_language"] = user_lang
     recent_turns = session_vars.get("recent_turns")
 
     is_whatsapp = str(msg.get("channel", "")).strip().lower() == "whatsapp"
-    response_length_instruction = (
-        "Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres."
-        if is_whatsapp
-        else "Mantén la respuesta corta: máximo 3 líneas y 450 caracteres."
-    )
-
-    user_prompt = (
-        "Fecha de hoy (Argentina): {today}\n"
-        "Canal: {channel}\n"
-        "Conversation ID: {conversation_id}\n"
-        "Cliente pregunta:\n{question}\n\n"
-        "Variables de sesion actuales:\n{session_vars}\n\n"
-        "{crm_context}"
-        "\n\nEvidencia interna recuperada:\n{context}\n\n"
-        "Instrucciones CRÍTICAS:\n"
-        "- {lang_instruction}\n"
-        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación "
-        "(si ya le diste un precio o una fecha, podés repetirlo).\n"
-        "- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. "
-        "Decir que no lo tenés es el último recurso.\n"
-        "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
-        "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
-        "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
-        "- {response_length_instruction}\n"
-        "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
-        "- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n"
-        "- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, "
-        "no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n"
-        "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
-        "- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. "
-        "Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n"
-        "- No pidas el email si ya lo pediste en esta conversación.\n"
-        "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
-    ).format(
+    # Grounding rules are the engine's; the tenant adds its own (nico_core.prompt).
+    user_prompt = build_user_prompt(
+        TENANT.prompt,
         today=today.isoformat(),
+        tz_label=TENANT.locale.label,
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],
-        session_vars=json.dumps(session_vars_for_llm, ensure_ascii=False),
+        session_vars_json=json.dumps(session_vars_for_llm, ensure_ascii=False),
         crm_context=crm_client_context,
         context=context,
-        lang_instruction=lang_instruction,
-        response_length_instruction=response_length_instruction,
+        lang=user_lang,
     )
 
     # Optional: groups calls so the fixed system prompt hits OpenAI's prompt
@@ -1295,160 +1136,10 @@ def is_multi_message_enabled() -> bool:
     return raw in ("1", "true", "yes", "on")
 
 
-_MONTH_ABBR: dict[str, str] = {
-    "enero": "Ene", "febrero": "Feb", "marzo": "Mar", "abril": "Abr",
-    "mayo": "May", "junio": "Jun", "julio": "Jul", "agosto": "Ago",
-    "septiembre": "Sep", "setiembre": "Sep", "octubre": "Oct",
-    "noviembre": "Nov", "diciembre": "Dic",
-    "january": "Jan", "february": "Feb", "march": "Mar", "april": "Apr",
-    "may": "May", "june": "Jun", "july": "Jul", "august": "Aug",
-    "september": "Sep", "october": "Oct", "november": "Nov", "december": "Dec",
-}
-
-_TITLE_PATTERN = re.compile(
-    r"^([ \t]*)(\d+\s*\+\s*\d+)\s+(?:D[ÍI]AS|d[íi]as)\s*\|\s*(.+?)\s*$",
-    flags=re.MULTILINE,
-)
-
-
-def _format_program_title(match: "re.Match[str]") -> str:
-    indent = match.group(1)
-    days = re.sub(r"\s+", "", match.group(2))
-    rest = match.group(3).strip()
-    paren = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", rest)
-    if paren:
-        name = paren.group(1).strip().title()
-        note = paren.group(2).strip().lower()
-        return f"{indent}*{days} días - {name}* _({note})_"
-    return f"{indent}*{days} días - {rest.title()}*"
-
-
-def _format_inline_program_list(text: str) -> str:
-    """Convert semicolon-separated inline program dates into a numbered list."""
-    if ";" not in text or not re.search(r"\(\s*\d+\s*\+\s*\d+\s*d[íi]as\s*\)", text, re.IGNORECASE):
-        return text
-
-    prefix = ""
-    body = text
-    if ":" in text:
-        maybe_prefix, maybe_body = text.split(":", 1)
-        if re.search(r"\(\s*\d+\s*\+\s*\d+\s*d[íi]as\s*\)", maybe_body, re.IGNORECASE):
-            prefix = maybe_prefix.strip()
-            body = maybe_body.strip()
-
-    entry_re = re.compile(
-        r"^\s*(?P<name>[^()]+?)\s*\(\s*(?P<days>\d+\s*\+\s*\d+)\s*d[íi]as\s*\)\s*(?P<schedule>.+?)\s*$",
-        re.IGNORECASE,
-    )
-    month_keys = "|".join(sorted(_MONTH_ABBR.keys(), key=len, reverse=True))
-    abbr_keys = "|".join(sorted(set(_MONTH_ABBR.values()), key=len, reverse=True))
-    month_day_re = re.compile(
-        rf"\b(?P<month>{month_keys}|{abbr_keys})\.?\s*(?P<days>\d{{1,2}}(?:\s*,\s*\d{{1,2}})*)",
-        re.IGNORECASE,
-    )
-
-    lines: list[str] = []
-    for raw_entry in [p.strip() for p in body.split(";") if p.strip()]:
-        entry = raw_entry.rstrip(".")
-        m = entry_re.match(entry)
-        if not m:
-            return text
-
-        name = m.group("name").strip().title()
-        days = re.sub(r"\s+", "", m.group("days"))
-        schedule = m.group("schedule").strip()
-        month_chunks: list[str] = []
-        for mm in month_day_re.finditer(schedule):
-            month_raw = mm.group("month").lower()
-            abbr = _MONTH_ABBR.get(month_raw, mm.group("month").title())
-            day_list = [d.strip() for d in mm.group("days").split(",") if d.strip()]
-            month_chunks.append(f"{abbr} {', '.join(day_list)}")
-        schedule_fmt = " · ".join(month_chunks) if month_chunks else schedule
-        lines.append(f"{len(lines) + 1}. *{name}* ({days} días): {schedule_fmt}")
-
-    if not lines:
-        return text
-    return f"{prefix}:\n" + "\n".join(lines) if prefix else "\n".join(lines)
-
-
 def format_whatsapp_departure_dates(reply_text: str, channel: str) -> str:
-    """Render departure-date blocks compactly for WhatsApp readability."""
-    if not reply_text or channel.strip().lower() != "whatsapp":
-        return reply_text
-
-    text = reply_text
-    lower_text = text.lower()
-    has_dates_marker = any(
-        token in lower_text
-        for token in (
-            "fechas",
-            "salidas",
-            "departure",
-            "departures",
-        )
-    )
-    has_structured_dates = "|" in text or re.search(
-        r"\(\s*\d+\s*\+\s*\d+\s*d[íi]as\s*\).+;",
-        text,
-        re.IGNORECASE,
-    )
-    looks_like_dates_response = bool(has_dates_marker and has_structured_dates)
-    if not looks_like_dates_response:
-        return reply_text
-
-    month_pattern = re.compile(
-        r"\b("
-        r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|"
-        r"january|february|march|april|may|june|july|august|september|october|november|december"
-        r")\s*:\s*([0-9]{1,2}(?:\s*(?:\||,)\s*[0-9]{1,2})+)",
-        flags=re.IGNORECASE,
-    )
-
-    def _compact_month(match: "re.Match[str]") -> str:
-        month_label = match.group(1)
-        days = [d.strip() for d in re.split(r"\||,", match.group(2)) if d.strip()]
-        if len(days) < 2:
-            return match.group(0)
-        abbr = _MONTH_ABBR.get(month_label.lower(), month_label)
-        return f"{abbr} {', '.join(days)}"
-
-    formatted = month_pattern.sub(_compact_month, text)
-
-    # Collapse consecutive month lines into one compact line per program.
-    abbr_set = set(_MONTH_ABBR.values())
-    month_keys = "|".join(sorted(_MONTH_ABBR.keys(), key=len, reverse=True))
-    abbr_keys = "|".join(sorted(abbr_set, key=len, reverse=True))
-    month_line_re = re.compile(
-        rf"^[ \t]*[-*]?[ \t]*(?P<month>{month_keys}|{abbr_keys})[ \t]*:?[ \t]+"
-        rf"(?P<days>\d{{1,2}}(?:[ \t]*[,|][ \t]*\d{{1,2}})*)\s*$",
-        re.IGNORECASE,
-    )
-
-    out_lines: list[str] = []
-    buffer: list[str] = []
-    for line in formatted.split("\n"):
-        if re.fullmatch(r"[ \t]*[-*][ \t]*", line):
-            continue
-        m = month_line_re.match(line)
-        if m:
-            month_raw = m.group("month").lower()
-            abbr = _MONTH_ABBR.get(month_raw, m.group("month").capitalize())
-            days = [d.strip() for d in re.split(r"[,|]", m.group("days")) if d.strip()]
-            buffer.append(f"{abbr} {', '.join(days)}")
-            continue
-        if buffer:
-            out_lines.append(" · ".join(buffer))
-            buffer = []
-        out_lines.append(line)
-    if buffer:
-        out_lines.append(" · ".join(buffer))
-
-    formatted = "\n".join(out_lines)
-    formatted = _TITLE_PATTERN.sub(_format_program_title, formatted)
-    formatted = _format_inline_program_list(formatted)
-    formatted = re.sub(r"[ \t]+\n", "\n", formatted)
-    formatted = re.sub(r"\n{3,}", "\n\n", formatted)
-    return formatted.strip()
+    """Tenant layout of the reply for the channel (Acomara: compact departure dates)."""
+    format_reply = TENANT.hooks.format_reply
+    return format_reply(reply_text, channel) if format_reply else reply_text
 
 
 def normalize_for_intent(text: str) -> str:
@@ -1670,102 +1361,13 @@ def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -
     return bool(_HANDOFF_REQUEST_RE.search(normalized))
 
 
-def _contains_known_program_duration(normalized_text: str) -> bool:
-    return bool(
-        re.search(
-            r"\b(18\s*\+\s*2|17\s*\+\s*2|14\s*\+\s*2|12\s*\+\s*2)\b",
-            normalized_text,
-        )
-    )
-
-
-def _is_program_options_first_intent(normalized_text: str) -> bool:
-    generic_keywords = (
-        "opciones",
-        "alternativas",
-        "programas",
-        "itinerarios",
-        "expediciones",
-        "que opciones",
-        "cuales son",
-        "what options",
-        "which options",
-        "alternatives",
-        "programs",
-        "itineraries",
-        "expeditions",
-    )
-    has_generic_keyword = any(k in normalized_text for k in generic_keywords)
-    return has_generic_keyword and not _contains_known_program_duration(normalized_text)
-
-
-def _is_program_options_followup_intent(normalized_text: str) -> bool:
-    followup_keywords = (
-        "otras",
-        "otras opciones",
-        "otras alternativas",
-        "las otras",
-        "restantes",
-        "demas",
-        "todas",
-        "lista",
-        "listame",
-        "all options",
-        "other options",
-        "other alternatives",
-        "the other",
-        "list the others",
-    )
-    return any(k in normalized_text for k in followup_keywords)
-
-
-def _first_program_options_reply(lang: str) -> str:
-    if lang == "en":
-        return (
-            "I recommend starting with two options:\n"
-            "1. 18+2 (highly recommended)\n"
-            "2. 12+2 (recommended)\n\n"
-            "There are other alternatives as well. If you'd like, I can list them in detail."
-        )
-    return (
-        "Para empezar, te recomiendo estas dos opciones:\n"
-        "1. 18+2 (muy recomendada)\n"
-        "2. 12+2 (recomendada)\n\n"
-        "También hay otras alternativas. Si querés, te las paso en detalle."
-    )
-
-
-def _followup_program_options_reply(lang: str) -> str:
-    if lang == "en":
-        return (
-            "The other alternatives are:\n"
-            "1. 14+2\n"
-            "2. 17+2"
-        )
-    return (
-        "Las otras alternativas son:\n"
-        "1. 14+2\n"
-        "2. 17+2"
-    )
-
-
 def build_program_options_guidance_reply(
     user_text: str,
     session_vars: dict[str, Any],
     lang: str,
 ) -> str | None:
-    normalized = normalize_for_intent(user_text)
-    options_stage = int(session_vars.get("program_options_stage") or 0)
-
-    if options_stage <= 0 and _is_program_options_first_intent(normalized):
-        session_vars["program_options_stage"] = 1
-        return _first_program_options_reply(lang)
-
-    if options_stage >= 1 and _is_program_options_followup_intent(normalized):
-        session_vars["program_options_stage"] = 2
-        return _followup_program_options_reply(lang)
-
-    return None
+    """Recommend the tenant's short list of programs, then the rest (nico_core.program_guide)."""
+    return program_options_reply(TENANT.program_guide, normalize_for_intent(user_text), session_vars, lang)
 
 
 def should_send_handoff_email(
@@ -1842,7 +1444,8 @@ def ensure_runtime() -> dict[str, Any]:
 
     rows = app.config.get("INDEX_ROWS")
     if rows is None:
-        rows = load_index(INDEX_PATH)
+        # A tenant without an FAQ index answers from the system prompt and key facts only.
+        rows = load_index(INDEX_PATH) if INDEX_PATH is not None else []
         app.config["INDEX_ROWS"] = rows
 
     system_prompt = app.config.get("SYSTEM_PROMPT")
@@ -1893,6 +1496,7 @@ def ensure_runtime() -> dict[str, Any]:
         "hibp_timeout_seconds": int(_env("HIBP_TIMEOUT_SECONDS", "10") or "10"),
         "rows": rows,
         "system_prompt": system_prompt,
+        "brand_name": TENANT.brand_name,
     }
 
 
@@ -1901,6 +1505,7 @@ def build_version_payload() -> dict[str, Any]:
         env=_env,
         is_cloud_runtime=is_cloud_runtime,
         python_version=sys.version.split(" ")[0],
+        service_name=TENANT.integrations.service_name,
     )
 
 
@@ -2082,7 +1687,7 @@ def audit_dashboard() -> Any:
         except Exception as exc:  # pragma: no cover
                 return f"Audit error: {exc}", 500
 
-        return render_audit_dashboard_html(report)
+        return render_audit_dashboard_html(report, brand_name=TENANT.brand_name)
 
 
 @app.get("/version")
@@ -2220,6 +1825,7 @@ def process_inbound_message(
                 context.extracted_email,
                 runtime.get("hibp_api_key") or "",
                 timeout=runtime.get("hibp_timeout_seconds", 10),
+                user_agent=TENANT.integrations.user_agent,
             )
 
             if check_succeeded:
@@ -2389,13 +1995,13 @@ def process_inbound_message(
             session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)
-            short_program = short_program_reply(msg.text, lang)
+            tenant_reply = first_fixed_reply(TENANT.hooks, msg.text, lang)
             if asks_if_bot(msg.text):
                 # Honest and fixed: the model tended to dodge it with "no lo tengo a mano".
                 decision.reply = get_phrase("bot_question", lang)
-            elif short_program is not None:
-                # Fernando's 6,000 m rule; the model got it backwards for Kilimanjaro.
-                decision.reply = short_program
+            elif tenant_reply is not None:
+                # The tenant's own fixed rules (Acomara: Fernando's 6,000 m rule).
+                decision.reply = tenant_reply
             elif guided_reply is not None:
                 decision.reply = guided_reply
             else:
@@ -2407,9 +2013,10 @@ def process_inbound_message(
                     session_vars.get("recent_turns"),
                     runtime["top_k"],
                 )
-                decision.hits = ensure_departure_hit(
-                    decision.hits, runtime["rows"], msg.text, lang, runtime["top_k"]
-                )
+                if TENANT.hooks.select_evidence:
+                    decision.hits = TENANT.hooks.select_evidence(
+                        decision.hits, runtime["rows"], msg.text, lang, runtime["top_k"]
+                    )
                 decision.reply = generate_reply(
                     client,
                     runtime["chat_model"],
@@ -2420,16 +2027,18 @@ def process_inbound_message(
                     history_turns=runtime.get("history_turns", DEFAULT_HISTORY_TURNS),
                 )
                 decision.reply = drop_repeated_email_ask(decision.reply, session_vars)
-                departures = season_departures(runtime["rows"])
-                decision.reply = apply_video_call_close(
-                    decision.reply,
-                    msg.text,
-                    session_vars,
-                    lang,
-                    has_email=bool(context.extracted_email),
-                    extra_note=extended_alternative_note(msg.text, departures, today_in_argentina(), lang),
-                    departures=departures,
-                )
+                if TENANT.hooks.close_reply:
+                    decision.reply = TENANT.hooks.close_reply(
+                        decision.reply,
+                        CloseContext(
+                            user_text=msg.text,
+                            session_vars=session_vars,
+                            lang=lang,
+                            has_email=bool(context.extracted_email),
+                            index_rows=runtime["rows"],
+                            today=today_in_argentina(),
+                        ),
+                    )
                 decision.reply = apply_email_ack_or_request_policy(
                     decision.reply, session_vars, context.extracted_email, lang, msg.text
                 )
@@ -2855,7 +2464,7 @@ def chat_completions_compatible() -> Any:
                 "outbound_message",
                 {
                     "text": decision.reply,
-                    "source": "acomara-orchestrator-chat-completions",
+                    "source": f"{TENANT.integrations.service_name}-chat-completions",
                     "faq_sources": [h["id"] for h in decision.hits],
                     "llm_model": effective_chat_model,
                     "llm_model_source": effective_chat_model_source,

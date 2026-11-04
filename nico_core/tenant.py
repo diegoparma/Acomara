@@ -1,0 +1,200 @@
+"""Per-business configuration for the Nico engine.
+
+Phase 1 keeps the config as plain Python (a `TENANT` object in
+`tenants/<slug>/__init__.py`): it holds regexes and callables, needs no new
+dependency and is checked by the test suite. Text a non-developer edits
+(phrases, key facts, prompt) can move to data files later without changing
+this interface.
+"""
+from __future__ import annotations
+
+import importlib
+import os
+from dataclasses import dataclass, field
+from datetime import timedelta, timezone, tzinfo
+from pathlib import Path
+from typing import Any, Callable, Mapping
+
+from nico_core.hooks import TenantHooks
+from nico_core.program_guide import ProgramGuideConfig
+from nico_core.prompt import PromptConfig
+from nico_core.season import SeasonConfig
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+DEFAULT_TENANT = "acomara"
+TENANT_ENV = "NICO_TENANT"
+
+# Keys every tenant must translate: the engine sends them without the model.
+REQUIRED_PHRASES = (
+    "reset_acknowledge",
+    "handoff_ask_email",
+    "handoff_executed",
+    "handoff_pending",
+    "proactive_email_request",
+    "proactive_email_saved",
+    "proactive_email_check_failed",
+    "paused_handoff",
+    "paused_suspicious",
+    "paused_proactive_email",
+    "paused_loop_final",
+    "repeat_prefix",
+    "thanks_reply_1",
+    "thanks_reply_2",
+    "bot_question",
+    "email_received_short",
+    "email_received_ack",
+    "opening_welcome",
+)
+
+
+@dataclass(frozen=True)
+class KnowledgeConfig:
+    """Where the tenant's knowledge lives. Paths are relative to the repo root.
+
+    The files are referenced, never copied: other work edits them in place.
+    """
+
+    system_prompt_path: str
+    # Facts that always win over retrieved chunks; appended to the system prompt.
+    key_facts_path: str | None = None
+    # Embedded FAQ chunks (JSONL from scripts/build_cloud_index.py).
+    index_path: str | None = None
+    # Used only when the prompt file is missing.
+    fallback_system_prompt: str = "Eres un asistente comercial. Responde con precision y no inventes datos."
+
+    def resolve(self, relative: str | None) -> Path | None:
+        return REPO_ROOT / relative if relative else None
+
+
+@dataclass(frozen=True)
+class LocaleConfig:
+    """Where the business operates: the model gets "today" in this time zone."""
+
+    utc_offset_hours: float = 0
+    tz_abbreviation: str = "UTC"
+    # Shown to the model next to the date: "Fecha de hoy (Argentina)".
+    label: str = "UTC"
+
+    @property
+    def tz(self) -> tzinfo:
+        return timezone(timedelta(hours=self.utc_offset_hours), self.tz_abbreviation)
+
+
+# (phone=..., email=...) -> {"found", "contacted", "client_id", "client_name",
+# "consultation_count", "last_consultation_date", "search_by"}
+CrmLookup = Callable[..., dict[str, Any]]
+# (contact_address, text) -> reply for a non-client (e.g. a team phone) or None
+InternalRouter = Callable[[str, str], "str | None"]
+
+
+def no_crm(phone: str = "", email: str = "") -> dict[str, Any]:
+    """CRM adapter for a business without a CRM: nobody is a known client."""
+    return {
+        "found": False,
+        "contacted": False,
+        "client_id": None,
+        "consultation_count": 0,
+        "last_consultation_date": None,
+        "client_name": None,
+        "search_by": None,
+    }
+
+
+def no_internal_route(contact_address: str, text: str) -> None:
+    return None
+
+
+@dataclass(frozen=True)
+class LanguageHints:
+    """Trade words added to the engine's es/en/pt detection, per language.
+
+    strong: one match decides the language; keywords: counted as whole words;
+    stopwords: counted in the word-set fallback. Never add proper nouns.
+    """
+
+    strong: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    keywords: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    stopwords: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class IntegrationsConfig:
+    """External systems and identifiers of one deploy."""
+
+    # Name in /health, /version and the chat completions metadata.
+    service_name: str = "nico-orchestrator"
+    # Sent to Have I Been Pwned.
+    user_agent: str = "Nico-SalesAgent/1.0"
+    crm_lookup: CrmLookup = no_crm
+    # Messages that must not reach the sales flow (Acomara: team phones go
+    # to the internal cash-flow agent).
+    internal_router: InternalRouter = no_internal_route
+    # OpenBSP organization audited by /audit/* when none is given.
+    openbsp_organization_id: str | None = None
+    # Nico's own agent id in OpenBSP/Supabase, to tell its messages from a human's.
+    agent_id: str | None = None
+
+
+@dataclass(frozen=True)
+class TenantConfig:
+    """Everything that makes Nico sell for one business and not another."""
+
+    slug: str
+    brand_name: str
+    # Fixed replies per language: {"es": {"key": "text"}, ...}. The first
+    # language in `languages` is the fallback for missing keys.
+    phrases: Mapping[str, Mapping[str, str]]
+    knowledge: KnowledgeConfig
+    languages: tuple[str, ...] = ("es", "en", "pt")
+    locale: LocaleConfig = field(default_factory=LocaleConfig)
+    # None: the business sells all year and never warns about dates.
+    season: SeasonConfig | None = None
+    # None: options questions go to the model like any other.
+    program_guide: ProgramGuideConfig | None = None
+    hooks: TenantHooks = field(default_factory=TenantHooks)
+    integrations: IntegrationsConfig = field(default_factory=IntegrationsConfig)
+    language_hints: LanguageHints = field(default_factory=LanguageHints)
+    prompt: PromptConfig = field(default_factory=PromptConfig)
+    placeholder: bool = False
+    notes: str = ""
+    extra: Mapping[str, object] = field(default_factory=dict)
+
+    @property
+    def default_language(self) -> str:
+        return self.languages[0]
+
+    def validate(self) -> list[str]:
+        """Problems that would make the engine send a broken reply; empty when fine."""
+        problems = []
+        for lang in self.languages:
+            if lang not in self.phrases:
+                problems.append(f"{self.slug}: no phrases for language {lang!r}")
+                continue
+            for key in REQUIRED_PHRASES:
+                if not self.phrases[lang].get(key):
+                    problems.append(f"{self.slug}: phrase {key!r} missing in {lang!r}")
+        return problems
+
+
+def load_tenant(slug: str | None = None) -> TenantConfig:
+    """Import `tenants.<slug>` and return its TENANT; slug defaults to $NICO_TENANT or acomara."""
+    slug = (slug or os.getenv(TENANT_ENV) or DEFAULT_TENANT).strip().lower().replace("-", "_")
+    if not slug.isidentifier():
+        raise ValueError(f"invalid tenant slug: {slug!r}")
+    module = importlib.import_module(f"tenants.{slug}")
+    tenant = getattr(module, "TENANT", None)
+    if not isinstance(tenant, TenantConfig):
+        raise TypeError(f"tenants.{slug} has no TENANT of type TenantConfig")
+    return tenant
+
+
+_ACTIVE: TenantConfig | None = None
+
+
+def get_tenant() -> TenantConfig:
+    """The tenant this deploy serves, loaded once per process."""
+    global _ACTIVE
+    if _ACTIVE is None:
+        _ACTIVE = load_tenant()
+    return _ACTIVE

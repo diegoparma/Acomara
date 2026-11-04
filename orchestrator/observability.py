@@ -44,6 +44,7 @@ def build_version_payload(
     env: EnvFn,
     is_cloud_runtime: IsCloudRuntimeFn,
     python_version: str,
+    service_name: str = "nico-orchestrator",
 ) -> dict[str, Any]:
     commit_sha = (
         env("VERCEL_GIT_COMMIT_SHA", None)
@@ -56,7 +57,7 @@ def build_version_payload(
     deployment = deployment_id if deployment_id != "unknown" else deployment_url
     version = _resolve_app_version(env, commit_sha, deployment_id)
     return {
-        "service": "acomara-orchestrator",
+        "service": service_name,
         "environment": env("VERCEL_ENV", env("ENV", "unknown")),
         "runtime_mode": "cloud" if is_cloud_runtime() else "local",
         "version": version,
@@ -149,7 +150,8 @@ def build_safe_version_response(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def render_audit_dashboard_html(report: dict[str, Any]) -> str:
+def render_audit_dashboard_html(report: dict[str, Any], brand_name: str = "Nico") -> str:
+    brand = html.escape(brand_name)
     totals = report.get("totals", {})
     issue_counts = report.get("issue_counts", {})
     status_counts = report.get("status_counts", {})
@@ -193,7 +195,7 @@ def render_audit_dashboard_html(report: dict[str, Any]) -> str:
 <head>
     <meta charset='utf-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <title>Acomara Audit Dashboard</title>
+    <title>{brand} Audit Dashboard</title>
     <style>
         :root {{
             --bg: #f6f7f9;
@@ -225,7 +227,7 @@ def render_audit_dashboard_html(report: dict[str, Any]) -> str:
 </head>
 <body>
     <div class='wrap'>
-        <h1>Acomara Conversation Audit</h1>
+        <h1>{brand} Conversation Audit</h1>
         <div class='meta'>Generado: {report.get('generated_at', '-')} | Organization: {report.get('organization_id', '-')}</div>
 
         <div class='grid'>

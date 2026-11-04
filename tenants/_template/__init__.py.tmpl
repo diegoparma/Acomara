@@ -1,0 +1,27 @@
+"""{BRAND}: PLACEHOLDER tenant created by scripts/new_tenant.py.
+
+Before deploying: rewrite phrases.py in the business's voice, write
+system-prompt.md and datos-clave.md, decide the season (or delete it), add
+hooks only for rules the model does not apply reliably, and set
+placeholder=False. Guide: docs/sales-agent/17-nico-producto.md.
+"""
+from nico_core.season import SeasonConfig
+from nico_core.tenant import IntegrationsConfig, KnowledgeConfig, LocaleConfig, TenantConfig
+from tenants.{SLUG}.phrases import PHRASES
+
+TENANT = TenantConfig(
+    slug="{SLUG}",
+    brand_name="{BRAND}",
+    placeholder=True,
+    phrases=PHRASES,
+    languages=("es", "en", "pt"),
+    knowledge=KnowledgeConfig(
+        system_prompt_path="tenants/{SLUG}/system-prompt.md",
+        key_facts_path="tenants/{SLUG}/datos-clave.md",
+        index_path=None,
+    ),
+    locale=LocaleConfig(utc_offset_hours=-3, tz_abbreviation="ART", label="Argentina"),
+    # Delete if the business sells all year.
+    season=SeasonConfig(months=frozenset({11, 12, 1, 2, 3}), trip_intent_tokens=("viaje", "trip", "viagem", "fecha", "date", "data")),
+    integrations=IntegrationsConfig(service_name="{SLUG_DASH}-orchestrator", user_agent="{SLUG_CAMEL}-SalesAgent/1.0"),
+)
