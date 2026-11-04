@@ -38,6 +38,7 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 - Si el cliente lo pide explícitamente ("English please", "en español"), queda fijo.
 - Si no, sigue al cliente cuando el mensaje tiene señales claras del idioma. Si no hay señales ("ok", un email, "Anytime today"), mantiene el idioma anterior.
 - "Aconcagua" no cuenta como palabra en español.
+- **Usted.** Si el cliente escribe de usted ("usted", "me podría", "quisiera saber", "le agradezco") y nunca de vos, el modelo recibe la nota de responder de usted y las frases fijas en español (bienvenida, pedido de email, aviso de temporada, cierre con videollamada, agradecimientos, derivación) salen en su versión de usted (`orchestrator/usted.py`). Solo se cambian frases fijas enteras, nunca palabras sueltas del texto del modelo. Si cambiás una frase fija en español, agregá su versión de usted ahí: `tests/test_usted.py` falla si falta.
 
 ## 3. Reglas del system prompt (lo que la IA puede y no puede decir)
 

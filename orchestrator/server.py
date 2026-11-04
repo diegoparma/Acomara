@@ -82,6 +82,8 @@ from orchestrator.sales_rules import apply_video_call_close, extended_alternativ
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
+    client_messages,
+    client_uses_usted,
     extract_customer_name,
     history_to_messages,
     humanize_reply,
@@ -90,6 +92,7 @@ from orchestrator.humanize import (
     style_hints,
     trim_to_last_sentence,
 )
+from orchestrator.usted import to_usted
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
@@ -2467,6 +2470,10 @@ def process_inbound_message(
                 decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
     decision.reply = format_whatsapp_departure_dates(decision.reply, msg.channel)
+    if get_session_language(session_vars, msg.text) == "es" and client_uses_usted(
+        [*client_messages(session_vars.get("recent_turns")), msg.text]
+    ):
+        decision.reply = to_usted(decision.reply)
 
     # Outbound safety filter: never send credential-like content.
     effective_lang = get_session_language(session_vars, msg.text)

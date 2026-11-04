@@ -363,6 +363,15 @@ _USTED_RE = re.compile(
 _VOS_RE = re.compile(r"\b(?:quer[eé]s|ten[eé]s|pod[eé]s|sab[eé]s|decime|pasame|contame|vos)\b", re.IGNORECASE)
 
 
+def client_messages(recent_turns: Any) -> list[str]:
+    """The client's messages in the stored transcript, oldest first."""
+    return [
+        str(t.get("text") or "")
+        for t in (recent_turns if isinstance(recent_turns, list) else [])
+        if isinstance(t, dict) and t.get("role") == "user" and t.get("text")
+    ]
+
+
 def client_uses_usted(user_texts: list[str]) -> bool:
     """True when the client writes formally ("usted", "me podría") and never with vos."""
     joined = " ".join(t for t in user_texts if t)
@@ -382,8 +391,7 @@ def style_hints(
     client actually did than from a general rule in the system prompt.
     """
     turns = recent_turns if isinstance(recent_turns, list) else []
-    user_texts = [str(t.get("text") or "") for t in turns if isinstance(t, dict) and t.get("role") == "user"]
-    user_texts.append(user_text or "")
+    user_texts = [*client_messages(turns), user_text or ""]
     previous = recent_assistant_replies(turns, limit=2)
     hints: list[str] = []
 
