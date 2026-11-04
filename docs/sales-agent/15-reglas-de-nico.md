@@ -47,7 +47,7 @@ Fuente: `docs/sales-agent/02-system-prompt.md` (v3.5) más la ficha `docs/knowle
 **Nunca:**
 - Confirmar cupo real por fecha, confirmar reservas ni hacer cotizaciones personalizadas.
 - Inventar precios, promociones, descuentos o condiciones.
-- Dar recomendaciones médicas (usa una frase fija que deriva a los médicos de montaña).
+- Dar recomendaciones médicas: dice que no puede y que eso lo evalúa un médico (antes del viaje el del cliente, en la montaña los del Parque). Puede contar lo que dice el FAQ: controles médicos obligatorios en Confluencia, Plaza de Mulas y Plaza Argentina, y que Acomara no recomienda Diamox ni otra medicación. Antes mandaba a "consultar el protocolo médico" (que el cliente no tiene) y en inglés decía "in the KB". La limpieza saca cualquier mención a "KB", "FAQ" o "documentación".
 - Preguntarle al cliente si quiere hablar con un humano.
 - Pedir el email más de una vez, o volver a pedir datos que el cliente ya dio.
 

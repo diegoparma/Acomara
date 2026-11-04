@@ -104,6 +104,10 @@ SCENARIOS: dict[str, list[str]] = {
         "Pero ¿hay lugar o no?",
         "¿Me podés confirmar si hay cupo?",
     ],
+    "medico": [
+        "Hola, tengo hipertensión controlada, ¿puedo hacer el Aconcagua?",
+        "¿Conviene tomar Diamox para la altura?",
+    ],
     "nombre": [
         "Hi, I'm Wes from Australia. Is the permit included in the price?",
         "What about the rescue insurance?",
@@ -130,6 +134,8 @@ FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
     ("fechas_y_temporada", 1): {"must": [r"14\+2", r"18\+2", r"videollamada", r"disponibilidad"], "must_not": [r"20\d{2}/\d{2}"]},
     ("pareja", 1): {"must": [_PRICE, r"videollamada"], "must_not": [_OLD_PRICE]},
     ("fechas_y_temporada", 2): {"must": [r"noviembre a marzo"]},
+    ("medico", 0): {"must": [r"m[eé]dic"], "must_not": [r"\bKB\b|protocolo m[eé]dico", r"\bpod[eé]s (ir|subir|hacerlo)\b"]},
+    ("medico", 1): {"must": [r"m[eé]dic"], "must_not": [r"\b(te|le) (recomiendo|conviene) tomar\b|\btom[aá]\b"]},
     ("cliente_corto", 1): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
     ("portugues", 0): {"must": [_PRICE], "must_not": [_OLD_PRICE, r"\b(?:usted|querés|quieres)\b"]},
     ("usted", 2): {"must": [r"no (est[aá] )?incluid|aparte|por separado|obligatori"]},
@@ -158,7 +164,7 @@ TELLS = {
         r"hay algo m[aá]s en (lo )?que|no dudes en|estoy aqu[ií] para|anything else i can help|feel free to",
         re.IGNORECASE,
     ),
-    "mentions_docs": re.compile(r"\bFAQ\b|documentaci[oó]n|base de (datos|conocimiento)", re.IGNORECASE),
+    "mentions_docs": re.compile(r"\bFAQ\b|\bKB\b|documentaci[oó]n|base de (datos|conocimiento)", re.IGNORECASE),
     "asesor_humano": re.compile(r"asesor humano|human advisor", re.IGNORECASE),
 }
 # Claims the client already gave an email; checked only while they haven't.
