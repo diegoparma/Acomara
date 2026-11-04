@@ -55,9 +55,11 @@ USTED_PHRASES: dict[str, str] = {
     "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.": (
         "¡Gracias! Ya tengo su email ({email}). Un asesor del equipo revisa su consulta y le escribe por acá. Si quiere sumar algo (fechas, cuántos son, experiencia previa), cuénteme y lo agrego."
     ),
-    "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.": (
-        "Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si quiere le paso las fechas de la próxima temporada."
+    # In two pieces: the second one is dropped when the reply already offers something.
+    "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas.": (
+        "Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas."
     ),
+    "Si querés te paso las fechas de la próxima temporada.": "Si quiere le paso las fechas de la próxima temporada.",
     # Without the "¡Hola!": the welcome mirrors the client's greeting ("¡Buenas tardes!").
     "Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.": (
         "Gracias por escribirnos. ¿En qué le puedo ayudar?\n\nSi le sirve, además de responderle por acá le mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones."
