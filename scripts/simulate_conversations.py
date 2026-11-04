@@ -129,6 +129,7 @@ FACT_CHECKS: dict[tuple[str, int], dict[str, list[str]]] = {
     ("fechas_y_temporada", 0): {"must": [r"(?i)nov"]},
     ("fechas_y_temporada", 1): {"must": [r"14\+2", r"18\+2", r"videollamada", r"disponibilidad"], "must_not": [r"20\d{2}/\d{2}"]},
     ("pareja", 1): {"must": [_PRICE, r"videollamada"], "must_not": [_OLD_PRICE]},
+    ("fechas_y_temporada", 2): {"must": [r"noviembre a marzo"]},
     ("cliente_corto", 1): {"must": [_PRICE], "must_not": [_OLD_PRICE]},
     ("portugues", 0): {"must": [_PRICE], "must_not": [_OLD_PRICE, r"\b(?:usted|querés|quieres)\b"]},
     ("usted", 2): {"must": [r"no (est[aá] )?incluid|aparte|por separado|obligatori"]},
