@@ -336,6 +336,34 @@ class ReplyBubblesTests(unittest.TestCase):
     def test_long_lists_stay_in_one_message(self):
         self.assertEqual(choose_reply_bubbles("a\n\nb\n\nc\n\nd", True, False), [])
 
+    def test_short_reaction_goes_first_on_its_own(self):
+        self.assertEqual(
+            choose_reply_bubbles("Dale! El 18+2 es el que recomendamos para quien no estuvo arriba de 6.000 m.", True, False),
+            ["Dale!", "El 18+2 es el que recomendamos para quien no estuvo arriba de 6.000 m."],
+        )
+
+    def test_closing_question_after_a_long_answer_goes_apart(self):
+        reply = (
+            "El 18+2 es el que recomendamos, tiene más días de aclimatación y sale lo mismo que los cortos. "
+            "¿Tenés fecha en mente?"
+        )
+        self.assertEqual(
+            choose_reply_bubbles(reply, True, False),
+            [
+                "El 18+2 es el que recomendamos, tiene más días de aclimatación y sale lo mismo que los cortos.",
+                "¿Tenés fecha en mente?",
+            ],
+        )
+
+    def test_reaction_answer_and_question_make_three(self):
+        reply = "¡Qué bueno! El Kili es una linda base. Para ustedes va el 18+2, el de más aclimatación, y sale lo mismo. ¿Ya tienen fecha?"
+        self.assertEqual(len(choose_reply_bubbles(reply, True, False)), 3)
+
+    def test_short_replies_and_lists_are_not_split(self):
+        self.assertEqual(choose_reply_bubbles("Sale USD 7.250. ¿Tenés fecha?", True, False), [])
+        self.assertEqual(choose_reply_bubbles("Fechas:\n1. 18+2: Dic 5, 19\n2. 14+2: Ene 3", True, False), [])
+        self.assertEqual(choose_reply_bubbles("Son aprox. 5.000 m de altura en Plaza Argentina, más o menos.", True, False), [])
+
     def test_disabled_without_respond_tool(self):
         self.assertEqual(choose_reply_bubbles("a\n\nb", False, False), [])
 

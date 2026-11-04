@@ -402,3 +402,38 @@ def style_hints(
     if opener:
         hints.append(f'Tu mensaje anterior arrancó con "{opener}": arrancá distinto, o directo con la respuesta.')
     return hints
+
+
+# --- Pacing: how a person splits a reply into WhatsApp messages ----------------
+
+_BUBBLE_SENTENCE_RE = re.compile(r"(?<=[.!?…])\s+(?=[¡¿\"'(]?[A-ZÁÉÍÓÚÑ])")
+_MAX_REACTION_CHARS = 30
+_MIN_BUBBLE_CHARS = 40
+
+
+def split_single_paragraph(paragraph: str) -> list[str]:
+    """Split one paragraph the way people type on WhatsApp.
+
+    A short reaction goes first on its own ("Dale!", then the answer), and a
+    closing question goes last on its own after a long answer. Lists and
+    anything with line breaks stay together, and short replies stay whole.
+    """
+    paragraph = (paragraph or "").strip()
+    if not paragraph or "\n" in paragraph:
+        return [paragraph] if paragraph else []
+    sentences = [s for s in _BUBBLE_SENTENCE_RE.split(paragraph) if s.strip()]
+    if len(sentences) < 2:
+        return [paragraph]
+    head: list[str] = []
+    tail: list[str] = []
+    if len(sentences[0]) <= _MAX_REACTION_CHARS and len(" ".join(sentences[1:])) >= _MIN_BUBBLE_CHARS:
+        head = [sentences.pop(0)]
+    if (
+        len(sentences) >= 2
+        and sentences[-1].rstrip().endswith("?")
+        and len(" ".join(sentences[:-1])) >= 80
+    ):
+        tail = [sentences.pop()]
+    if not head and not tail:
+        return [paragraph]
+    return head + [" ".join(sentences)] + tail
