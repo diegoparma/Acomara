@@ -11,5 +11,11 @@
       "src": "/(.*)",
       "dest": "api/index.py"
     }
+  ],
+  "crons": [
+    {
+      "path": "/cron/facts-reminder",
+      "schedule": "17 12 * * 1"
+    }
   ]
 }
