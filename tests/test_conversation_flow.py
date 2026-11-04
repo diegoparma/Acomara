@@ -154,6 +154,12 @@ class ConversationFlowTests(unittest.TestCase):
         self.assertTrue(reply.startswith("¡Hola! Todo bien por acá."), reply)
         self.assertEqual(self.model.calls, [])
 
+    def test_casual_out_of_season_question_gets_the_warning(self):
+        self.model.replies = ["Las salidas son de noviembre a febrero."]
+        self.store["conv-flow"] = {"conversation_turn_count": 6, "conversation_language": "es", "email_requested": True}
+        reply = self._text(self._send("¿Y se puede ir en julio?"))
+        self.assertTrue(reply.startswith("Ojo: las expediciones al Aconcagua son solo de noviembre a marzo"), reply)
+
     def test_email_with_a_question_gets_both_bubbles(self):
         self.model.replies = ["El 18+2 sale USD 6.990, sujeto a disponibilidad."]
         self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}

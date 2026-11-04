@@ -539,7 +539,7 @@ _OUT_OF_SEASON_MONTHS = range(4, 11)
 # English "may" only counts as the month next to a date-like context
 # ("in May", "May 12", "12th of May"), never as the modal verb ("May I...").
 _MAY_MONTH_RE = re.compile(
-    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until)\s+may\b"
+    r"\b(?:in|on|of|during|early|late|mid|next|this|by|until|about|for)\s+may\b"
     r"|\bmay\s+\d"
     r"|\d(?:st|nd|rd|th)?\s+(?:of\s+)?may\b"
 )
@@ -572,6 +572,25 @@ _TRIP_INTENT_TOKENS = (
 )
 
 
+_SEASON_MONTH_ALT = "|".join(sorted(set(OUT_OF_SEASON_MONTH_TOKENS) | {"may"}, key=len, reverse=True))
+# "¿Y se puede ir en julio?", "Can we go in June?", "Dá pra ir em julho?":
+# a travel verb with an out-of-season month within three words after it.
+_TRAVEL_VERB_NEAR_MONTH_RE = re.compile(
+    r"\b(?:ir|irnos|vamos|viajar|venir|hacerlo|hacerla|subirlo|subir|go|going|travel|come|visit|climb|do it|fazer|vir)\b"
+    r"(?:\W+\w+){0,3}?\W+(?:" + _SEASON_MONTH_ALT + r")\b"
+)
+# "¿Y en julio?", "What about June?", "¿Qué tal octubre?": a short question
+# about a month, in a sales chat, is a question about going then.
+_SHORT_MONTH_QUESTION_RE = re.compile(r"\b(?:" + _SEASON_MONTH_ALT + r")\b")
+
+
+def _asks_about_a_month(normalized: str) -> bool:
+    if _TRAVEL_VERB_NEAR_MONTH_RE.search(normalized):
+        return True
+    words = re.findall(r"\w+", normalized)
+    return "?" in normalized and len(words) <= 6 and bool(_SHORT_MONTH_QUESTION_RE.search(normalized))
+
+
 def mentions_out_of_season(text: str) -> bool:
     """Return True if the user message references an out-of-season month
     together with an expedition/trip intent. Conservative on purpose."""
@@ -580,7 +599,7 @@ def mentions_out_of_season(text: str) -> bool:
     lowered = text.lower()
     normalized = unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
 
-    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS)
+    has_intent = any(tok in normalized for tok in _TRIP_INTENT_TOKENS) or _asks_about_a_month(normalized)
     if not has_intent:
         return False
 
