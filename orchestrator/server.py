@@ -71,7 +71,6 @@ from orchestrator.session_client import (
 from orchestrator.inbound import (
     validate_and_normalize_headers as _validate_and_normalize_headers,
 )
-from orchestrator.crm_client_status import check_client_status
 from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
@@ -79,9 +78,8 @@ from orchestrator.humanize import (
     humanize_reply,
     trim_to_last_sentence,
 )
-from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
-from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
-from orchestrator.caja_interno import internal_reply
+from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID as _ENGINE_DEFAULT_AGENT_ID, human_replied_recently
+from orchestrator.conversation_audit import DEFAULT_ORG_ID as _ENGINE_DEFAULT_ORG_ID, run_conversation_audit
 from nico_core import get_tenant
 from nico_core.hooks import CloseContext, first_fixed_reply
 from nico_core.program_guide import program_options_reply
@@ -89,6 +87,11 @@ from nico_core.season import mentions_off_season, numeric_date_is_off_season
 
 ROOT = Path(__file__).resolve().parents[1]
 TENANT = get_tenant()
+# Adapters and ids from the tenant (module names kept: tests patch them).
+check_client_status = TENANT.integrations.crm_lookup
+internal_reply = TENANT.integrations.internal_router
+DEFAULT_ORG_ID = TENANT.integrations.openbsp_organization_id or _ENGINE_DEFAULT_ORG_ID
+DEFAULT_NICO_AGENT_ID = TENANT.integrations.agent_id or _ENGINE_DEFAULT_AGENT_ID
 INDEX_PATH = TENANT.knowledge.resolve(TENANT.knowledge.index_path)
 SYSTEM_PROMPT_PATH = TENANT.knowledge.resolve(TENANT.knowledge.system_prompt_path)
 KEY_FACTS_PATH = TENANT.knowledge.resolve(TENANT.knowledge.key_facts_path)
@@ -1684,6 +1687,7 @@ def ensure_runtime() -> dict[str, Any]:
         "hibp_timeout_seconds": int(_env("HIBP_TIMEOUT_SECONDS", "10") or "10"),
         "rows": rows,
         "system_prompt": system_prompt,
+        "brand_name": TENANT.brand_name,
     }
 
 
@@ -1692,6 +1696,7 @@ def build_version_payload() -> dict[str, Any]:
         env=_env,
         is_cloud_runtime=is_cloud_runtime,
         python_version=sys.version.split(" ")[0],
+        service_name=TENANT.integrations.service_name,
     )
 
 
@@ -1873,7 +1878,7 @@ def audit_dashboard() -> Any:
         except Exception as exc:  # pragma: no cover
                 return f"Audit error: {exc}", 500
 
-        return render_audit_dashboard_html(report)
+        return render_audit_dashboard_html(report, brand_name=TENANT.brand_name)
 
 
 @app.get("/version")
@@ -2011,6 +2016,7 @@ def process_inbound_message(
                 context.extracted_email,
                 runtime.get("hibp_api_key") or "",
                 timeout=runtime.get("hibp_timeout_seconds", 10),
+                user_agent=TENANT.integrations.user_agent,
             )
 
             if check_succeeded:
@@ -2649,7 +2655,7 @@ def chat_completions_compatible() -> Any:
                 "outbound_message",
                 {
                     "text": decision.reply,
-                    "source": "acomara-orchestrator-chat-completions",
+                    "source": f"{TENANT.integrations.service_name}-chat-completions",
                     "faq_sources": [h["id"] for h in decision.hits],
                     "llm_model": effective_chat_model,
                     "llm_model_source": effective_chat_model_source,

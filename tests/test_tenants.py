@@ -41,6 +41,41 @@ class TenantLoadingTests(unittest.TestCase):
         self.assertIs(server.I18N_PHRASES, server.TENANT.phrases)
 
 
+class AcomaraBrandingTests(unittest.TestCase):
+    """Values that used to be hard-coded in orchestrator/ and now come from the tenant."""
+
+    def test_service_name_and_dashboard(self) -> None:
+        from orchestrator import server
+        from orchestrator.observability import render_audit_dashboard_html
+
+        self.assertEqual(server.build_version_payload()["service"], "acomara-orchestrator")
+        html = render_audit_dashboard_html({}, brand_name=server.TENANT.brand_name)
+        self.assertIn("<title>Acomara Audit Dashboard</title>", html)
+        self.assertIn("<h1>Acomara Conversation Audit</h1>", html)
+
+    def test_email_subjects_carry_the_brand(self) -> None:
+        from orchestrator import handoff_email
+
+        runtime = {"brand_name": "Acomara", "handoff_email_from": "a@x.com", "handoff_email_to": "b@x.com",
+                   "handoff_email_api_key": "k"}
+        msg = {k: "conv-1" for k in ("conversation_id", "organization_id", "contact_id", "contact_address", "channel", "text")}
+        with mock.patch.object(handoff_email, "_http_json", return_value=(200, {})) as http:
+            handoff_email.send_handoff_email(runtime, msg, {})
+            handoff_email.send_new_lead_email(runtime, msg, "c@x.com", {})
+        subjects = [c.kwargs["body"]["subject"] for c in http.call_args_list]
+        self.assertEqual(subjects[0], "[Acomara] Solicitud de asesor humano - conv-1")
+        self.assertEqual(subjects[1], "[Acomara] Nuevo lead con email - c@x.com")
+
+    def test_integrations_are_the_acomara_ones(self) -> None:
+        from orchestrator import caja_interno, crm_client_status, server
+
+        self.assertIs(server.check_client_status, crm_client_status.check_client_status)
+        self.assertIs(server.internal_reply, caja_interno.internal_reply)
+        self.assertEqual(server.DEFAULT_ORG_ID, "7cb6ffa2-4452-4d65-b880-bfa31b197eee")
+        self.assertEqual(server.DEFAULT_NICO_AGENT_ID, "50ce8caf-1088-4a42-ac2e-bda296174530")
+        self.assertEqual(server.TENANT.integrations.user_agent, "Acomara-SalesAgent/1.0")
+
+
 class TenantCompletenessTests(unittest.TestCase):
     def test_every_tenant_is_complete(self) -> None:
         self.assertIn("acomara", TENANT_SLUGS)

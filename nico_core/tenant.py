@@ -13,7 +13,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import timedelta, timezone, tzinfo
 from pathlib import Path
-from typing import Mapping
+from typing import Any, Callable, Mapping
 
 from nico_core.hooks import TenantHooks
 from nico_core.program_guide import ProgramGuideConfig
@@ -80,6 +80,48 @@ class LocaleConfig:
         return timezone(timedelta(hours=self.utc_offset_hours), self.tz_abbreviation)
 
 
+# (phone=..., email=...) -> {"found", "contacted", "client_id", "client_name",
+# "consultation_count", "last_consultation_date", "search_by"}
+CrmLookup = Callable[..., dict[str, Any]]
+# (contact_address, text) -> reply for a non-client (e.g. a team phone) or None
+InternalRouter = Callable[[str, str], "str | None"]
+
+
+def no_crm(phone: str = "", email: str = "") -> dict[str, Any]:
+    """CRM adapter for a business without a CRM: nobody is a known client."""
+    return {
+        "found": False,
+        "contacted": False,
+        "client_id": None,
+        "consultation_count": 0,
+        "last_consultation_date": None,
+        "client_name": None,
+        "search_by": None,
+    }
+
+
+def no_internal_route(contact_address: str, text: str) -> None:
+    return None
+
+
+@dataclass(frozen=True)
+class IntegrationsConfig:
+    """External systems and identifiers of one deploy."""
+
+    # Name in /health, /version and the chat completions metadata.
+    service_name: str = "nico-orchestrator"
+    # Sent to Have I Been Pwned.
+    user_agent: str = "Nico-SalesAgent/1.0"
+    crm_lookup: CrmLookup = no_crm
+    # Messages that must not reach the sales flow (Acomara: team phones go
+    # to the internal cash-flow agent).
+    internal_router: InternalRouter = no_internal_route
+    # OpenBSP organization audited by /audit/* when none is given.
+    openbsp_organization_id: str | None = None
+    # Nico's own agent id in OpenBSP/Supabase, to tell its messages from a human's.
+    agent_id: str | None = None
+
+
 @dataclass(frozen=True)
 class TenantConfig:
     """Everything that makes Nico sell for one business and not another."""
@@ -97,6 +139,7 @@ class TenantConfig:
     # None: options questions go to the model like any other.
     program_guide: ProgramGuideConfig | None = None
     hooks: TenantHooks = field(default_factory=TenantHooks)
+    integrations: IntegrationsConfig = field(default_factory=IntegrationsConfig)
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)

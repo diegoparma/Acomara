@@ -5,7 +5,11 @@ Every value here was moved out of orchestrator/ unchanged; the golden test
 """
 from nico_core.program_guide import ProgramGuideConfig
 from nico_core.season import SeasonConfig
-from nico_core.tenant import KnowledgeConfig, LocaleConfig, TenantConfig
+from nico_core.tenant import IntegrationsConfig, KnowledgeConfig, LocaleConfig, TenantConfig
+from orchestrator.caja_interno import internal_reply
+from orchestrator.conversation_audit import DEFAULT_ORG_ID
+from orchestrator.crm_client_status import check_client_status
+from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID
 from tenants.acomara.hooks import HOOKS
 from tenants.acomara.phrases import I18N_PHRASES
 
@@ -92,4 +96,14 @@ TENANT = TenantConfig(
         },
     ),
     hooks=HOOKS,
+    integrations=IntegrationsConfig(
+        service_name="acomara-orchestrator",
+        user_agent="Acomara-SalesAgent/1.0",
+        # SGI endpoint (sgi_endpoint/nico_cliente_status.php), MySQL fallback.
+        crm_lookup=check_client_status,
+        # Team phones go to the cash-flow agent in aconcagua-plan-admin.
+        internal_router=internal_reply,
+        openbsp_organization_id=DEFAULT_ORG_ID,
+        agent_id=DEFAULT_NICO_AGENT_ID,
+    ),
 )
