@@ -226,6 +226,15 @@ def _send_admin_email(
     return True, status, data
 
 
+def send_admin_email(
+    runtime: dict[str, Any],
+    subject: str,
+    text_body: str,
+) -> tuple[bool, int, dict[str, Any]]:
+    """Public entry point for other modules (e.g. the facts expiry reminder)."""
+    return _send_admin_email(runtime, subject, text_body)
+
+
 def send_new_lead_email(
     runtime: dict[str, Any],
     msg: dict[str, str],

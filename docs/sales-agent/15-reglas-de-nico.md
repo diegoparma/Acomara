@@ -1,6 +1,6 @@
 # Reglas de Nico
 
-*Manual de comportamiento del agente de ventas. Actualizado 2026-10-06.*
+*Manual de comportamiento del agente de ventas. Actualizado 2026-11-04.*
 
 Este documento describe **todo lo que Nico decide antes de responder**, en el orden en que lo evalúa, más las alertas de la auditoría. Si cambiás una regla en el código, actualizá este archivo.
 
@@ -42,6 +42,8 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 ## 3. Reglas del system prompt (lo que la IA puede y no puede decir)
 
 Fuente: `docs/sales-agent/02-system-prompt.md` (v3.4) más la ficha `docs/knowledge/datos-clave.md` (programas, precio, permiso y seguro), que se agrega al final del prompt y vale más que cualquier fragmento del FAQ. Lo que confirme Fernando se suma a esa ficha.
+
+**Datos que cambian (planilla de Fernando).** Si `NICO_FACTS_CSV_URL` está configurada, después de la ficha va el bloque "DATOS QUE CAMBIAN", leído de la planilla de Google que edita Fernando (precios, promociones, anticipo, formas de pago, permiso, seguro, alquiler de equipo, temporada). Vale más que la ficha y que el FAQ. Solo entran como datos las filas en estado `Vigente` cuya fecha *Vigente hasta* no pasó (hora de Argentina); las filas `A confirmar`, vencidas o con texto que parece una instrucción no se dan como dato: el modelo recibe solo el tema y la orden de decir que lo confirma un asesor. Se relee cada 10 minutos (`NICO_FACTS_TTL_SECONDS`); si falla, sigue la última copia buena, y si nunca se leyó, queda solo la ficha. Los lunes, un email avisa a Fernando qué filas vencieron o vencen en 14 días. El estado se ve en `/version` (campo `facts`). Guía: `18-planilla-de-datos.md`. Ojo: el aviso fuera de temporada (regla 12) sigue fijo en el código (noviembre a marzo) y no lee la planilla.
 
 **Nunca:**
 - Confirmar cupo real por fecha, confirmar reservas ni hacer cotizaciones personalizadas.

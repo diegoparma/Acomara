@@ -89,6 +89,7 @@ from orchestrator.humanize import (
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
+from orchestrator import live_facts
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
@@ -742,8 +743,11 @@ def load_system_prompt() -> str:
     # Core facts go in the fixed system prompt (cacheable) so the model cannot
     # contradict them between runs; the permit was "included" in one run and
     # "not included" in the next (simulation 2026-10-08).
-    if KEY_FACTS_PATH.exists():
-        prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{KEY_FACTS_PATH.read_text(encoding='utf-8')}"
+    # Volatile facts come from Fernando's sheet when NICO_FACTS_CSV_URL is set
+    # (orchestrator/live_facts.py); otherwise this is datos-clave.md as before.
+    key_facts = live_facts.key_facts_text(KEY_FACTS_PATH)
+    if key_facts:
+        prompt = f"{prompt.rstrip()}\n\n--------------------------------------------------\n\n{key_facts}"
     return prompt
 
 
@@ -1846,9 +1850,11 @@ def ensure_runtime() -> dict[str, Any]:
         app.config["INDEX_ROWS"] = rows
 
     system_prompt = app.config.get("SYSTEM_PROMPT")
-    if system_prompt is None:
+    facts_revision = live_facts.revision()
+    if system_prompt is None or app.config.get("SYSTEM_PROMPT_FACTS_REVISION") != facts_revision:
         system_prompt = load_system_prompt()
         app.config["SYSTEM_PROMPT"] = system_prompt
+        app.config["SYSTEM_PROMPT_FACTS_REVISION"] = facts_revision
 
     return {
         "api_key": api_key,
@@ -2088,7 +2094,21 @@ def audit_dashboard() -> Any:
 @app.get("/version")
 def version() -> Any:
     payload = build_version_payload()
-    return jsonify(build_safe_version_response(payload))
+    response = build_safe_version_response(payload)
+    response["facts"] = live_facts.status()
+    return jsonify(response)
+
+
+@app.route("/cron/facts-reminder", methods=["GET", "POST"])
+def facts_reminder() -> Any:
+    """Weekly email to Fernando with expired / expiring sheet facts (Vercel cron)."""
+    load_local_env()
+    cron_secret = _env("CRON_SECRET")
+    bearer = request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+    if not ((cron_secret and bearer == cron_secret) or (_env("ORCHESTRATOR_API_KEY") and _is_authorized_for_audit())):
+        return auth_error("Invalid or missing API key for facts reminder.")
+    force = _parse_bool_query(request.args.get("force"), default=False)
+    return jsonify(live_facts.send_expiry_reminder(force=force))
 
 
 # ---------------------------------------------------------------------------
