@@ -86,6 +86,7 @@ from orchestrator.humanize import (
     history_to_messages,
     humanize_reply,
     recent_assistant_replies,
+    split_single_paragraph,
     style_hints,
     trim_to_last_sentence,
 )
@@ -165,6 +166,9 @@ class ReplyDecision:
     outbound_safety_blocked: bool = False
 
 
+# A client who thanks several times gets a different short answer each time.
+THANKS_REPLY_VARIANTS = 4
+
 # i18n: Internationalization layer for fixed phrases
 I18N_PHRASES = {
     "es": {
@@ -182,6 +186,8 @@ I18N_PHRASES = {
         "repeat_prefix": "Como te decía,",
         "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
         "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy.",
+        "thanks_reply_3": "De nada 🙌",
+        "thanks_reply_4": "Dale, cuando quieras.",
         "bot_question": "Soy el asistente digital del equipo de Acomara 🙂 Te respondo por acá lo que necesites, y si preferís hablar con un asesor, avisame y te paso.",
         "email_received_short": "¡Gracias! Ya tengo tu email, se lo paso a un asesor del equipo.",
         "email_received_ack": "¡Gracias! Ya tengo tu email ({email}). Un asesor del equipo revisa tu consulta y te escribe por acá. Si querés sumar algo (fechas, cuántos son, experiencia previa), contame y lo agrego.",
@@ -203,6 +209,8 @@ I18N_PHRASES = {
         "repeat_prefix": "As I mentioned,",
         "thanks_reply_1": "You're welcome! Message me here anytime.",
         "thanks_reply_2": "My pleasure! If anything else comes up, I'm here.",
+        "thanks_reply_3": "No worries 🙌",
+        "thanks_reply_4": "Anytime!",
         "bot_question": "I'm the Acomara team's digital assistant 🙂 I can answer whatever you need here, and if you'd rather talk to an advisor, just let me know.",
         "email_received_short": "Thanks! Got your email, I'll pass it to one of our advisors.",
         "email_received_ack": "Thanks! I've got your email ({email}). One of our advisors will review your request and message you here. If you want to add anything (dates, group size, previous experience), tell me and I'll include it.",
@@ -224,6 +232,8 @@ I18N_PHRASES = {
         "repeat_prefix": "Como te falei,",
         "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
         "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui.",
+        "thanks_reply_3": "De nada 🙌",
+        "thanks_reply_4": "Por nada, qualquer coisa me chama.",
         "bot_question": "Sou o assistente digital da equipe da Acomara 🙂 Te respondo por aqui o que precisar, e se preferir falar com um consultor, é só me avisar.",
         "email_received_short": "Obrigado! Já tenho seu email, vou passar para um consultor da equipe.",
         "email_received_ack": "Obrigado! Já tenho seu email ({email}). Um consultor da equipe vai ver sua consulta e te escreve por aqui. Se quiser acrescentar algo (datas, quantas pessoas, experiência prévia), me conta que eu incluo.",
@@ -1271,10 +1281,15 @@ def choose_reply_bubbles(reply: str, can_emit_multi: bool, is_opening: bool) -> 
 
     People send "Gracias!" and the answer as two messages. Paragraphs become
     bubbles when there are 2-3 of them; a longer list stays in one message.
+    A single paragraph is split only at a short opening reaction or before a
+    closing question that follows a long answer.
     """
     if not can_emit_multi or not (reply or "").strip():
         return []
     parts = split_reply_into_messages(reply)
+    if len(parts) == 1:
+        # One paragraph: a short reaction or a closing question can go apart.
+        parts = split_single_paragraph(parts[0])
     if is_opening or 2 <= len(parts) <= MAX_REPLY_BUBBLES:
         return parts
     return []
@@ -2401,7 +2416,7 @@ def process_inbound_message(
             decision.reply = get_phrase("opening_welcome", lang)
         elif is_thanks_only(msg.text):
             thanks_count = int(session_vars.get("thanks_reply_count") or 0)
-            decision.reply = get_phrase(f"thanks_reply_{thanks_count % 2 + 1}", lang)
+            decision.reply = get_phrase(f"thanks_reply_{thanks_count % THANKS_REPLY_VARIANTS + 1}", lang)
             session_vars["thanks_reply_count"] = thanks_count + 1
         else:
             guided_reply = build_program_options_guidance_reply(msg.text, session_vars, lang)

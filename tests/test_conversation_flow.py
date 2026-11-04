@@ -153,6 +153,10 @@ class ConversationFlowTests(unittest.TestCase):
         self.assertTrue(bot.startswith("Soy el asistente digital"))
         self.assertEqual(self.model.calls, [])
         self.assertEqual(self._text(self._send("Gracias de nuevo")), "¡Un placer! Si te surge otra duda, acá estoy.")
+        # Four different answers before any repeats.
+        later = [self._text(self._send(text)) for text in ("Muchas gracias", "Gracias!", "Mil gracias")]
+        self.assertEqual(len({thanks, "¡Un placer! Si te surge otra duda, acá estoy.", *later[:2]}), 4)
+        self.assertEqual(later[2], thanks)
 
 
     def test_fernando_rules_in_the_real_flow(self):
