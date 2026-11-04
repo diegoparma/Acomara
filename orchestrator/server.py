@@ -82,6 +82,7 @@ from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID as _ENGINE_DEFAULT
 from orchestrator.conversation_audit import DEFAULT_ORG_ID as _ENGINE_DEFAULT_ORG_ID, run_conversation_audit
 from nico_core import get_tenant
 from nico_core.hooks import CloseContext, first_fixed_reply
+from nico_core.prompt import build_user_prompt
 from nico_core.program_guide import program_options_reply
 from nico_core.season import mentions_off_season, numeric_date_is_off_season
 
@@ -1020,65 +1021,27 @@ def generate_reply(
     )
     user_lang = get_session_language(session_vars, msg["text"])
 
-    lang_instruction = {
-        "es": "Responde en español.",
-        "en": "Respond in English.",
-        "pt": "Responda em português.",
-    }.get(user_lang, "Respond in the user's language.")
-
     crm_client_context = build_crm_client_context(session_vars)
 
     # Override conversation_language in the dumped state so the LLM does not
-    # see a stale/contradictory signal vs the explicit lang_instruction.
+    # see a stale/contradictory signal vs the explicit language instruction.
     session_vars_for_llm = {key: session_vars[key] for key in _SESSION_KEYS_FOR_LLM if key in session_vars}
     session_vars_for_llm["conversation_language"] = user_lang
     recent_turns = session_vars.get("recent_turns")
 
     is_whatsapp = str(msg.get("channel", "")).strip().lower() == "whatsapp"
-    response_length_instruction = (
-        "Mantén la respuesta muy corta: máximo 2 líneas y 280 caracteres."
-        if is_whatsapp
-        else "Mantén la respuesta corta: máximo 3 líneas y 450 caracteres."
-    )
-
-    user_prompt = (
-        "Fecha de hoy ({tz_label}): {today}\n"
-        "Canal: {channel}\n"
-        "Conversation ID: {conversation_id}\n"
-        "Cliente pregunta:\n{question}\n\n"
-        "Variables de sesion actuales:\n{session_vars}\n\n"
-        "{crm_context}"
-        "\n\nEvidencia interna recuperada:\n{context}\n\n"
-        "Instrucciones CRÍTICAS:\n"
-        "- {lang_instruction}\n"
-        "- Basa tu respuesta ÚNICAMENTE en la evidencia recuperada y en lo que ya le dijiste al cliente en esta conversación "
-        "(si ya le diste un precio o una fecha, podés repetirlo).\n"
-        "- Si la evidencia trae información relacionada, aunque sea parcial, respondé con eso. "
-        "Decir que no lo tenés es el último recurso.\n"
-        "- Puedes traducir la respuesta del FAQ al idioma del usuario si es necesario.\n"
-        "- Pero NO INVENTES, NO AGREGUES ni NO EMBELLEZCAS información más allá de lo que dice el FAQ.\n"
-        "- La estructura y contenido de la respuesta debe ser fiel al FAQ, solo adaptado en idioma y claridad.\n"
-        "- {response_length_instruction}\n"
-        "- Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: una línea por programa con meses abreviados y días agrupados.\n"
-        "- Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.\n"
-        "- Arriba tenés los mensajes anteriores de esta conversación. Si ya hablaron, no vuelvas a saludar, "
-        "no repitas lo que ya dijiste y no preguntes datos que el cliente ya te dio.\n"
-        "- NO hagas preguntas de cierre ni acciones siguientes que no vengan del FAQ.\n"
-        "- Si de verdad no hay nada relacionado, decilo con tus palabras y ofrecé que un asesor del equipo lo confirme. "
-        "Si ya lo dijiste antes en esta conversación, no lo repitas: respondé lo que sí sabés o preguntá qué necesita exactamente.\n"
-        "- No pidas el email si ya lo pediste en esta conversación.\n"
-        "- Nunca menciones FAQ, documentación, evidencia ni base de datos."
-    ).format(
+    # Grounding rules are the engine's; the tenant adds its own (nico_core.prompt).
+    user_prompt = build_user_prompt(
+        TENANT.prompt,
         today=today.isoformat(),
         tz_label=TENANT.locale.label,
         channel=msg["channel"],
         conversation_id=msg["conversation_id"],
         question=msg["text"],
-        session_vars=json.dumps(session_vars_for_llm, ensure_ascii=False),
+        session_vars_json=json.dumps(session_vars_for_llm, ensure_ascii=False),
         crm_context=crm_client_context,
         context=context,
-        lang_instruction=lang_instruction,
-        response_length_instruction=response_length_instruction,
+        lang=user_lang,
     )
 
     # Optional: groups calls so the fixed system prompt hits OpenAI's prompt

@@ -17,6 +17,7 @@ from typing import Any, Callable, Mapping
 
 from nico_core.hooks import TenantHooks
 from nico_core.program_guide import ProgramGuideConfig
+from nico_core.prompt import PromptConfig
 from nico_core.season import SeasonConfig
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -154,6 +155,7 @@ class TenantConfig:
     hooks: TenantHooks = field(default_factory=TenantHooks)
     integrations: IntegrationsConfig = field(default_factory=IntegrationsConfig)
     language_hints: LanguageHints = field(default_factory=LanguageHints)
+    prompt: PromptConfig = field(default_factory=PromptConfig)
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)

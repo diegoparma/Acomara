@@ -4,6 +4,7 @@ Every value here was moved out of orchestrator/ unchanged; the golden test
 (tests/test_acomara_golden.py) proves Acomara's replies are identical.
 """
 from nico_core.program_guide import ProgramGuideConfig
+from nico_core.prompt import PromptConfig
 from nico_core.season import SeasonConfig
 from nico_core.tenant import IntegrationsConfig, KnowledgeConfig, LanguageHints, LocaleConfig, TenantConfig
 from orchestrator.caja_interno import internal_reply
@@ -96,6 +97,14 @@ TENANT = TenantConfig(
         },
     ),
     hooks=HOOKS,
+    prompt=PromptConfig(
+        human_name="un asesor del equipo",
+        extra_rules=(
+            "Si compartes fechas de salida y el canal es WhatsApp, usa lista numerada: "
+            "una línea por programa con meses abreviados y días agrupados.",
+            "Las fechas de salida de la evidencia ya están actualizadas a hoy: compartilas todas, no saques ninguna.",
+        ),
+    ),
     # Mountaineering words that were part of the engine's language detection.
     language_hints=LanguageHints(
         strong={"en": ("summit", "expedition", "ascent")},
