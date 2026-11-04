@@ -1,16 +1,16 @@
 Clave,Tema,Qué puede decir Nico,Estado,Vigente hasta,Fuente,Confirmado por,Última actualización
-precio_regular,Precios,"Precio regular de las expediciones abiertas: USD 7.250 por persona. Cuesta lo mismo en todos los programas, sin importar la duración.",Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-precio_promo,Precios,"Algunas salidas tienen promoción, entre USD 5.990 y USD 6.390, según los lugares libres de cada fecha. El precio exacto de una fecha lo confirma un asesor.",Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-precio_privada,Precios,Expediciones privadas: desde USD 7.990 por persona. En las abiertas no hay guía exclusivo.,Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-trek_plaza_mulas,Precios,Trek a Plaza de Mulas: USD 4.890 (promoción USD 3.690).,Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-trek_plaza_francia,Precios,"Trek a Plaza Francia: solo privado, mínimo 2 personas, USD 1.499 por persona.",Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-anticipo,Reserva,Se reserva con un anticipo de USD 699 en www.aconcaguaexpeditions.com/booking.,Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-pago_paypal,Pagos,"PayPal: 5,5% de comisión.",Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-pago_transferencia,Pagos,"Transferencia bancaria: 3,8% de impuesto.",Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-pago_usdt,Pagos,USDT por Coinbase o Binance: sin impuesto.,Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-pago_tarjeta,Pagos,Con tarjeta no se mantiene el precio promocional.,Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-permiso_parque,Permisos,"El permiso del Parque no está incluido. Acomara lo tramita sin cargo; el valor depende de la nacionalidad, la ruta y la fecha (entre USD 650 y USD 1.400).",Vigente,2027-02-28,FAQ faq-029 y datos-clave.md,Fernando,2026-11-03
-seguro_rescate,Permisos,"El seguro de rescate es obligatorio y no está incluido: debe cubrir rescate hasta 7.000 m y helicóptero, con 30 días de cobertura. Ronda los USD 400 con Global Rescue.",Vigente,2027-02-28,FAQ faq-032 y datos-clave.md,Fernando,2026-11-03
-alquiler_equipo,Equipo,"Alquilar todo el equipo personal ronda los USD 1.000; después de reservar, Acomara ayuda con el alquiler.",Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
-temporada,Temporada,Las expediciones se hacen de noviembre a marzo.,Vigente,2027-03-31,Diego (2026-11-04),Diego,2026-11-04
-logistica_suelta,Servicios,Esta temporada no vendemos logística suelta ni reservamos vuelos. Fuera de temporada no hay servicios.,Vigente,2027-02-28,datos-clave.md,Fernando,2026-11-03
+precio_regular,Precios,"Precio regular de las expediciones abiertas: USD 7.250 por persona. Cuesta lo mismo en todos los programas, sin importar la duración.",Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+precio_promo,Precios,"Algunas salidas tienen promoción, entre USD 5.990 y USD 6.390, según los lugares libres de cada fecha. El precio exacto de una fecha lo confirma un asesor.",Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+precio_privada,Precios,Expediciones privadas: desde USD 7.990 por persona. En las abiertas no hay guía exclusivo.,Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+trek_plaza_mulas,Precios,Trek a Plaza de Mulas: USD 4.890 (promoción USD 3.690).,Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+trek_plaza_francia,Precios,"Trek a Plaza Francia: solo privado, mínimo 2 personas, USD 1.499 por persona.",Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+anticipo,Reserva,Se reserva con un anticipo de USD 699 en www.aconcaguaexpeditions.com/booking.,Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+pago_paypal,Pagos,"PayPal: 5,5% de comisión.",Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+pago_transferencia,Pagos,"Transferencia bancaria: 3,8% de impuesto.",Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+pago_usdt,Pagos,USDT por Coinbase o Binance: sin impuesto.,Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+pago_tarjeta,Pagos,Con tarjeta no se mantiene el precio promocional.,Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+permiso_parque,Permisos,"El permiso del Parque no está incluido. Acomara lo tramita sin cargo; el valor depende de la nacionalidad, la ruta y la fecha (entre USD 650 y USD 1.400).",Vigente,2027-03-31,FAQ faq-029 y datos-clave.md,Fernando,2026-11-03
+seguro_rescate,Permisos,"El seguro de rescate es obligatorio y no está incluido: debe cubrir rescate hasta 7.000 m y helicóptero, con 30 días de cobertura. Ronda los USD 400 con Global Rescue.",Vigente,2027-03-31,FAQ faq-032 y datos-clave.md,Fernando,2026-11-03
+alquiler_equipo,Equipo,"Alquilar todo el equipo personal ronda los USD 1.000; después de reservar, Acomara ayuda con el alquiler.",Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
+temporada,Temporada,Las expediciones se hacen de noviembre a marzo.,Vigente,2027-03-31,datos-clave.md (otras partes dicen noviembre a marzo),,2026-11-03
+logistica_suelta,Servicios,Esta temporada no vendemos logística suelta ni reservamos vuelos. Fuera de temporada no hay servicios.,Vigente,2027-03-31,datos-clave.md,Fernando,2026-11-03
