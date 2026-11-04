@@ -19,9 +19,12 @@ from orchestrator.humanize import (  # noqa: E402
     MAX_RECENT_TURNS,
     append_recent_turns,
     assistant_already_spoke,
+    client_uses_usted,
+    extract_customer_name,
     history_to_messages,
     humanize_reply,
     recent_assistant_replies,
+    style_hints,
     trim_to_last_sentence,
 )
 from orchestrator.server import (  # noqa: E402
@@ -238,6 +241,76 @@ class HumanizeVarietyTests(unittest.TestCase):
         self.assertEqual(recent_assistant_replies(None), [])
 
 
+class CustomerNameTests(unittest.TestCase):
+    def test_introductions_and_signatures(self):
+        cases = {
+            "Hi, I'm Wes from Australia. Is the permit included?": "Wes",
+            "Great, thanks. Regards, Wes": "Wes",
+            "Cheers,\nJacques": "Jacques",
+            "Hola! Soy Martina, de Rosario.": "Martina",
+            "Me llamo juan": "Juan",
+            "Mi nombre es Ana María": "Ana",
+            "Oi, sou o Diego e quero ir": "Diego",
+            "Acá te escribe Lucía desde Chile": "Lucía",
+            "Gracias, Pedro": "Pedro",
+        }
+        for text, name in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(extract_customer_name(text), name)
+
+    def test_things_that_are_not_names(self):
+        for text in (
+            "Soy de Córdoba",
+            "soy médico",
+            "Soy Argentino",
+            "I'm interested in climbing",
+            "I'm Planning a trip",
+            "Muchas gracias!",
+            "ok gracias Nico",
+            "Gracias, Perfecto.",
+            "Thanks, Great!",
+            "",
+        ):
+            with self.subTest(text=text):
+                self.assertIsNone(extract_customer_name(text))
+
+
+class StyleHintsTests(unittest.TestCase):
+    def test_usted_is_mirrored_only_in_spanish_and_without_vos(self):
+        self.assertTrue(client_uses_usted(["Buenas tardes, ¿usted me podría indicar el precio?"]))
+        self.assertFalse(client_uses_usted(["¿Me podría decir el precio? ¿Tenés fechas?"]))
+        self.assertFalse(client_uses_usted(["¿Cuánto sale?"]))
+        hints = style_hints("¿Usted me podría indicar qué incluye el precio?", [])
+        self.assertTrue(any("usted" in h for h in hints))
+        self.assertFalse(any("usted" in h for h in style_hints("Usted?", [], language="en")))
+
+    def test_short_messages_get_short_answers(self):
+        self.assertTrue(any("corto" in h for h in style_hints("precio?", [])))
+        self.assertFalse(any("corto" in h for h in style_hints("Hola, somos tres amigos y queremos ir en enero, ¿qué nos conviene?", [])))
+        self.assertTrue(any("reaccioná" in h for h in style_hints("x" * 230, [])))
+
+    def test_emojis_follow_the_client(self):
+        self.assertTrue(any("emojis" in h for h in style_hints("precio?", [])))
+        self.assertFalse(any("emojis" in h for h in style_hints("precio? 🙏", [])))
+
+    def test_name_is_suggested_but_not_repeated(self):
+        self.assertTrue(any("se llama Wes" in h for h in style_hints("And the insurance?", [], customer_name="Wes")))
+        turns = append_recent_turns([], "Hi", "Sure Wes, it's separate.")
+        self.assertTrue(any("no lo pongas" in h for h in style_hints("And boots?", turns, customer_name="Wes")))
+        self.assertFalse(any("Wes" in h for h in style_hints("And boots?", turns)))
+
+    def test_not_every_message_ends_in_a_question(self):
+        turns = append_recent_turns([], "a", "¿Para cuándo?")
+        turns = append_recent_turns(turns, "b", "¿Cuántos son?")
+        self.assertTrue(any("pregunta" in h for h in style_hints("enero, somos 2", turns)))
+        turns = append_recent_turns(turns, "c", "Dale.")
+        self.assertFalse(any("pregunta" in h for h in style_hints("ok", turns)))
+
+    def test_last_opener_is_flagged(self):
+        turns = append_recent_turns([], "a", "¡Genial! Sale USD 7.250.")
+        self.assertTrue(any('"genial"' in h for h in style_hints("y qué incluye", turns)))
+
+
 class TrimToLastSentenceTests(unittest.TestCase):
     def test_cut_sentence_is_dropped(self):
         self.assertEqual(
@@ -314,6 +387,12 @@ class GenerateReplyMemoryTests(unittest.TestCase):
         session = {"recent_turns": append_recent_turns([], "Somos 3", "¡Genial! ¿Para qué fecha?")}
         reply, _ = self._run(session, text="¡Genial! El 18+2 tiene 20 días.")
         self.assertEqual(reply, "El 18+2 tiene 20 días.")
+
+    def test_style_hints_reach_the_model(self):
+        _, model_input = self._run({"customer_name": "Ana"})
+        prompt = model_input[-1]["content"]
+        self.assertIn("Cómo escribir este mensaje", prompt)
+        self.assertIn("se llama Ana", prompt)
 
     def test_first_reply_keeps_its_greeting(self):
         reply, model_input = self._run({})

@@ -79,7 +79,11 @@
   - Cuál es el precio canónico vigente de Plaza Francia.
   - Si el bot debe **nunca** confirmar precio (derivar siempre) o si puede leer del canon.
 
-### ⏸ Fix #4 — Detección y uso del nombre
+### ✅ Fix #4 — Detección y uso del nombre (2026-11-04)
+- `orchestrator/humanize.py::extract_customer_name`: "me llamo / soy / I'm / my name is / sou o" y firmas ("Regards, Wes"). Conservador: "soy de Córdoba", "I'm interested", "soy médico" no cuentan. Se guarda una vez en `customer_name`.
+- Decisión: se usa en la charla, no solo en el handoff. El modelo recibe "El cliente se llama X, podés usarlo una vez si sale natural", o "ya lo usaste, esta vez no" si apareció en los últimos 2 mensajes.
+
+#### Propuesta original
 - **Problema real detectado:** Wes Holloway y Diego firmaron su nombre; el bot nunca lo usó.
 - **Propuesta:** extraer firma con regex (`Regards,\s*(...)`, "soy/me llamo/I'm"), persistir en `customer_name`, exponer al prompt.
 - **Pendiente:** definir si lo usamos en saludos sucesivos o sólo en el handoff.
