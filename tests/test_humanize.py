@@ -168,6 +168,11 @@ class HumanizeVarietyTests(unittest.TestCase):
         )
         self.assertEqual(humanize_reply("¡Genial! Sale USD 7.250."), "¡Genial! Sale USD 7.250.")
 
+    def test_reaction_inside_the_sentence_is_kept(self):
+        for reply in ("Claro que sí, el permiso lo tramitamos nosotros.", "Genial que vengan en enero.", "Sure thing, it's 20 days."):
+            with self.subTest(reply=reply):
+                self.assertEqual(humanize_reply(reply, previous_replies=self.PREV), reply)
+
     def test_opener_alone_is_kept(self):
         self.assertEqual(humanize_reply("¡Genial!", previous_replies=self.PREV), "¡Genial!")
 

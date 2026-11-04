@@ -77,11 +77,13 @@ _FILLER_OPENER_RES = tuple(
     )
 )
 # A one-word reaction at the start: "¡Genial!", "Perfecto,", "Great!".
-# Fine once in a while; the same one every message gives a bot away.
+# Fine once in a while; the same one every message gives a bot away. It must
+# be followed by punctuation: "Claro que sí" or "Genial que vengan" are part of
+# the sentence and stay.
 _INTERJECTION_RE = re.compile(
     r"^\s*(?:¡\s*)?(?P<word>genial|perfecto|perfecta|excelente|buen[ií]simo|b[aá]rbaro|dale|claro|entiendo|"
     r"qu[eé] bueno|s[uú]per|ok|okey|listo|great|perfect|awesome|sure|got it|of course|absolutely|certainly|"
-    r"[oó]timo|perfeito|legal|entendi|beleza|show)\b\s*(?:[!.,]+|(?=\s))\s*",
+    r"[oó]timo|perfeito|legal|entendi|beleza|show)\s*[!.,]+\s*",
     re.IGNORECASE,
 )
 _EMOJI_RE = re.compile(
