@@ -270,6 +270,8 @@ class CustomerNameTests(unittest.TestCase):
             "Soy Argentino",
             "I'm interested in climbing",
             "I'm Planning a trip",
+            "I'm Brazilian, is the permit included?",
+            "Hola, soy Ingeniero y quiero ir",
             "Muchas gracias!",
             "ok gracias Nico",
             "Gracias, Perfecto.",
