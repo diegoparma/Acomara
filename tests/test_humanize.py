@@ -23,6 +23,7 @@ from orchestrator.humanize import (  # noqa: E402
     extract_customer_name,
     history_to_messages,
     humanize_reply,
+    personalize_welcome,
     recent_assistant_replies,
     style_hints,
     trim_to_last_sentence,
@@ -316,6 +317,44 @@ class StyleHintsTests(unittest.TestCase):
     def test_last_opener_is_flagged(self):
         turns = append_recent_turns([], "a", "¡Genial! Sale USD 7.250.")
         self.assertTrue(any('"genial"' in h for h in style_hints("y qué incluye", turns)))
+
+
+class PersonalizeWelcomeTests(unittest.TestCase):
+    def _welcome(self, lang, text, name=None):
+        return personalize_welcome(I18N_PHRASES[lang]["opening_welcome"], text, name).split("!")[0] + "!"
+
+    def test_answers_the_greeting_the_client_used(self):
+        self.assertEqual(self._welcome("es", "Buenas tardes"), "¡Buenas tardes!")
+        self.assertEqual(self._welcome("es", "buen dia"), "¡Buen día!")
+        self.assertEqual(self._welcome("es", "Buenas! quiero info"), "¡Buenas!")
+        self.assertEqual(self._welcome("en", "Good morning"), "Good morning!")
+        self.assertEqual(self._welcome("pt", "Boa noite"), "Boa noite!")
+        self.assertEqual(self._welcome("es", "hola"), "¡Hola!")
+
+    def test_uses_the_name_the_client_gave(self):
+        self.assertEqual(self._welcome("es", "Hola, soy Martina", "Martina"), "¡Hola, Martina!")
+        self.assertEqual(self._welcome("en", "Hi, I'm Wes", "Wes"), "Hi Wes!")
+        self.assertEqual(self._welcome("pt", "Boa tarde, sou o Diego", "Diego"), "Boa tarde, Diego!")
+
+    def test_how_are_you_gets_an_answer(self):
+        out = personalize_welcome(I18N_PHRASES["es"]["opening_welcome"], "Hola, ¿cómo estás?")
+        self.assertTrue(out.startswith("¡Hola! Todo bien por acá. Gracias por escribirnos."), out)
+        out = personalize_welcome(I18N_PHRASES["en"]["opening_welcome"], "Hi, how are you?")
+        self.assertTrue(out.startswith("Hi! All good here, thanks. Thanks for reaching out."), out)
+        out = personalize_welcome(I18N_PHRASES["pt"]["opening_welcome"], "Oi, tudo bem?")
+        self.assertTrue(out.startswith("Olá! Tudo ótimo por aqui."), out)
+
+    def test_rest_of_the_welcome_is_unchanged(self):
+        welcome = I18N_PHRASES["es"]["opening_welcome"]
+        out = personalize_welcome(welcome, "Buenas noches")
+        self.assertEqual(out[len("¡Buenas noches!"):], welcome[len("¡Hola!"):])
+        self.assertEqual(personalize_welcome("Otra cosa", "Buenas"), "Otra cosa")
+
+    def test_still_switches_to_usted(self):
+        from orchestrator.usted import to_usted
+
+        out = to_usted(personalize_welcome(I18N_PHRASES["es"]["opening_welcome"], "Buenas tardes"))
+        self.assertTrue(out.startswith("¡Buenas tardes! Gracias por escribirnos. ¿En qué le puedo ayudar?"))
 
 
 class TrimToLastSentenceTests(unittest.TestCase):

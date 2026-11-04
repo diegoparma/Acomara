@@ -58,8 +58,9 @@ USTED_PHRASES: dict[str, str] = {
     "Ojo: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si querés te paso las fechas de la próxima temporada.": (
         "Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas. Si quiere le paso las fechas de la próxima temporada."
     ),
-    "¡Hola! Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.": (
-        "¡Hola! Gracias por escribirnos. ¿En qué le puedo ayudar?\n\nSi le sirve, además de responderle por acá le mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones."
+    # Without the "¡Hola!": the welcome mirrors the client's greeting ("¡Buenas tardes!").
+    "Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.": (
+        "Gracias por escribirnos. ¿En qué le puedo ayudar?\n\nSi le sirve, además de responderle por acá le mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones."
     ),
     # sales_rules
     "Te soy sincero: el {program} es solo para quien ya estuvo arriba de los 6.000 m, está muy entrenado y llega aclimatado. ": (
