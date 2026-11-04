@@ -105,6 +105,19 @@ def no_internal_route(contact_address: str, text: str) -> None:
 
 
 @dataclass(frozen=True)
+class LanguageHints:
+    """Trade words added to the engine's es/en/pt detection, per language.
+
+    strong: one match decides the language; keywords: counted as whole words;
+    stopwords: counted in the word-set fallback. Never add proper nouns.
+    """
+
+    strong: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    keywords: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    stopwords: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class IntegrationsConfig:
     """External systems and identifiers of one deploy."""
 
@@ -140,6 +153,7 @@ class TenantConfig:
     program_guide: ProgramGuideConfig | None = None
     hooks: TenantHooks = field(default_factory=TenantHooks)
     integrations: IntegrationsConfig = field(default_factory=IntegrationsConfig)
+    language_hints: LanguageHints = field(default_factory=LanguageHints)
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)

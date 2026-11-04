@@ -165,6 +165,8 @@ class ReplyDecision:
 
 # i18n: fixed phrases come from the tenant config (tenants/<slug>/).
 I18N_PHRASES = TENANT.phrases
+# Words of the tenant's trade that also tell the language ("summit" → en).
+_HINTS = TENANT.language_hints
 
 
 def detect_language_from_text(text: str) -> str:
@@ -205,10 +207,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "regards",
         "thanks",
         "thank you",
-        "summit",
-        "expedition",
-        "ascent",
-    )
+    ) + _HINTS.strong.get("en", ())
     strong_pt_tokens = (
         "gostaria",
         "obrigado",
@@ -223,7 +222,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         # and "español". The standalone "olá" greeting is too short to lock
         # the language on its own; it is handled via word-boundary keyword_count
         # below and the < 20-char fallback in detect_language_confident.
-    )
+    ) + _HINTS.strong.get("pt", ())
     strong_es_tokens = (
         "quiero",
         "quisiera",
@@ -234,7 +233,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "podrias",
         "podria",
         "gracias",
-    )
+    ) + _HINTS.strong.get("es", ())
 
     for tok in strong_en_tokens:
         if tok in normalized_text:
@@ -274,10 +273,9 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "necesito",
         "tengo",
         "me interesa",
-        "ascenso",
-        # NOTE: do not add "aconcagua" — it is a proper noun used in every
-        # language and made English messages tie with Spanish.
-    )
+        # NOTE: tenants must not add proper nouns ("aconcagua"): they are used
+        # in every language and made English messages tie with Spanish.
+    ) + _HINTS.keywords.get("es", ())
     pt_keywords = (
         "oi",
         "ola",
@@ -294,7 +292,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "preciso",
         "tenho",
         "estou",
-    )
+    ) + _HINTS.keywords.get("pt", ())
     en_keywords = (
         "hello",
         "hi",
@@ -307,9 +305,7 @@ def _detect_language_with_evidence(text: str) -> str | None:
         "i want",
         "i need",
         "interested",
-        "expedition",
-        "route",
-    )
+    ) + _HINTS.keywords.get("en", ())
 
     es_count = keyword_count(es_keywords)
     pt_count = keyword_count(pt_keywords)
@@ -323,19 +319,18 @@ def _detect_language_with_evidence(text: str) -> str | None:
     es_stopwords = {
         "de", "la", "el", "que", "en", "y", "por", "para", "con", "una", "un",
         "hola", "buenas", "aun", "ninguna", "te", "me", "quiero", "necesito",
-    }
+    } | set(_HINTS.stopwords.get("es", ()))
     pt_stopwords = {
         "de", "do", "da", "que", "em", "e", "por", "para", "com", "uma", "um",
         "oi", "ola", "voce", "nao", "sim", "quero", "gostaria", "pergunta",
-    }
+    } | set(_HINTS.stopwords.get("pt", ()))
     en_stopwords = {
         "the", "and", "for", "with", "to", "from", "please", "hello", "hi", "thanks",
         "i", "you", "we", "can", "do", "have", "sir", "week", "next", "my",
         "is", "are", "it", "what", "how", "will", "am", "this", "that", "of",
         "if", "now", "about", "because", "only", "any", "there", "your", "be",
-        "would", "should", "price", "yes", "appreciate", "available", "climb",
-        "climbing",
-    }
+        "would", "should", "price", "yes", "appreciate", "available",
+    } | set(_HINTS.stopwords.get("en", ()))
     es_word_score = len(word_set & es_stopwords)
     pt_word_score = len(word_set & pt_stopwords)
     en_word_score = len(word_set & en_stopwords)
@@ -384,16 +379,16 @@ def detect_language_confident(text: str) -> str | None:
     strong_en_tokens = (
         "i would", "i'd like", "i want", "i need", "i'm interested",
         "interested in", "could you", "please send", "regards",
-        "thank you", "summit", "expedition", "ascent",
-    )
+        "thank you",
+    ) + _HINTS.strong.get("en", ())
     strong_pt_tokens = (
         "gostaria", "obrigado", "obrigada", "quero fazer", "quero saber",
         "este passeio", "qual e", "tem alguma", "voce", "para mim",
-    )
+    ) + _HINTS.strong.get("pt", ())
     strong_es_tokens = (
         "quiero", "quisiera", "necesito", "me interesa", "buenos dias",
         "buenas tardes", "podrias", "podria", "gracias", "por favor",
-    )
+    ) + _HINTS.strong.get("es", ())
 
     for tok in strong_en_tokens:
         if tok in normalized_text:

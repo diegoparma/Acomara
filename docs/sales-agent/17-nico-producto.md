@@ -26,7 +26,7 @@ Estado **antes** de este trabajo. La columna "Fase 1" dice dónde quedó.
 | Llamadas a la regla de 6.000 m, al FAQ de fechas y al cierre con videollamada | Negocio | → hooks del tenant (`tenants/acomara/hooks.py`) |
 | CRM (`check_client_status`), agente de caja (`internal_reply`), org de OpenBSP, agent id de Nico | Integración | → `TenantConfig.integrations` |
 | Nombre del servicio en `/health`, `source` en la respuesta | Marca | → `integrations.service_name` |
-| Detección de idioma es/en/pt | Motor, con palabras del rubro ("summit", "expedition", "ascent", "route", "climb", "ascenso") | **Pendiente** (fase 2) |
+| Detección de idioma es/en/pt | Motor, con palabras del rubro ("summit", "expedition", "ascent", "route", "climb", "ascenso") | → `TenantConfig.language_hints` (fase 2) |
 | Instrucciones al modelo en `generate_reply` (en español, "un asesor del equipo", fechas en WhatsApp) | Motor con supuestos de Acomara | **Pendiente** (fase 2) |
 | `format_whatsapp_departure_dates` (títulos "18+2 DÍAS \| …") | Negocio disfrazado de motor | **Pendiente** (fase 2, hook) |
 | Comandos, anti-duplicados, pausa, derivación, verificación de email, burbujas, filtro de credenciales, endpoint OpenAI-compatible, auditoría | Motor | Queda en `server.py` (fase 3 lo mueve a `nico_core`) |
@@ -80,7 +80,7 @@ WhatsApp/OpenBSP │  /v1/chat/completions (hoy)           │  email, web chat 
 | `integrations` | CRM, ruteo interno, ids de OpenBSP/Supabase, nombre del servicio | SGI, caja, ids actuales |
 | `placeholder` | Marca un tenant que no está listo para producción | `False` |
 
-Para completar en fase 2: `voice` (reglas de `humanize.py`: voseo, emojis, largo de burbujas), `prompt_instructions` (las reglas fijas que hoy arma `generate_reply`), `language_hints` (palabras del rubro para detectar idioma), `qualification_fields` (qué datos junta Nico antes de derivar: fechas, cantidad de personas, experiencia; hoy implícitos en el prompt) y `handoff` (destinatarios por tipo: lead, derivación, alerta de bot).
+Para completar en fase 2: `voice` (reglas de `humanize.py`: voseo, emojis, largo de burbujas), `prompt_instructions` (las reglas fijas que hoy arma `generate_reply`), `qualification_fields` (qué datos junta Nico antes de derivar: fechas, cantidad de personas, experiencia; hoy implícitos en el prompt) y `handoff` (destinatarios por tipo: lead, derivación, alerta de bot).
 
 **Por qué Python y no YAML (por ahora):** la config tiene regex y funciones; en Python no hace falta ninguna dependencia nueva y los tests la validan. Lo que edita alguien que no programa (frases, datos clave, prompt) ya está o puede estar en archivos de texto que la config solo nombra.
 
@@ -127,7 +127,7 @@ Otra sesión está armando `evals/`. La forma propuesta para que sirvan a varios
 | Fase | Qué | Riesgo | Estado |
 |---|---|---|---|
 | **1. Extraer datos de negocio** | `TenantConfig`, `tenants/acomara`, frases, conocimiento, temporada, guía de opciones, hooks, marca e integraciones. Test golden + test de un segundo tenant | Bajo: golden idéntico | **Hecha** (este PR) |
-| **2. Completar la config** | `voice` (cuando la sesión de voz cierre `humanize.py`), instrucciones del prompt de `generate_reply`, palabras del rubro en la detección de idioma, formato de fechas como hook, destinatarios de derivación, textos de emails y respuesta de credenciales por idioma. Mover `sales_rules.py` y `departures.py` a `tenants/acomara/` cuando no haya otras sesiones tocándolos | Medio: tocan el prompt; el golden de prompts lo cubre | Siguiente |
+| **2. Completar la config** | `voice` (cuando la sesión de voz cierre `humanize.py`), instrucciones del prompt de `generate_reply`, palabras del rubro ~~palabras del rubro en la detección de idioma~~ (hecho), formato de fechas como hook, destinatarios de derivación, textos de emails y respuesta de credenciales por idioma. Mover `sales_rules.py` y `departures.py` a `tenants/acomara/` cuando no haya otras sesiones tocándolos | Medio: tocan el prompt; el golden de prompts lo cubre | Siguiente |
 | **3. Partir `server.py`** | El pipeline a `nico_core/pipeline.py`, adaptadores `Channel` y `SessionStore`, `server.py` queda como app Flask fina | Medio: mucho movimiento de código; tests de flujo existentes | Después |
 | **4. Segundo negocio real** | ABC con textos y precios validados contra su web, su índice FAQ, su prompt; deploy propio | Bajo para Acomara | Cuando Diego decida |
 | **5. Herramientas** | Script "nuevo tenant" (copia una plantilla y valida), validación de config en CI, guía para cargar conocimiento | Bajo | Opcional |

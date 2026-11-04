@@ -5,7 +5,7 @@ Every value here was moved out of orchestrator/ unchanged; the golden test
 """
 from nico_core.program_guide import ProgramGuideConfig
 from nico_core.season import SeasonConfig
-from nico_core.tenant import IntegrationsConfig, KnowledgeConfig, LocaleConfig, TenantConfig
+from nico_core.tenant import IntegrationsConfig, KnowledgeConfig, LanguageHints, LocaleConfig, TenantConfig
 from orchestrator.caja_interno import internal_reply
 from orchestrator.conversation_audit import DEFAULT_ORG_ID
 from orchestrator.crm_client_status import check_client_status
@@ -96,6 +96,12 @@ TENANT = TenantConfig(
         },
     ),
     hooks=HOOKS,
+    # Mountaineering words that were part of the engine's language detection.
+    language_hints=LanguageHints(
+        strong={"en": ("summit", "expedition", "ascent")},
+        keywords={"es": ("ascenso",), "en": ("expedition", "route")},
+        stopwords={"en": ("climb", "climbing")},
+    ),
     integrations=IntegrationsConfig(
         service_name="acomara-orchestrator",
         user_agent="Acomara-SalesAgent/1.0",
