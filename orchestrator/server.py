@@ -1636,7 +1636,8 @@ def ensure_runtime() -> dict[str, Any]:
 
     rows = app.config.get("INDEX_ROWS")
     if rows is None:
-        rows = load_index(INDEX_PATH)
+        # A tenant without an FAQ index answers from the system prompt and key facts only.
+        rows = load_index(INDEX_PATH) if INDEX_PATH is not None else []
         app.config["INDEX_ROWS"] = rows
 
     system_prompt = app.config.get("SYSTEM_PROMPT")
