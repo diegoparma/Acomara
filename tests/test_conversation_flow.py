@@ -144,6 +144,16 @@ class ConversationFlowTests(unittest.TestCase):
         reply = self._text(self._send("¿Qué incluye el precio?"))
         self.assertIn("pasame tu email", reply)
 
+    def test_welcome_answers_the_clients_greeting(self):
+        reply = self._text(self._send("Buenas tardes"))
+        self.assertTrue(reply.startswith("¡Buenas tardes! Gracias por escribirnos."), reply)
+        self.assertEqual(self.model.calls, [])
+
+    def test_how_are_you_first_message_gets_the_welcome(self):
+        reply = self._text(self._send("Hola, ¿cómo estás?"))
+        self.assertTrue(reply.startswith("¡Hola! Todo bien por acá."), reply)
+        self.assertEqual(self.model.calls, [])
+
     def test_email_with_a_question_gets_both_bubbles(self):
         self.model.replies = ["El 18+2 sale USD 6.990, sujeto a disponibilidad."]
         self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}

@@ -38,11 +38,10 @@ class UstedPhrasesTests(unittest.TestCase):
                 self.assertIn(phrase, sources)
 
     def test_every_vos_phrase_in_the_code_has_an_usted_version(self):
-        covered = "\n".join(USTED_PHRASES)
         for key, text in I18N_PHRASES["es"].items():
-            if any(w in f" {text} " for w in _VOS_WORDS) and key not in ("thanks_reply_3",):
-                with self.subTest(key=key):
-                    self.assertTrue(text in covered or text.format(email="{email}") in covered, key)
+            with self.subTest(key=key):
+                converted = to_usted(text.replace("{email}", "ana@example.com"))
+                self.assertFalse(any(w in f" {converted} " for w in _VOS_WORDS), converted)
 
     def test_usted_versions_have_no_vos_and_are_clean(self):
         for target in USTED_PHRASES.values():

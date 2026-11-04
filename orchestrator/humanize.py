@@ -451,3 +451,51 @@ def split_single_paragraph(paragraph: str) -> list[str]:
     if not head and not tail:
         return [paragraph]
     return head + [" ".join(sentences)] + tail
+
+
+# --- First message: answer the greeting the client used ------------------------
+
+# (client greeting regex, how we answer it). First match wins.
+_GREETING_REPLIES: tuple[tuple[re.Pattern[str], str], ...] = tuple(
+    (re.compile(pattern, re.IGNORECASE), answer)
+    for pattern, answer in (
+        (r"^\W*buen(?:os)? d[ií]as?\b", "¡Buen día"),
+        (r"^\W*buenas tardes\b", "¡Buenas tardes"),
+        (r"^\W*buenas noches\b", "¡Buenas noches"),
+        (r"^\W*buenas\b", "¡Buenas"),
+        (r"^\W*good morning\b", "Good morning"),
+        (r"^\W*good afternoon\b", "Good afternoon"),
+        (r"^\W*good evening\b", "Good evening"),
+        (r"^\W*bom dia\b", "Bom dia"),
+        (r"^\W*boa tarde\b", "Boa tarde"),
+        (r"^\W*boa noite\b", "Boa noite"),
+    )
+)
+_WELCOME_GREETING_RE = re.compile(r"^(¡Hola|Hi|Olá)!")
+_HOW_ARE_YOU_RE = re.compile(
+    r"c[oó]mo (?:est[aá]s?|and[aá]s|va|le va|te va)|qu[eé] tal|how are you|how'?s it going|tudo bem|como vai|tudo bom",
+    re.IGNORECASE,
+)
+_HOW_ARE_YOU_ANSWER = {"¡Hola": " Todo bien por acá.", "Hi": " All good here, thanks.", "Olá": " Tudo ótimo por aqui."}
+
+
+def personalize_welcome(welcome: str, client_text: str, customer_name: str | None = None) -> str:
+    """Open the fixed welcome the way the client opened: "Buenas tardes" gets
+    "¡Buenas tardes!", "¿cómo estás?" gets an answer, and a client who said
+    their name hears it back.
+
+    Only the leading "¡Hola!" / "Hi!" / "Olá!" of the welcome changes.
+    """
+    match = _WELCOME_GREETING_RE.match(welcome or "")
+    if not match:
+        return welcome
+    greeting = match.group(1)
+    how_are_you = _HOW_ARE_YOU_ANSWER[greeting] if _HOW_ARE_YOU_RE.search(client_text or "") else ""
+    for pattern, answer in _GREETING_REPLIES:
+        if pattern.search(client_text or ""):
+            greeting = answer
+            break
+    if customer_name:
+        separator = " " if greeting in ("Hi", "Good morning", "Good afternoon", "Good evening") else ", "
+        greeting = f"{greeting}{separator}{customer_name}"
+    return f"{greeting}!{how_are_you}{welcome[match.end():]}"

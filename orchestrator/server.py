@@ -87,6 +87,7 @@ from orchestrator.humanize import (
     extract_customer_name,
     history_to_messages,
     humanize_reply,
+    personalize_welcome,
     recent_assistant_replies,
     split_single_paragraph,
     style_hints,
@@ -1490,6 +1491,9 @@ _PURE_GREETING_TOKENS: frozenset[str] = frozenset({
     "buenas", "buen", "dia", "buenos", "dias",
     "good", "morning", "afternoon", "evening",
     "bom", "boa", "tarde", "noite",
+    # "Buenas tardes", "Hola, ¿cómo estás?", "Oi, tudo bem?" are greetings too.
+    "tardes", "noches", "holaa", "holi", "como", "estas", "esta", "andas", "anda", "va", "que", "tal",
+    "todo", "bien", "how", "are", "you", "tudo", "bem", "vai",
 })
 
 
@@ -2416,7 +2420,9 @@ def process_inbound_message(
         if session_vars.get("conversation_turn_count") == 1 and (
             _is_pure_greeting(msg.text) or is_generic_opening(msg.text)
         ):
-            decision.reply = get_phrase("opening_welcome", lang)
+            decision.reply = personalize_welcome(
+                get_phrase("opening_welcome", lang), msg.text, session_vars.get("customer_name")
+            )
         elif is_thanks_only(msg.text):
             thanks_count = int(session_vars.get("thanks_reply_count") or 0)
             decision.reply = get_phrase(f"thanks_reply_{thanks_count % THANKS_REPLY_VARIANTS + 1}", lang)
