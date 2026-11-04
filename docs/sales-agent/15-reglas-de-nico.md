@@ -1,6 +1,6 @@
 # Reglas de Nico
 
-*Manual de comportamiento del agente de ventas. Actualizado 2026-10-06.*
+*Manual de comportamiento del agente de ventas. Actualizado 2026-11-04.*
 
 Este documento describe **todo lo que Nico decide antes de responder**, en el orden en que lo evalúa, más las alertas de la auditoría. Si cambiás una regla en el código, actualizá este archivo.
 
@@ -28,7 +28,7 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 | 10b | **Cierre con videollamada** | Cuando el cliente elige una fecha (un "5/12" cuenta solo si es una salida real: "somos 4/5 personas" no) o habla de reservar (preguntar por cancelaciones o reembolsos no cuenta), la respuesta cierra invitando a una videollamada (día, hora y ciudad) y pide el email si todavía no lo tiene; si eligió una fecha, aclara que la disponibilidad la confirma un asesor, y si esa fecha es solo del 12+2 o el 14+2 sugiere la salida más cercana del 18+2. Una vez por conversación. Si el email ya se pidió, se saca de la respuesta del modelo cualquier nuevo pedido. | — |
 | 11 | **Pedido de email** | Una sola vez, en los turnos 3 o 4, si todavía no lo tiene. Si el cliente manda el email junto con una pregunta, agradece en una línea y responde la pregunta igual. Si la respuesta del modelo ya pide el email, no se agrega el pedido fijo. | — |
 | 12 | **Fuera de temporada** | Si menciona un viaje entre abril y octubre, avisa una vez que la temporada es de noviembre a marzo. Una fecha numérica solo cuenta si cae fuera de temporada leída como día/mes y como mes/día ("5/12" es el 5 de diciembre); los rangos con unidad ("4-6 personas") y el "may" verbo en inglés no cuentan. | — |
-| 13 | **Formato de fechas y tono** | Formatea las fechas de salida para WhatsApp y limpia la respuesta del modelo: negritas de WhatsApp en lugar de Markdown, sin guiones largos, sin volver a saludar, sin frases de asistente ("¿Hay algo más en lo que pueda ayudarte?") y sin frases cortadas. Las respuestas de 2-3 párrafos salen en mensajes separados. | `OPENBSP_MULTI_MESSAGE_ENABLED` (burbujas) |
+| 13 | **Formato de fechas y tono** | Formatea las fechas de salida para WhatsApp y limpia la respuesta del modelo: negritas de WhatsApp en lugar de Markdown, sin guiones largos, sin volver a saludar, sin frases de asistente ("¿Hay algo más en lo que pueda ayudarte?", "Espero que te sirva") y sin frases cortadas. Para que no suene a plantilla: si el mensaje anterior ya arrancó con una reacción ("¡Genial!", "Perfecto,") o esa misma reacción se usó en los últimos 3 mensajes, la saca; saca un ofrecimiento o pregunta larga copiada textual de un mensaje anterior (no los datos ni nada con números); saca disculpas por una "confusión" que no hubo, "Entiendo que querés saber…" al principio y "Gracias por tu consulta" después del primer mensaje; deja un solo emoji y un solo "!". Las respuestas de 2-3 párrafos salen en mensajes separados. | `OPENBSP_MULTI_MESSAGE_ENABLED` (burbujas) |
 | 14 | **Filtro de seguridad** | Nunca envía nada que parezca una contraseña, token o credencial. | — |
 | 15 | **Respuesta duplicada** | Si la respuesta es idéntica a la última enviada hace menos de 30 segundos, no la manda. Si pasó más tiempo, el cliente volvió a preguntar: la manda empezando con "Como te decía,". Antes de enviar vuelve a leer la sesión, por si otro mensaje del cliente procesado en paralelo ya la mandó. | — |
 
@@ -41,7 +41,7 @@ Cada mensaje de WhatsApp que entra pasa por estas reglas en orden. La primera qu
 
 ## 3. Reglas del system prompt (lo que la IA puede y no puede decir)
 
-Fuente: `docs/sales-agent/02-system-prompt.md` (v3.4) más la ficha `docs/knowledge/datos-clave.md` (programas, precio, permiso y seguro), que se agrega al final del prompt y vale más que cualquier fragmento del FAQ. Lo que confirme Fernando se suma a esa ficha.
+Fuente: `docs/sales-agent/02-system-prompt.md` (v3.5) más la ficha `docs/knowledge/datos-clave.md` (programas, precio, permiso y seguro), que se agrega al final del prompt y vale más que cualquier fragmento del FAQ. Lo que confirme Fernando se suma a esa ficha.
 
 **Nunca:**
 - Confirmar cupo real por fecha, confirmar reservas ni hacer cotizaciones personalizadas.
