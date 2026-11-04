@@ -15,6 +15,7 @@ from datetime import timedelta, timezone, tzinfo
 from pathlib import Path
 from typing import Mapping
 
+from nico_core.program_guide import ProgramGuideConfig
 from nico_core.season import SeasonConfig
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -92,6 +93,8 @@ class TenantConfig:
     locale: LocaleConfig = field(default_factory=LocaleConfig)
     # None: the business sells all year and never warns about dates.
     season: SeasonConfig | None = None
+    # None: options questions go to the model like any other.
+    program_guide: ProgramGuideConfig | None = None
     placeholder: bool = False
     notes: str = ""
     extra: Mapping[str, object] = field(default_factory=dict)

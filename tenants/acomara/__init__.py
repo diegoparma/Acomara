@@ -3,6 +3,7 @@
 Every value here was moved out of orchestrator/ unchanged; the golden test
 (tests/test_acomara_golden.py) proves Acomara's replies are identical.
 """
+from nico_core.program_guide import ProgramGuideConfig
 from nico_core.season import SeasonConfig
 from nico_core.tenant import KnowledgeConfig, LocaleConfig, TenantConfig
 from tenants.acomara.phrases import I18N_PHRASES
@@ -34,5 +35,59 @@ TENANT = TenantConfig(
             "aconcagua", "montaña", "montanha", "mountain", "alta montaña",
             "alta montanha", "fecha", "data", "date",
         ),
+    ),
+    # "¿Qué opciones tienen?": Fernando leads with the 18+2 and the 12+2.
+    # Portuguese gets the Spanish text, as before the split.
+    program_guide=ProgramGuideConfig(
+        known_product_re=r"\b(18\s*\+\s*2|17\s*\+\s*2|14\s*\+\s*2|12\s*\+\s*2)\b",
+        first_intent_keywords=(
+            "opciones",
+            "alternativas",
+            "programas",
+            "itinerarios",
+            "expediciones",
+            "que opciones",
+            "cuales son",
+            "what options",
+            "which options",
+            "alternatives",
+            "programs",
+            "itineraries",
+            "expeditions",
+        ),
+        followup_keywords=(
+            "otras",
+            "otras opciones",
+            "otras alternativas",
+            "las otras",
+            "restantes",
+            "demas",
+            "todas",
+            "lista",
+            "listame",
+            "all options",
+            "other options",
+            "other alternatives",
+            "the other",
+            "list the others",
+        ),
+        first_reply={
+            "en": (
+                "I recommend starting with two options:\n"
+                "1. 18+2 (highly recommended)\n"
+                "2. 12+2 (recommended)\n\n"
+                "There are other alternatives as well. If you'd like, I can list them in detail."
+            ),
+            "es": (
+                "Para empezar, te recomiendo estas dos opciones:\n"
+                "1. 18+2 (muy recomendada)\n"
+                "2. 12+2 (recomendada)\n\n"
+                "También hay otras alternativas. Si querés, te las paso en detalle."
+            ),
+        },
+        followup_reply={
+            "en": "The other alternatives are:\n1. 14+2\n2. 17+2",
+            "es": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+        },
     ),
 )

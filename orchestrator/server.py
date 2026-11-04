@@ -90,6 +90,7 @@ from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_rec
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
 from nico_core import get_tenant
+from nico_core.program_guide import program_options_reply
 from nico_core.season import mentions_off_season, numeric_date_is_off_season
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1555,102 +1556,13 @@ def wants_human_handoff(text: str, session_vars: dict[str, Any] | None = None) -
     return bool(_HANDOFF_REQUEST_RE.search(normalized))
 
 
-def _contains_known_program_duration(normalized_text: str) -> bool:
-    return bool(
-        re.search(
-            r"\b(18\s*\+\s*2|17\s*\+\s*2|14\s*\+\s*2|12\s*\+\s*2)\b",
-            normalized_text,
-        )
-    )
-
-
-def _is_program_options_first_intent(normalized_text: str) -> bool:
-    generic_keywords = (
-        "opciones",
-        "alternativas",
-        "programas",
-        "itinerarios",
-        "expediciones",
-        "que opciones",
-        "cuales son",
-        "what options",
-        "which options",
-        "alternatives",
-        "programs",
-        "itineraries",
-        "expeditions",
-    )
-    has_generic_keyword = any(k in normalized_text for k in generic_keywords)
-    return has_generic_keyword and not _contains_known_program_duration(normalized_text)
-
-
-def _is_program_options_followup_intent(normalized_text: str) -> bool:
-    followup_keywords = (
-        "otras",
-        "otras opciones",
-        "otras alternativas",
-        "las otras",
-        "restantes",
-        "demas",
-        "todas",
-        "lista",
-        "listame",
-        "all options",
-        "other options",
-        "other alternatives",
-        "the other",
-        "list the others",
-    )
-    return any(k in normalized_text for k in followup_keywords)
-
-
-def _first_program_options_reply(lang: str) -> str:
-    if lang == "en":
-        return (
-            "I recommend starting with two options:\n"
-            "1. 18+2 (highly recommended)\n"
-            "2. 12+2 (recommended)\n\n"
-            "There are other alternatives as well. If you'd like, I can list them in detail."
-        )
-    return (
-        "Para empezar, te recomiendo estas dos opciones:\n"
-        "1. 18+2 (muy recomendada)\n"
-        "2. 12+2 (recomendada)\n\n"
-        "También hay otras alternativas. Si querés, te las paso en detalle."
-    )
-
-
-def _followup_program_options_reply(lang: str) -> str:
-    if lang == "en":
-        return (
-            "The other alternatives are:\n"
-            "1. 14+2\n"
-            "2. 17+2"
-        )
-    return (
-        "Las otras alternativas son:\n"
-        "1. 14+2\n"
-        "2. 17+2"
-    )
-
-
 def build_program_options_guidance_reply(
     user_text: str,
     session_vars: dict[str, Any],
     lang: str,
 ) -> str | None:
-    normalized = normalize_for_intent(user_text)
-    options_stage = int(session_vars.get("program_options_stage") or 0)
-
-    if options_stage <= 0 and _is_program_options_first_intent(normalized):
-        session_vars["program_options_stage"] = 1
-        return _first_program_options_reply(lang)
-
-    if options_stage >= 1 and _is_program_options_followup_intent(normalized):
-        session_vars["program_options_stage"] = 2
-        return _followup_program_options_reply(lang)
-
-    return None
+    """Recommend the tenant's short list of programs, then the rest (nico_core.program_guide)."""
+    return program_options_reply(TENANT.program_guide, normalize_for_intent(user_text), session_vars, lang)
 
 
 def should_send_handoff_email(
