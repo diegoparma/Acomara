@@ -127,6 +127,23 @@ class ConversationFlowTests(unittest.TestCase):
         self._send("What about the rescue insurance?")
         self.assertIn("se llama Wes", self.model.calls[1][-1]["content"])
 
+    def test_fixed_phrases_follow_a_client_who_writes_with_usted(self):
+        self.model.replies = ["Incluye hotel en Mendoza, comidas en la montaña, mulas y guías.", "Incluye hotel y comidas."]
+        self.store["conv-flow"] = {
+            "conversation_turn_count": 2,
+            "conversation_language": "es",
+            "recent_turns": [{"role": "user", "text": "Buenas tardes, quisiera saber si organizan la expedición."}],
+        }
+        reply = self._text(self._send("¿Usted me podría indicar qué incluye el precio?"))
+        self.assertIn("páseme su email", reply)
+        self.assertNotIn("pasame tu email", reply)
+
+    def test_fixed_phrases_stay_in_vos_otherwise(self):
+        self.model.replies = ["Incluye hotel en Mendoza, comidas en la montaña, mulas y guías."]
+        self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}
+        reply = self._text(self._send("¿Qué incluye el precio?"))
+        self.assertIn("pasame tu email", reply)
+
     def test_email_with_a_question_gets_both_bubbles(self):
         self.model.replies = ["El 18+2 sale USD 6.990, sujeto a disponibilidad."]
         self.store["conv-flow"] = {"conversation_turn_count": 2, "conversation_language": "es"}
