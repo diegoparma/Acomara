@@ -97,6 +97,7 @@ from orchestrator.usted import to_usted
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
+from orchestrator import kb_retrieval
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "docs" / "knowledge" / "faq_cloud_index.jsonl"
@@ -1028,12 +1029,7 @@ def retrieve_top_k(
     top_k: int,
 ) -> list[dict[str, Any]]:
     emb = client.embeddings.create(model=embed_model, input=query_text).data[0].embedding
-    scored: list[dict[str, Any]] = []
-    for row in rows:
-        score = cosine(emb, row["embedding"])
-        scored.append({"score": score, **row})
-    scored.sort(key=lambda x: x["score"], reverse=True)
-    return scored[:top_k]
+    return kb_retrieval.rank(rows, [query_text], [emb], top_k, mode=retrieval_mode())
 
 
 def build_contextual_query(query_text: str, recent_turns: Any, max_chars: int = 700) -> str:
@@ -1071,14 +1067,20 @@ def retrieve_with_context(
     if contextual == query_text:
         return retrieve_top_k(client, embed_model, rows, query_text, top_k)
     data = client.embeddings.create(model=embed_model, input=[query_text, contextual]).data
-    best: dict[Any, dict[str, Any]] = {}
-    for item in data:
-        for row in rows:
-            score = cosine(item.embedding, row["embedding"])
-            key = row.get("id", id(row))
-            if key not in best or score > best[key]["score"]:
-                best[key] = {"score": score, **row}
-    return sorted(best.values(), key=lambda x: x["score"], reverse=True)[:top_k]
+    vectors = [item.embedding for item in data]
+    return kb_retrieval.rank(rows, [query_text, contextual], vectors, top_k, mode=retrieval_mode())
+
+
+def retrieval_mode() -> str:
+    """dense (default) or hybrid (embeddings + keywords); see orchestrator/kb_retrieval.py."""
+    mode = str(_env("RETRIEVAL_MODE", "dense") or "dense").strip().lower()
+    return mode if mode in ("dense", "hybrid") else "dense"
+
+
+def index_embed_model(rows: list[dict[str, Any]], configured: str | None) -> str:
+    """Queries must be embedded with the model that built the index; the index says which."""
+    built_with = next((r.get("embed_model") for r in rows if r.get("embed_model")), None)
+    return built_with or configured or "text-embedding-3-large"
 
 
 def hits_to_context(hits: list[dict[str, Any]]) -> str:
@@ -1903,7 +1905,7 @@ def ensure_runtime() -> dict[str, Any]:
 
     return {
         "api_key": api_key,
-        "embed_model": _env("OPENAI_EMBED_MODEL", "text-embedding-3-large"),
+        "embed_model": index_embed_model(rows, _env("OPENAI_EMBED_MODEL", "text-embedding-3-large")),
         "chat_model": _env("OPENAI_CHAT_MODEL", "gpt-5.4"),
         "chat_model_from_request": str(_env("OPENAI_CHAT_MODEL_FROM_REQUEST", "false") or "false")
         .strip()

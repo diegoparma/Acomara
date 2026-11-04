@@ -2,7 +2,7 @@
 
 Fuentes: lo que Fernando responde en las conversaciones (lo más actual) y, si él no lo dijo, las preguntas frecuentes (entre corchetes, la entrada). Si un fragmento recuperado dice otra cosa, vale esta ficha.
 
-## Programas (temporada noviembre a febrero)
+## Programas (temporada 2026/27, salidas de noviembre a febrero)
 - 18+2 días, Ruta Normal, Extendido: el que recomendamos siempre, el de más días de aclimatación (caminatas a Plaza Francia, 4.200 m, y al cerro Bonete, 5.100 m). Para quien no estuvo por encima de 6.000 m, incluido quien hizo el Kilimanjaro, es el indicado. [Fernando, faq-005]
 - 14+2 días, Ascenso Rápido, y 12+2 días, Ascenso Extremo (Ruta Normal): solo para quien ya estuvo por encima de 6.000 m, está muy entrenado y llega aclimatado. Saltean las caminatas de aclimatación. No los recomiendes a nadie sin esa experiencia. [Fernando, faq-005]
 - 17+2 días, Glaciar Polaco 360° (travesía "Dos caras"): menos transitada y más exigente; más distancia, más frío, más viento. Base en Plaza Argentina. [faq-003]

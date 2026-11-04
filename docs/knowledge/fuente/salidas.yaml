@@ -1,0 +1,38 @@
+# SALIDAS PROGRAMADAS de la temporada (la usa la respuesta de fechas en
+# faq.yaml con {departures_list}). Una fecha por día de salida, AAAA-MM-DD.
+#
+# El código (orchestrator/departures.py) lee la lista ya generada para filtrar
+# las fechas pasadas y ofrecer el 18+2 cuando preguntan por un programa corto,
+# así que el formato de salida ("Noviembre: 14 | 22") lo arma el generador:
+# acá solo se cargan fechas.
+source: Fernando (salidas programadas, no confirmadas)
+confidence: confirmed
+valid_from: 2026-07-01
+valid_until: 2027-03-31
+check_with: [aconcagua-plan-admin]
+
+programs:
+  - program: "18+2"
+    label:
+      es: NORMAL EXTENDIDO (recomendado)
+      en: NORMAL EXTENDED (recommended)
+      pt: NORMAL ESTENDIDO (recomendado)
+    dates: [2026-11-14, 2026-11-22, 2026-12-01, 2026-12-04, 2026-12-20, 2026-12-27, 2027-01-02, 2027-01-10, 2027-01-31, 2027-02-07]
+  - program: "14+2"
+    label:
+      es: NORMAL ASCENSO RÁPIDO
+      en: NORMAL FAST ASCENT
+      pt: NORMAL ASCENSÃO RÁPIDA
+    dates: [2026-11-18, 2026-11-26, 2026-12-05, 2026-12-10, 2027-01-06, 2027-01-14, 2027-02-11]
+  - program: "12+2"
+    label:
+      es: NORMAL ASCENSO EXTREMO
+      en: NORMAL EXTREME ASCENT
+      pt: NORMAL ASCENSÃO EXTREMA
+    dates: [2026-11-20, 2026-11-28, 2026-12-07, 2026-12-12, 2026-12-26, 2027-01-02, 2027-01-08, 2027-01-16, 2027-02-06, 2027-02-13]
+  - program: "17+2"
+    label:
+      es: GLACIAR POLACO 360°
+      en: 360° POLISH GLACIER
+      pt: GLACIAR POLONÊS 360°
+    dates: [2026-12-01, 2026-12-28, 2027-01-03, 2027-02-01]
