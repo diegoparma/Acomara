@@ -2,6 +2,8 @@
 
 Agente de ventas por WhatsApp/email para expediciones al Aconcagua. Diseño y operación en `docs/sales-agent/`; estado general en `docs/estado-nico-para-fernando.md`.
 
+Nico se está convirtiendo en un motor reutilizable (`nico_core/`) con una config por negocio en `tenants/<negocio>/` (`NICO_TENANT`, por defecto `acomara`). Los datos de negocio (frases fijas, temporada, programas, reglas de venta, CRM) van en el tenant, no en `orchestrator/server.py`. Diseño y fases: `docs/sales-agent/17-nico-producto.md`. Si cambiás una respuesta fija de Acomara a propósito, regenerá el golden: `python3 tests/test_acomara_golden.py --update`.
+
 ## Parte del negocio Aconcagua
 
 Este repo es parte del mismo negocio que:
