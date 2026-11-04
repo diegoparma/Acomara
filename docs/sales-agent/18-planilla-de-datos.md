@@ -47,7 +47,7 @@ Si la planilla no responde o queda mal armada (por ejemplo, alguien borró la fi
 
 La planilla ya existe: **"nico"**, en la carpeta Acomara del Drive de Diego (https://docs.google.com/spreadsheets/d/1w9J2KmtKysMLa2cBw4k6HSVF2FZbA7pWuEJgWsR-lTI/edit), compartida como "cualquier persona con el enlace puede ver". Para que Fernando la edite, hay que compartírsela como editor. `docs/sales-agent/planilla-datos-semilla.csv` es una copia del 2026-11-04, por si hubiera que armarla de nuevo (Archivo → Importar).
 
-1. Completar la fila de **temporada**, que está *A confirmar* porque las fuentes no coinciden (noviembre a febrero o noviembre a marzo). Hasta que esté *Vigente*, Nico dice que la temporada la confirma un asesor.
+1. Temporada: noviembre a marzo (lo definió Diego el 2026-11-04). La fila queda *Vigente* hasta el 2027-03-31.
 2. El enlace CSV es `https://docs.google.com/spreadsheets/d/1w9J2KmtKysMLa2cBw4k6HSVF2FZbA7pWuEJgWsR-lTI/export?format=csv&gid=0` (lee la primera hoja). Funciona mientras la planilla siga compartida con enlace; si se cierra, Nico sigue con la última copia y después vuelve a la ficha. Los datos de la planilla son públicos (son los precios que damos a cualquier cliente): no pongas nada privado en esa hoja.
 3. En Vercel, cargar `NICO_FACTS_CSV_URL` con ese enlace. Opcionales: `NICO_FACTS_TTL_SECONDS` (600), `NICO_FACTS_REMINDER_TO` (si el aviso no va a `HANDOFF_EMAIL_TO`), `NICO_FACTS_ALLOWED_DOMAINS`, y `CRON_SECRET` para que el aviso de los lunes (cron de `vercel.json`, `/cron/facts-reminder`) esté autorizado.
 4. Cuando la planilla esté andando, sacar de `datos-clave.md` los datos que ahora viven en la planilla, para que no haya dos versiones.

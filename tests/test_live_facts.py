@@ -94,7 +94,8 @@ class ParsingTest(_Base):
         self.assertEqual(skipped, 0)
         by_key = {f.key: f for f in facts}
         self.assertFalse(any(f.rejected for f in facts))
-        self.assertEqual(by_key["temporada"].state(TODAY), "a_confirmar")
+        self.assertEqual(by_key["temporada"].state(TODAY), "vigente")
+        self.assertIn("noviembre a marzo", by_key["temporada"].text)
         for key in ("precio_regular", "precio_promo", "precio_privada", "trek_plaza_mulas",
                     "trek_plaza_francia", "anticipo", "pago_paypal", "pago_transferencia",
                     "pago_usdt", "pago_tarjeta", "permiso_parque", "seguro_rescate", "alquiler_equipo"):
