@@ -95,10 +95,23 @@ class ParsingTest(_Base):
         by_key = {f.key: f for f in facts}
         self.assertFalse(any(f.rejected for f in facts))
         self.assertEqual(by_key["temporada"].state(TODAY), "a_confirmar")
-        for key in ("precio-regular", "promo-salidas", "expedicion-privada", "anticipo",
-                    "formas-de-pago", "permiso-parque", "seguro-rescate", "alquiler-equipo"):
+        for key in ("precio_regular", "precio_promo", "precio_privada", "trek_plaza_mulas",
+                    "trek_plaza_francia", "anticipo", "pago_paypal", "pago_transferencia",
+                    "pago_usdt", "pago_tarjeta", "permiso_parque", "seguro_rescate", "alquiler_equipo"):
             self.assertEqual(by_key[key].state(TODAY), "vigente", key)
-        self.assertNotIn("logistica", " ".join(by_key))
+
+    def test_shared_topic_names_the_row_to_confirm(self) -> None:
+        csv_text = (
+            "Clave,Tema,Qué puede decir Nico,Estado,Vigente hasta\n"
+            "precio_regular,Precios,Precio regular USD 7.250.,Vigente,2027-02-28\n"
+            "precio_promo,Precios,Promo USD 5.990.,Vigente,2026-11-01\n"
+        )
+        facts, _ = lf.parse_csv(csv_text)
+        block = lf.render_block(facts, TODAY)
+        self.assertIn("- Precios: Precio regular USD 7.250.", block)
+        confirm = block.split("## A confirmar por un asesor", 1)[1]
+        self.assertIn("- Precios (precio promo)", confirm)
+        self.assertNotIn("- Precios\n", confirm + "\n")
 
 
 class ValidityTest(_Base):

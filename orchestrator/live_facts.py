@@ -313,8 +313,13 @@ def render_block(facts: list[Fact], today: date) -> str:
     for fact in facts:
         if fact.state(today) == "vigente" and fact.text:
             valid.append(f"- {fact.topic}: {fact.text}")
-        elif fact.topic not in confirm_topics:
-            confirm_topics.append(fact.topic)
+            continue
+        # Name the row, not just its topic: several rows share "Precios", and an
+        # expired promo must not silence the regular price that is still valid.
+        label = fact.key.replace("_", " ").replace("-", " ")
+        item = fact.topic if _norm(fact.topic) == _norm(label) else f"{fact.topic} ({label})"
+        if item not in confirm_topics:
+            confirm_topics.append(item)
 
     lines = [
         BLOCK_HEADER,
@@ -335,8 +340,9 @@ def render_block(facts: list[Fact], today: date) -> str:
         lines += [
             "",
             "## A confirmar por un asesor",
-            "Sobre estos temas no des cifras ni condiciones, ni de esta ficha ni de "
-            "los fragmentos: decí que lo confirma un asesor.",
+            "Sobre estos puntos no des cifras ni condiciones, ni de esta ficha ni de "
+            "los fragmentos: decí que lo confirma un asesor. Lo que figura en "
+            "Vigentes sí lo podés decir.",
         ]
         size = sum(len(x) for x in lines)
         for topic in confirm_topics:

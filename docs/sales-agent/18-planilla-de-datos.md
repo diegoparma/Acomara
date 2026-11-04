@@ -45,11 +45,10 @@ Si la planilla no responde o queda mal armada (por ejemplo, alguien borró la fi
 
 ## Puesta en marcha (Diego, una sola vez)
 
-1. Crear la planilla en Google Sheets e importar `docs/sales-agent/planilla-datos-semilla.csv` (Archivo → Importar). La semilla sale de `datos-clave.md`: revisá las fechas de *Vigente hasta* (las promociones, el trek a Plaza de Mulas, que tiene promo, y el permiso vencen el 2026-11-30 para que Fernando los confirme) y completá la fila de **temporada**, que queda *A confirmar* porque las fuentes no coinciden (noviembre a febrero o noviembre a marzo).
-2. Conseguir el enlace CSV, de una de estas dos formas:
-   - Archivo → Compartir → **Publicar en la web** → la hoja → *Valores separados por comas (.csv)*. Google puede tardar unos minutos en reflejar los cambios.
-   - O compartir como "cualquier persona con el enlace puede ver" y usar `https://docs.google.com/spreadsheets/d/<ID>/export?format=csv&gid=<GID>`.
-   Los datos de la planilla son públicos (son los precios que damos a cualquier cliente): no pongas nada privado en esa hoja.
+La planilla ya existe: **"nico"**, en la carpeta Acomara del Drive de Diego (https://docs.google.com/spreadsheets/d/1w9J2KmtKysMLa2cBw4k6HSVF2FZbA7pWuEJgWsR-lTI/edit), compartida como "cualquier persona con el enlace puede ver". Para que Fernando la edite, hay que compartírsela como editor. `docs/sales-agent/planilla-datos-semilla.csv` es una copia del 2026-11-04, por si hubiera que armarla de nuevo (Archivo → Importar).
+
+1. Completar la fila de **temporada**, que está *A confirmar* porque las fuentes no coinciden (noviembre a febrero o noviembre a marzo). Hasta que esté *Vigente*, Nico dice que la temporada la confirma un asesor.
+2. El enlace CSV es `https://docs.google.com/spreadsheets/d/1w9J2KmtKysMLa2cBw4k6HSVF2FZbA7pWuEJgWsR-lTI/export?format=csv&gid=0` (lee la primera hoja). Funciona mientras la planilla siga compartida con enlace; si se cierra, Nico sigue con la última copia y después vuelve a la ficha. Los datos de la planilla son públicos (son los precios que damos a cualquier cliente): no pongas nada privado en esa hoja.
 3. En Vercel, cargar `NICO_FACTS_CSV_URL` con ese enlace. Opcionales: `NICO_FACTS_TTL_SECONDS` (600), `NICO_FACTS_REMINDER_TO` (si el aviso no va a `HANDOFF_EMAIL_TO`), `NICO_FACTS_ALLOWED_DOMAINS`, y `CRON_SECRET` para que el aviso de los lunes (cron de `vercel.json`, `/cron/facts-reminder`) esté autorizado.
 4. Cuando la planilla esté andando, sacar de `datos-clave.md` los datos que ahora viven en la planilla, para que no haya dos versiones.
 
