@@ -145,6 +145,8 @@ _EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF]")
 _TUTEO = re.compile(r"\b(quer[eé]s|ten[eé]s|pod[eé]s|contame|fijate|pasame|decime|avisame)\b", re.IGNORECASE)
 _USTED_CLIENT = re.compile(r"\b(usted|ustedes podr[ií]an|le agradezco|quisiera)\b", re.IGNORECASE)
 _PARAPHRASE = re.compile(r"^\s*(entiendo que|me pregunt[aá]s|you(?:'re| are) asking|i understand)", re.IGNORECASE)
+# Requests and offers that are not questions: "pasame tu email", "si querés…".
+_ASK = re.compile(r"\b(?:pasame|p[aá]seme|send me|me passa|si quer[eé]s|si quiere|if you'?d like|se quiser)\b", re.IGNORECASE)
 _APOLOGY = re.compile(r"disculp|lamento|perd[oó]n|sorry|apologi|desculp", re.IGNORECASE)
 
 # What gives a reply away as a bot, checked on every reply.
@@ -261,6 +263,7 @@ def run(only: str | None) -> dict:
             "paraphrase_opener": 0,
             "apology": 0,
             "tuteo_after_usted": 0,
+            "stacked_asks": 0,
             "name_known": 0,
             "name_used": 0,
             "chars": [],
@@ -327,6 +330,10 @@ def run(only: str | None) -> dict:
                 previous_opener = opener
                 style["more_than_one_emoji"] += len(_EMOJI.findall(reply)) > 1
                 style["paraphrase_opener"] += bool(_PARAPHRASE.search(reply))
+                asks = sum(
+                    1 for sentence in re.split(r"(?<=[.!?])\s+|\n+", reply) if "?" in sentence or _ASK.search(sentence)
+                )
+                style["stacked_asks"] += asks >= 2
                 style["apology"] += bool(_APOLOGY.search(reply))
                 style["tuteo_after_usted"] += bool(client_said_usted and _TUTEO.search(reply))
                 known_name = session.store.get(conversation_id, {}).get("customer_name")

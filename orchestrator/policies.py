@@ -39,6 +39,20 @@ def _reply_asks_for_email(reply: str) -> bool:
     return bool(_EMAIL_WORD_RE.search(reply or ""))
 
 
+def _split_trailing_question(reply: str) -> tuple[str, str]:
+    """(answer, closing question) when the reply ends with a question; else (reply, "")."""
+    text = (reply or "").rstrip()
+    if not text.endswith("?"):
+        return text, ""
+    cut = max(text.rfind(mark, 0, len(text) - 1) for mark in (".", "!", "?", "\n"))
+    if cut <= 0:
+        return text, ""
+    question = text[cut + 1 :].strip()
+    if re.search(r"\d", question):  # "¿Te sirve la del 5/12?" carries data: keep it.
+        return text, ""
+    return text[: cut + 1].rstrip(), question
+
+
 def _asks_more_than_email(user_text: str, email: str) -> bool:
     rest = (user_text or "").replace(email, " ").strip(" \t\n.,;:!-")
     return "?" in rest or len(rest.split()) >= 6
@@ -69,6 +83,11 @@ def apply_email_ack_or_request_policy(
         session_vars["proactive_email_capture_pending"] = False
     elif should_request_email(session_vars):
         if not _reply_asks_for_email(reply):
+            # A person doesn't close with a question and then ask for the email
+            # in the same breath: the (once per conversation) email ask takes
+            # the place of a closing question without data. Waiting a turn
+            # instead lost the ask when the client said "lo hablo y te aviso".
+            reply, _ = _split_trailing_question(reply)
             # The model often asks for it itself; asking twice in one message reads as a bot.
             reply = f"{reply}\n\n{get_phrase('proactive_email_request', lang)}"
         session_vars["email_requested"] = True
@@ -87,9 +106,23 @@ def apply_out_of_season_policy(
 ) -> str:
     """Prepend out-of-season warning once per conversation when intent is present."""
     if mentions_out_of_season(user_text) and not session_vars.get("out_of_season_warned"):
-        reply = f"{get_phrase('out_of_season', lang)}\n\n{reply}"
+        warning = get_phrase("out_of_season", lang)
+        if _OFFER_RE.search(reply or ""):
+            # The reply already offers something ("Si querés, pasame tu email"):
+            # two "si querés" in one message reads like stacked templates, so
+            # the warning drops its own offer to send next season's dates.
+            warning = _drop_last_sentence(warning)
+        reply = f"{warning}\n\n{reply}"
         session_vars["out_of_season_warned"] = True
     return reply
+
+
+_OFFER_RE = re.compile(r"\bsi quer[eé]s\b|\bsi quiere\b|\bif you'?d like\b|\bse quiser\b", re.IGNORECASE)
+
+
+def _drop_last_sentence(text: str) -> str:
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    return " ".join(sentences[:-1]) if len(sentences) > 1 else text
 
 
 def apply_language_commit_policy(
