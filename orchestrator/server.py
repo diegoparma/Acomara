@@ -84,6 +84,7 @@ from orchestrator.humanize import (
     assistant_already_spoke,
     history_to_messages,
     humanize_reply,
+    recent_assistant_replies,
     trim_to_last_sentence,
 )
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
@@ -1225,6 +1226,7 @@ def generate_reply(
         reply,
         channel="whatsapp" if is_whatsapp else "other",
         already_spoke=assistant_already_spoke(recent_turns),
+        previous_replies=recent_assistant_replies(recent_turns),
     )
 
 

@@ -21,6 +21,7 @@ from orchestrator.humanize import (  # noqa: E402
     assistant_already_spoke,
     history_to_messages,
     humanize_reply,
+    recent_assistant_replies,
     trim_to_last_sentence,
 )
 from orchestrator.server import (  # noqa: E402
@@ -139,6 +140,104 @@ class HumanizeReplyTests(unittest.TestCase):
                     self.assertNotIn("automat", text.lower())
 
 
+class HumanizeVarietyTests(unittest.TestCase):
+    """Rules added so consecutive replies don't read like a template."""
+
+    PREV = ["¡Genial! El 18+2 es el que recomendamos para quien no estuvo arriba de 6.000 m."]
+
+    def test_same_opener_twice_in_a_row_is_dropped(self):
+        self.assertEqual(
+            humanize_reply("¡Genial! Sale USD 7.250 por persona.", already_spoke=True, previous_replies=self.PREV),
+            "Sale USD 7.250 por persona.",
+        )
+
+    def test_any_opener_right_after_another_opener_is_dropped(self):
+        self.assertEqual(
+            humanize_reply("Perfecto, sale USD 7.250.", already_spoke=True, previous_replies=self.PREV),
+            "Sale USD 7.250.",
+        )
+        self.assertEqual(
+            humanize_reply("Great! It's 20 days.", previous_replies=["Sure, the permit is separate."]),
+            "It's 20 days.",
+        )
+
+    def test_an_occasional_opener_is_kept(self):
+        self.assertEqual(
+            humanize_reply("Perfecto, sale USD 7.250.", already_spoke=True, previous_replies=["Sale en noviembre."]),
+            "Perfecto, sale USD 7.250.",
+        )
+        self.assertEqual(humanize_reply("¡Genial! Sale USD 7.250."), "¡Genial! Sale USD 7.250.")
+
+    def test_opener_alone_is_kept(self):
+        self.assertEqual(humanize_reply("¡Genial!", previous_replies=self.PREV), "¡Genial!")
+
+    def test_repeated_offer_is_dropped(self):
+        prev = ["Sale USD 7.250. Si querés, puedo enviarte el detalle completo según tu caso. ¿A qué email te lo mando?"]
+        self.assertEqual(
+            humanize_reply(
+                "El permiso va aparte. Si querés, puedo enviarte el detalle completo según tu caso.",
+                previous_replies=prev,
+            ),
+            "El permiso va aparte.",
+        )
+        self.assertEqual(
+            humanize_reply(
+                "The permit is separate.\nI can have a specialist send you pricing and available dates with full details.",
+                previous_replies=["I can have a specialist send you pricing and available dates with full details."],
+            ),
+            "The permit is separate.",
+        )
+
+    def test_repeated_facts_and_numbers_are_kept(self):
+        prev = ["El permiso del Parque no está incluido, lo tramitamos sin cargo con anticipación."]
+        same_fact = "El permiso del Parque no está incluido, lo tramitamos sin cargo con anticipación. Va aparte del precio."
+        self.assertEqual(humanize_reply(same_fact, previous_replies=prev), same_fact)
+        prev = ["Si querés, el precio regular es USD 7.250 por persona y hay promos."]
+        self.assertEqual(humanize_reply(prev[0], previous_replies=prev), prev[0])
+
+    def test_whole_reply_repeated_is_left_for_the_duplicate_guard(self):
+        offer = "Si querés, puedo enviarte el detalle completo según tu caso."
+        self.assertEqual(humanize_reply(offer, previous_replies=[offer]), offer)
+
+    def test_reflex_apologies_are_removed(self):
+        self.assertEqual(humanize_reply("Disculpá la confusión. El permiso no está incluido."), "El permiso no está incluido.")
+        self.assertEqual(humanize_reply("Sorry for any confusion! The permit isn't included."), "The permit isn't included.")
+        self.assertEqual(humanize_reply("Desculpe a confusão. A licença não está incluída."), "A licença não está incluída.")
+
+    def test_more_canned_closers_are_removed(self):
+        self.assertEqual(humanize_reply("El permiso va aparte. Espero que te sirva!"), "El permiso va aparte.")
+        self.assertEqual(humanize_reply("It's 20 days. Hope this helps!"), "It's 20 days.")
+        self.assertEqual(
+            humanize_reply("It's 20 days. Let me know if you have any other questions."), "It's 20 days."
+        )
+        self.assertEqual(humanize_reply("Sale en noviembre. Quedo a tu disposición."), "Sale en noviembre.")
+
+    def test_question_read_back_is_removed(self):
+        self.assertEqual(
+            humanize_reply("Entiendo que querés saber si el permiso está incluido. No, va aparte."),
+            "No, va aparte.",
+        )
+        self.assertEqual(
+            humanize_reply("You're asking about the permit. It's not included."), "It's not included."
+        )
+        self.assertEqual(humanize_reply("Entiendo perfectamente. Son 20 días."), "Son 20 días.")
+
+    def test_thanks_for_asking_only_in_the_first_reply(self):
+        self.assertEqual(humanize_reply("¡Gracias por tu consulta! Sale USD 7.250.", already_spoke=True), "Sale USD 7.250.")
+        self.assertEqual(humanize_reply("¡Gracias por tu consulta! Sale USD 7.250."), "¡Gracias por tu consulta! Sale USD 7.250.")
+
+    def test_at_most_one_emoji_and_one_exclamation_mark(self):
+        self.assertEqual(humanize_reply("Buenísimo 🙌 nos vemos en Mendoza 🏔️⛰️!!"), "Buenísimo 🙌 nos vemos en Mendoza!")
+        self.assertEqual(humanize_reply("Dale 👍🏽👍🏽"), "Dale 👍🏽")
+
+    def test_recent_assistant_replies(self):
+        turns = append_recent_turns([], "a", "b")
+        turns = append_recent_turns(turns, "c", "d")
+        self.assertEqual(recent_assistant_replies(turns), ["b", "d"])
+        self.assertEqual(recent_assistant_replies(turns, limit=1), ["d"])
+        self.assertEqual(recent_assistant_replies(None), [])
+
+
 class TrimToLastSentenceTests(unittest.TestCase):
     def test_cut_sentence_is_dropped(self):
         self.assertEqual(
@@ -210,6 +309,11 @@ class GenerateReplyMemoryTests(unittest.TestCase):
         session = {"recent_turns": append_recent_turns([], "Hola", "¡Hola! ¿En qué te ayudo?")}
         reply, _ = self._run(session)
         self.assertEqual(reply, "El 18+2 tiene *20 días*.")
+
+    def test_reply_does_not_reuse_the_last_opener(self):
+        session = {"recent_turns": append_recent_turns([], "Somos 3", "¡Genial! ¿Para qué fecha?")}
+        reply, _ = self._run(session, text="¡Genial! El 18+2 tiene 20 días.")
+        self.assertEqual(reply, "El 18+2 tiene 20 días.")
 
     def test_first_reply_keeps_its_greeting(self):
         reply, model_input = self._run({})
