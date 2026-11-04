@@ -1777,18 +1777,21 @@ def _is_program_options_followup_intent(normalized_text: str) -> bool:
 
 
 def _first_program_options_reply(lang: str) -> str:
+    # Fernando's rule: the 12+2 and 14+2 are only for people who have been
+    # above 6,000 m, so the first answer recommends the 18+2 and asks.
     if lang == "en":
         return (
-            "I recommend starting with two options:\n"
-            "1. 18+2 (highly recommended)\n"
-            "2. 12+2 (recommended)\n\n"
-            "There are other alternatives as well. If you'd like, I can list them in detail."
+            "The one we recommend is the 18+2: it has the most acclimatization days and costs the same as the shorter ones.\n"
+            "The 12+2 and 14+2 are only for people who have already been above 6,000 m. Have you been at high altitude before?"
+        )
+    if lang == "pt":
+        return (
+            "O que recomendamos é o 18+2: tem mais dias de aclimatação e custa o mesmo que os mais curtos.\n"
+            "O 12+2 e o 14+2 são só para quem já esteve acima de 6.000 m. Você já esteve em altitude?"
         )
     return (
-        "Para empezar, te recomiendo estas dos opciones:\n"
-        "1. 18+2 (muy recomendada)\n"
-        "2. 12+2 (recomendada)\n\n"
-        "También hay otras alternativas. Si querés, te las paso en detalle."
+        "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\n"
+        "El 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Estuviste en altura alguna vez?"
     )
 
 
