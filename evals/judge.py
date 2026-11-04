@@ -89,7 +89,7 @@ class LLMJudge:
             f"Idioma esperado de las respuestas: {persona.expected_lang}.\n\n"
             f"CONVERSACIÓN:\n{render_transcript(transcript)}"
         )
-        data = self.chat(self.system, user, seed=seed, max_tokens=1200)
+        data = self.chat(self.system, user, seed=seed, max_tokens=2500)
         return normalize_verdict(data, source="llm")
 
 
