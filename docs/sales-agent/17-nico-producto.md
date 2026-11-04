@@ -27,8 +27,8 @@ Estado **antes** de este trabajo. La columna "Fase 1" dice dónde quedó.
 | CRM (`check_client_status`), agente de caja (`internal_reply`), org de OpenBSP, agent id de Nico | Integración | → `TenantConfig.integrations` |
 | Nombre del servicio en `/health`, `source` en la respuesta | Marca | → `integrations.service_name` |
 | Detección de idioma es/en/pt | Motor, con palabras del rubro ("summit", "expedition", "ascent", "route", "climb", "ascenso") | → `TenantConfig.language_hints` (fase 2) |
-| Instrucciones al modelo en `generate_reply` (en español, "un asesor del equipo", fechas en WhatsApp) | Motor con supuestos de Acomara | **Pendiente** (fase 2) |
-| `format_whatsapp_departure_dates` (títulos "18+2 DÍAS \| …") | Negocio disfrazado de motor | **Pendiente** (fase 2, hook) |
+| Instrucciones al modelo en `generate_reply` (en español, "un asesor del equipo", fechas en WhatsApp) | Motor con supuestos de Acomara | → `nico_core/prompt.py` + `TenantConfig.prompt` (fase 2) |
+| `format_whatsapp_departure_dates` (títulos "18+2 DÍAS \| …") | Negocio disfrazado de motor | → `tenants/acomara/formatting.py`, hook `format_reply` (fase 2) |
 | Comandos, anti-duplicados, pausa, derivación, verificación de email, burbujas, filtro de credenciales, endpoint OpenAI-compatible, auditoría | Motor | Queda en `server.py` (fase 3 lo mueve a `nico_core`) |
 | Regex de derivación, "¿sos un bot?", saludos, agradecimientos | Motor (es/en/pt) | Queda |
 
@@ -127,14 +127,18 @@ Otra sesión está armando `evals/`. La forma propuesta para que sirvan a varios
 | Fase | Qué | Riesgo | Estado |
 |---|---|---|---|
 | **1. Extraer datos de negocio** | `TenantConfig`, `tenants/acomara`, frases, conocimiento, temporada, guía de opciones, hooks, marca e integraciones. Test golden + test de un segundo tenant | Bajo: golden idéntico | **Hecha** (este PR) |
-| **2. Completar la config** | `voice` (cuando la sesión de voz cierre `humanize.py`), instrucciones del prompt de `generate_reply`, ~~palabras del rubro en la detección de idioma~~ (hecho), formato de fechas como hook, destinatarios de derivación, textos de emails y respuesta de credenciales por idioma. Mover `sales_rules.py` y `departures.py` a `tenants/acomara/` cuando no haya otras sesiones tocándolos | Medio: tocan el prompt; el golden de prompts lo cubre | Siguiente |
-| **3. Partir `server.py`** | El pipeline a `nico_core/pipeline.py`, adaptadores `Channel` y `SessionStore`, `server.py` queda como app Flask fina | Medio: mucho movimiento de código; tests de flujo existentes | Después |
+| **2. Completar la config** | Hecho: instrucciones al modelo (`TenantConfig.prompt`), palabras del rubro en la detección de idioma (`language_hints`), formato de fechas como hook (`format_reply`). Falta: `voice` (cuando la sesión de voz cierre `humanize.py`), destinatarios de derivación por motivo, textos de los emails internos, y la respuesta fija al bloquear credenciales (dice "asesor humano", que la regla de voz prohíbe en frases fijas: decidirlo con la sesión de voz antes de moverla a `phrases`). Mover `sales_rules.py` y `departures.py` a `tenants/acomara/` cuando no haya otras sesiones tocándolos | Medio: tocan el prompt; el golden de prompts lo cubre | **En curso** |
+| **3. Partir `server.py`** | El pipeline a `nico_core/pipeline.py`, usar los adaptadores `SessionStore` y `Channel` (contratos ya definidos en `nico_core/adapters.py`, con `InMemorySessionStore` para evals sin red y `SessionAgentStore` sobre el cliente actual), `server.py` queda como app Flask fina | Medio: mucho movimiento de código; conviene cuando las otras sesiones no estén editando `server.py` | Contratos hechos |
 | **4. Segundo negocio real** | ABC con textos y precios validados contra su web, su índice FAQ, su prompt; deploy propio | Bajo para Acomara | Cuando Diego decida |
-| **5. Herramientas** | Script "nuevo tenant" (copia una plantilla y valida), validación de config en CI, guía para cargar conocimiento | Bajo | Opcional |
+| **5. Herramientas** | Hecho: `scripts/new_tenant.py <slug> "<Marca>"` crea un tenant placeholder desde `tenants/_template/` que ya pasa el test de completitud. Falta: validación de config en CI y guía para cargar conocimiento | Bajo | **En curso** |
 
 Reglas de la migración: pasos chicos, un commit por paso, el golden no cambia; los archivos que editan otras sesiones (`humanize.py`, el system prompt, `docs/knowledge/*`) no se mueven, se referencian.
 
-## 8. Qué quedó hecho en la fase 1
+## 8. Qué quedó hecho (fase 1 y parte de la 2)
+
+Fase 2, además: `nico_core/prompt.py` (las reglas fijas que recibe el modelo; Acomara agrega las dos de fechas de salida y nombra "un asesor del equipo"), `LanguageHints` (las palabras de montaña salieron del detector de idioma), hook `format_reply` (el formato de fechas de WhatsApp es de Acomara), `nico_core/adapters.py` (contratos de sesión y canal) y `scripts/new_tenant.py`. El golden sigue idéntico.
+
+Fase 1:
 
 - `nico_core/tenant.py`: `TenantConfig`, `KnowledgeConfig`, `LocaleConfig`, `IntegrationsConfig`, `load_tenant` / `get_tenant` (`NICO_TENANT`, por defecto `acomara`).
 - `nico_core/season.py`, `nico_core/program_guide.py`, `nico_core/hooks.py`: lógica genérica que antes estaba en `server.py`.
@@ -143,7 +147,7 @@ Reglas de la migración: pasos chicos, un commit por paso, el golden no cambia; 
 - Tests: `tests/test_acomara_golden.py` (frases, reglas, formato WhatsApp, prompt al modelo), `tests/test_tenants.py` (carga, completitud, marca), `tests/test_second_tenant.py` (levanta el server con ABC y verifica que no se filtra nada de Acomara).
 - `server.py` mantiene los mismos nombres públicos (`I18N_PHRASES`, `check_client_status`, `today_in_argentina`, …): ningún test ni script existente cambió.
 
-**Para desplegar otro negocio hoy:** crear `tenants/<negocio>/` copiando el de ABC, escribir su prompt y datos clave, crear un proyecto de Vercel con el mismo repo y `NICO_TENANT=<negocio>` más sus propias variables (OpenAI, OpenBSP, session-agent, email de derivación).
+**Para desplegar otro negocio hoy:** `python3 scripts/new_tenant.py <negocio> "<Marca>"`, reescribir sus frases, escribir su prompt y datos clave, crear un proyecto de Vercel con el mismo repo y `NICO_TENANT=<negocio>` más sus propias variables (OpenAI, OpenBSP, session-agent, email de derivación).
 
 ## 9. ¿Construir o comprar?
 
