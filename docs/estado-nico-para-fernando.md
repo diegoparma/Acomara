@@ -5,7 +5,7 @@
 
 ## Qué cambió esta semana
 
-*Cambios del 5 de noviembre de 2026. Estado: pendiente de despliegue (se actualiza cuando salgan a producción).*
+*Cambios del 5 de noviembre de 2026. Estado: en producción desde el 5 de noviembre (versión `800e5f0`), probado con mensajes reales: recomienda el 18+2 a quien no estuvo en altura, da el precio vigente de la planilla y usa lo que el cliente cuenta en el primer mensaje.*
 
 - **Ya no se queda callado.** Si el cliente repite algo, Nico contesta con una frase corta distinta en lugar de no decir nada.
 - **No pide el email dos veces.** Si ya lo dio, si dijo que lo pasa después o prefiere no darlo, Nico no se lo vuelve a pedir, ni siquiera al derivar con un asesor.
