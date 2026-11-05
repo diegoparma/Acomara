@@ -14,7 +14,7 @@ integra en una sola rama y despliega. Cada subagente agrega su reporte en su sec
 |---|---|---|---|---|
 | A | Arreglos de frases fijas en código | A (código) | `orchestrator/server.py`, `orchestrator/policies.py`, `orchestrator/sales_rules.py`, `orchestrator/humanize.py`, `orchestrator/usted.py`, `tests/test_cierre_fixes.py` | en curso |
 | B | Ajustes de prompt/voz según `fallas-top10.md` | B (prompt) | `docs/sales-agent/02-system-prompt.md` | hecho |
-| C | Ordenar docs | C (docs) | `docs/sales-agent/15-reglas-de-nico.md`, `docs/estado-nico-para-fernando.md`, `docs/sales-agent/README.md` | pendiente (después de A y B) |
+| C | Ordenar docs | C (docs) | `docs/sales-agent/15-reglas-de-nico.md`, `docs/estado-nico-para-fernando.md`, `docs/sales-agent/README.md` | hecho |
 | — | Integración, eval real (≤ USD 4), PR, deploy, verificación | orquestador | todo | pendiente |
 
 ## Reporte A (código)
@@ -39,7 +39,7 @@ Cambio en `02-system-prompt.md` (12.847 -> 13.257 bytes, +410): antes de la regl
 
 ## Reporte C (docs)
 
-_pendiente_
+Solo documentación. `15-reglas-de-nico.md`: actualizadas reglas 1 (/reset completo, también por chat/completions), 2, 6 (email no repreguntado), 8/8a (bienvenida solo sin datos), 15 (frase corta rotativa en vez de silencio), sección Idioma (frases fijas en pt, detección de portugués, tuteo/usted) y sección 3 (responder directo con datos-clave/planilla; fechas con "la disponibilidad la confirma un asesor"); numeración intacta. `estado-nico-para-fernando.md`: nueva sección "Qué cambió esta semana" marcada como pendiente de despliegue. `sales-agent/README.md`: índice nuevo. Tests: 426 OK.
 
 ## Integración y despliegue
 

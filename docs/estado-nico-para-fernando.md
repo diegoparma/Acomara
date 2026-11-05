@@ -1,5 +1,20 @@
 # Estado del Arte de Nico — Agente de Ventas Acomara
-*Documento interno · Mayo 2026*
+*Documento interno · Mayo 2026 · actualizado el 5 de noviembre de 2026*
+
+---
+
+## Qué cambió esta semana
+
+*Cambios del 5 de noviembre de 2026. Estado: pendiente de despliegue (se actualiza cuando salgan a producción).*
+
+- **Ya no se queda callado.** Si el cliente repite algo, Nico contesta con una frase corta distinta en lugar de no decir nada.
+- **No pide el email dos veces.** Si ya lo dio, si dijo que lo pasa después o prefiere no darlo, Nico no se lo vuelve a pedir, ni siquiera al derivar con un asesor.
+- **Saluda mejor.** Si el primer mensaje ya trae datos ("somos 3", "nunca estuve en altura"), Nico responde a eso y no con la bienvenida genérica.
+- **`/reset` borra todo.** Reinicia la conversación completa, también el nombre y el email que había guardado.
+- **Portugués y trato.** Mejor detección del portugués en mensajes cortos, y Nico acompaña el trato del cliente (tú, vos o usted).
+- **Responde directo.** Si el precio, qué incluye o las formas de pago están en la ficha o en la planilla, lo dice sin derivar. En preguntas de fechas da una respuesta corta y aclara que la disponibilidad la confirma un asesor.
+- **Pruebas automáticas.** Hay conversaciones simuladas para medir a Nico antes de publicar cambios, con un tope de gasto para que una prueba no se pase del presupuesto. Detalle técnico en `docs/sales-agent/16-evals.md`.
+- **Una sola fuente de datos.** Precios, salidas y datos clave salen de `docs/knowledge/fuente/`, y los valores que cambian se editan en la planilla de Google.
 
 ---
 
