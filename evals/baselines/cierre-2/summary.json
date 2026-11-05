@@ -1,0 +1,4847 @@
+{
+ "schema": 1,
+ "mode": "real",
+ "started_at": "2026-11-05T01:54:53+00:00",
+ "config": {
+  "n": 60,
+  "seed": 7,
+  "llm_personas": 6,
+  "concurrency": 8,
+  "nico_model": "gpt-4.1-mini",
+  "simulator_model": "gpt-4.1-mini",
+  "judge_model": "gpt-4.1",
+  "embed_model": null,
+  "offline": false,
+  "judge": true,
+  "max_turns": null,
+  "intents": [],
+  "languages": [],
+  "label": "cierre-2"
+ },
+ "git": {
+  "commit": "315e5f8",
+  "branch": "claude/lucid-dirac-wa6foy",
+  "dirty": false
+ },
+ "n": 66,
+ "errors": 1,
+ "ended_by": {
+  "customer": 66
+ },
+ "avg_turns": 6.273,
+ "overall": {
+  "mean": 55.905,
+  "ci95": 4.058
+ },
+ "dimensions": {
+  "humanness": {
+   "mean": 2.682,
+   "ci95": 0.165
+  },
+  "accuracy": {
+   "mean": 3.727,
+   "ci95": 0.226
+  },
+  "rules": {
+   "mean": 2.909,
+   "ci95": 0.253
+  },
+  "sales": {
+   "mean": 2.773,
+   "ci95": 0.242
+  },
+  "language": {
+   "mean": 4.273,
+   "ci95": 0.256
+  },
+  "length": {
+   "mean": 3.955,
+   "ci95": 0.279
+  }
+ },
+ "deterministic": {
+  "IDENTICAL_REPLY": {
+   "conversations": 15,
+   "rate": 0.2273,
+   "occurrences": 37,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0004",
+     "turn": 3,
+     "text": "I just need your email to pass you to the advisor.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 2,
+     "text": "El precio va de USD 5.990 a 7.250 según promo y fecha.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 2,
+     "text": "18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7",
+     "detail": ""
+    }
+   ]
+  },
+  "TOO_LONG": {
+   "conversations": 15,
+   "rate": 0.2273,
+   "occurrences": 24,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0000",
+     "turn": 5,
+     "text": "Te mandaron el detalle completo al mail que me diste, con precios y fechas para la temporada 2026/27:\n1) Normal Extendid…",
+     "detail": "402 car., burbuja más larga 402"
+    },
+    {
+     "persona": "l7-0001",
+     "turn": 9,
+     "text": "Got it! Here are the 2026/27 departures:\n18+2 normal extended: Nov 14, 22; Dec 1,4,20,27; Jan 2,10,31; Feb 7\n14+2 fast a…",
+     "detail": "443 car., burbuja más larga 327"
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 0,
+     "text": "Los programas abiertos para escalar al Aconcagua en 2026/27 son:\n1) 18+2 días Normal Extendido: nov 14, 22; dic 1, 4, 20…",
+     "detail": "350 car., burbuja más larga 350"
+    }
+   ]
+  },
+  "LANGUAGE_DRIFT": {
+   "conversations": 5,
+   "rate": 0.0758,
+   "occurrences": 8,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "l7-0002",
+     "turn": 3,
+     "text": "Janeiro disponíveis:\n1. 18+2 dias Normal Estendido: 2, 10, 31\n2. 14+2 dias Ascenso Rápido: 6, 14\n3. 12+2 dias Ascenso Extremo: 2, 8, 16\n4. 17+2 dias Glaciar Pol",
+     "detail": "esperado pt, detectado es"
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 1,
+     "text": "Estas son las salidas para la temporada 2026/27:\n\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 1",
+     "detail": "esperado pt, detectado es"
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 2,
+     "text": "Estas son las salidas programadas para la temporada 2026/27:\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 1",
+     "detail": "esperado pt, detectado es"
+    }
+   ]
+  },
+  "VOSEO_WITH_USTED": {
+   "conversations": 5,
+   "rate": 0.0758,
+   "occurrences": 11,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 0,
+     "text": "Si querés, un asesor te confirma todo con detalle.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0016",
+     "turn": 0,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0016",
+     "turn": 1,
+     "text": "Si querés te puedo pasar todo el detalle por email.",
+     "detail": ""
+    }
+   ]
+  },
+  "INVENTED_PRICE": {
+   "conversations": 3,
+   "rate": 0.0455,
+   "occurrences": 3,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "l7-0002",
+     "turn": 5,
+     "text": "Para 4 pessoas, multiplica USD 7.990 por pessoa na expedição privada, totalizando cerca de USD 31.960. Isso inclui guia exclusivo e serviços personalizados.",
+     "detail": "USD 31960"
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 8,
+     "text": "El presupuesto para 6 personas sería USD 43.500 por el programa 18+2 (USD 7.250 por persona). El Extra Acclimatization Program se cotiza según días y actividades; recomendamos 2 o 3 días, pero el prec",
+     "detail": "USD 43500"
+    },
+    {
+     "persona": "p7-0046",
+     "turn": 9,
+     "text": "Entiendo que te importe el presupuesto: los USD 14.500 no incluyen permisos ni equipo personal, esos son costos extras aparte. Si querés, te mando todo lo que hablamos al correo para que lo tengas bie",
+     "detail": "USD 14500"
+    }
+   ]
+  },
+  "EMAIL_ASKED_TWICE": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "occurrences": 2,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0004",
+     "turn": 1,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 1,
+     "text": "Claro, pasame tu mail y te envío el detalle completo con precios, fechas y qué incluye la e",
+     "detail": ""
+    }
+   ]
+  },
+  "INCLUDES_EVERYTHING": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "occurrences": 3,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0027",
+     "turn": 3,
+     "text": "Claro, el programa 18+2 incluye todo lo necesario para una buena aclimatación, al que se puede sumar el Ex",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 5,
+     "text": "El programa 18+2 cuesta USD 7.250 por persona, e incluye todo lo necesario para la expedición. El Extra Acclimatization Program, co",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0039",
+     "turn": 5,
+     "text": "gística suelta ni servicios sin guía, solo expediciones completas con todo incluido.",
+     "detail": ""
+    }
+   ]
+  },
+  "ASESOR_HUMANO": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "occurrences": 1,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0006",
+     "turn": 1,
+     "text": "Regarding your question, I’m an AI assistant helping the team, but a human advisor can guide you in detail when needed.",
+     "detail": ""
+    }
+   ]
+  },
+  "CONFIRMS_AVAILABILITY": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "occurrences": 2,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0042",
+     "turn": 3,
+     "text": "After you pay the USD 699 deposit online, your spot is reserved.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0042",
+     "turn": 4,
+     "text": "Once you pay the USD 699 deposit online, your spot is reserved and you'll get a confirmation email or receipt automatically.",
+     "detail": ""
+    }
+   ]
+  },
+  "EMAIL_ASKED_AFTER_GIVEN": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "occurrences": 1,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0045",
+     "turn": 5,
+     "text": "The video call platform isn't specified here, so I suggest checking your email tomorrow for details or asking the advisor during the call. Our schedule",
+     "detail": ""
+    }
+   ]
+  },
+  "OFF_SEASON_NOT_EXPLAINED": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "occurrences": 1,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0044",
+     "turn": 5,
+     "text": "",
+     "detail": ""
+    }
+   ]
+  }
+ },
+ "judge_violations": {
+  "UNHELPFUL_DEFLECTION": {
+   "conversations": 32,
+   "rate": 0.4848,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "l7-0004",
+     "turn": 6,
+     "text": "Pagos en cuotas los define el asesor.",
+     "detail": "Podría explicar mejor las opciones de pago y cuándo interviene el asesor, en vez de derivar sin agregar valor."
+    },
+    {
+     "persona": "l7-0005",
+     "turn": 7,
+     "text": "Entiendo que quiere más detalle, pero comisiones y materiales personalizados los confirma un asesor.",
+     "detail": "Nico podría haber dado al menos un rango orientativo o ejemplos generales, pero se limita a derivar sin agregar valor."
+    },
+    {
+     "persona": "l7-0005",
+     "turn": 6,
+     "text": "Sobre comisiones y co-marketing, eso lo confirma un asesor del equipo; ya le pasé la consulta para que le envíen opciones de materiales personalizados y campañas conjuntas.",
+     "detail": "Repite la derivación sin intentar aportar información útil o ejemplos generales."
+    }
+   ]
+  },
+  "NO_VIDEOCALL_FOR_BUYER": {
+   "conversations": 23,
+   "rate": 0.3485,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0000",
+     "turn": 4,
+     "text": "Algunos programas tienen promociones entre USD 5.990 y USD 6.390 según la fecha y lugares libres, pero todos cuestan igual.",
+     "detail": "No invita a videollamada cuando la clienta muestra interés concreto y ya dio su email."
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 4,
+     "text": "Un asesor puede confirmarte todo con detalle si querés.",
+     "detail": "No invita a videollamada cuando el cliente ya mostró interés concreto y dio su email."
+    },
+    {
+     "persona": "p7-0005",
+     "turn": 3,
+     "text": "Ya quedó todo registrado. En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.",
+     "detail": "El cliente está listo para avanzar y Nico no ofrece videollamada ni intenta avanzar la venta."
+    }
+   ]
+  },
+  "NO_QUALIFICATION": {
+   "conversations": 21,
+   "rate": 0.3182,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 2,
+     "text": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\nEl 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Ha estado en altura alguna vez?",
+     "detail": "El cliente ya había dicho su experiencia (trekking hasta 4.000 m), pero Nico vuelve a preguntar en vez de avanzar."
+    },
+    {
+     "persona": "l7-0004",
+     "turn": 4,
+     "text": "Para novatos y sin experiencia en altura, recomendamos el programa 18+2 días Normal Extendido, que tiene más aclimatación.",
+     "detail": "No vuelve a calificar sobre experiencia, grupo o fechas antes de recomendar, aunque el cliente ya dio parte de la info."
+    },
+    {
+     "persona": "l7-0005",
+     "turn": 0,
+     "text": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.",
+     "detail": "No pregunta por fechas tentativas ni por el perfil de los clientes finales, solo por experiencia en altura."
+    }
+   ]
+  },
+  "EMAIL_ASKED_AFTER_GIVEN": {
+   "conversations": 20,
+   "rate": 0.303,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0002",
+     "turn": 5,
+     "text": "What's your email so they can reach you?",
+     "detail": "El cliente ya dejó claro que no quiere dar el email y pide contacto por WhatsApp o email directo, pero Nico insiste en pedir el email en vez de ofrecer otra vía."
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 2,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": "El cliente ya había dado su email en el mensaje anterior."
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 1,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": "El cliente ya dejó claro que no quiere dar el email, pero Nico insiste."
+    }
+   ]
+  },
+  "ROBOTIC_TONE": {
+   "conversations": 17,
+   "rate": 0.2576,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0002",
+     "turn": 3,
+     "text": "Janeiro disponíveis:\n1. 18+2 dias Normal Estendido: 2, 10, 31\n2. 14+2 dias Ascenso Rápido: 6, 14\n3. 12+2 dias Ascenso Extremo: 2, 8, 16\n4. 17+2 dias Glaciar Polaco 360°: 3",
+     "detail": "Respondeu com uma lista formatada, pouco natural para WhatsApp e destoando do estilo curto do cliente."
+    },
+    {
+     "persona": "l7-0002",
+     "turn": 4,
+     "text": "Expedição privada com guia exclusivo custa a partir de USD 7.990 por pessoa, incluindo flexibilidade e serviços personalizados. Para tempo e conforto, o programa 18+2 dias Normal Estendido é a melhor opção, com máxima aclimatação.",
+     "detail": "A resposta soa formal e genérica, pouco adaptada ao tom telegráfico do cliente."
+    },
+    {
+     "persona": "l7-0002",
+     "turn": 5,
+     "text": "O custo da exclusividade do guia está incluído no valor fixo da expedição privada, que começa em USD 7.990 por pessoa. Não é cobrado um valor extra por pessoa além desse preço.",
+     "detail": "Explicação longa e repetitiva, poderia ser mais direta e natural."
+    }
+   ]
+  },
+  "TOO_LONG": {
+   "conversations": 16,
+   "rate": 0.2424,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0000",
+     "turn": 5,
+     "text": "Te mandaron el detalle completo al mail que me diste, con precios y fechas para la temporada 2026/27:\n1) Normal Extendido (18+2 días): Nov (14,22), Dic (1,4,20,27), Ene (2,10,31), Feb (7)\n2) Ascenso Rápido (14+2 días): Nov (18,26), Dic (5,10), Ene (6,14), Feb (11)\n3) Ascenso Extremo (12+2 días): Nov",
+     "detail": "Mensaje demasiado largo para WhatsApp, con formato de lista y exceso de fechas, poco natural para el canal."
+    },
+    {
+     "persona": "l7-0005",
+     "turn": 4,
+     "text": "Las salidas para el 18+2 son: noviembre 14 y 22, diciembre 1, 4, 20 y 27, enero 2, 10 y 31, febrero 7. El precio regular es USD 7.250, con promociones en algunas fechas. La reserva se hace con USD 699.",
+     "detail": "Mensaje demasiado largo para WhatsApp, podría dividirse en dos partes."
+    },
+    {
+     "persona": "p7-0001",
+     "turn": 3,
+     "text": "Mientras, le recuerdo las fechas programadas para la temporada 2026/27: 1. 18+2 Días Normal Extendido: Nov: 14, 22; Dic: 1, 4, 20, 27; Ene: 2, 10, 31; Feb: 7 2. 14+2 Días Ascenso Rápido: Nov: 18, 26; Dic: 5, 10; Ene: 6, 14; Feb: 11 3. 12+2 Días Ascenso Extremo: Nov: 20, 28; Dic: 7, 12, 26; Ene: 2, 8",
+     "detail": "Mensaje demasiado largo para WhatsApp, formato de lista y exceso de fechas."
+    }
+   ]
+  },
+  "IDENTICAL_REPLY": {
+   "conversations": 13,
+   "rate": 0.197,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0008",
+     "turn": 2,
+     "text": "De noviembre a febrero, las salidas 18+2 son: nov 14 y 22; dic 1, 4, 20, 27; ene 2, 10, 31; feb 7. El precio va de USD 5.990 a 7.250 según promo y fecha.",
+     "detail": "Repite la información de fechas y precios dos veces seguidas en el mismo turno."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 4,
+     "text": "Se um participante abandonar a expedição após o início, não há reembolso ou compensação, e podem haver custos extras para serviços fora do grupo, como resgate, mulas ou transferências separadas.\nSe um participante abandonar a expedição após o início, não há reembolso, e podem surgir custos extras pa",
+     "detail": "Repite casi la misma información dos veces seguidas en portugués."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 4,
+     "text": "Si un participante abandona la expedición desde el día 1, no hay reembolso ni compensación y pueden surgir costos extras por servicios fuera del grupo, como rescate, mulas o transferencias separadas.",
+     "detail": "Repite la misma información en español, innecesario y confuso."
+    }
+   ]
+  },
+  "CONFIRMS_AVAILABILITY": {
+   "conversations": 12,
+   "rate": 0.1818,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "l7-0000",
+     "turn": 5,
+     "text": "Te mandaron el detalle completo al mail que me diste, con precios y fechas para la temporada 2026/27:",
+     "detail": "Asegura que ya enviaron el detalle por mail, lo que implica confirmar disponibilidad y precio final, cuando debe aclarar que lo confirma un asesor."
+    },
+    {
+     "persona": "l7-0001",
+     "turn": 9,
+     "text": "Here are the 2026/27 departures: 18+2 normal extended: Nov 14, 22; Dec 1,4,20,27; Jan 2,10,31; Feb 7 ...",
+     "detail": "Nico presenta las fechas como disponibles, cuando solo un asesor puede confirmar disponibilidad y precio final."
+    },
+    {
+     "persona": "l7-0003",
+     "turn": 6,
+     "text": "Para el 22 de noviembre quedan salidas 18+2, pero la disponibilidad exacta para 3 personas la confirma un asesor.",
+     "detail": "Nico afirma que 'quedan salidas', lo que implica disponibilidad, cuando solo puede decir que la confirma un asesor."
+    }
+   ]
+  },
+  "SHORT_PROGRAM_TO_INEXPERIENCED": {
+   "conversations": 11,
+   "rate": 0.1667,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 3,
+     "text": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "detail": "Ofrece el 14+2 a alguien que no tiene experiencia sobre 6.000 m, lo cual contradice la regla de calificación."
+    },
+    {
+     "persona": "p7-0000",
+     "turn": 0,
+     "text": "Fechas 12+2: nov 20, 28; dic 7, 12, 26; ene 2, 8, 16; feb 6, 13. Fechas 14+2: nov 18, 26; dic 5, 10; ene 6, 14; feb 11.",
+     "detail": "Ofrece fechas de programas cortos a alguien que no tiene experiencia sobre 6.000 m, cuando solo debería recomendar el 18+2."
+    },
+    {
+     "persona": "p7-0007",
+     "turn": 0,
+     "text": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos. El 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Ha estado en altura alguna vez?",
+     "detail": "Menciona el 12+2 y 14+2 como alternativas iniciales, cuando solo debe recomendar 18+2 a inexpertos."
+    }
+   ]
+  },
+  "VOSEO_WITH_USTED": {
+   "conversations": 11,
+   "rate": 0.1667,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 8,
+     "text": "Te enviaremos el enlace para la videollamada con anticipación. La cita queda para el jueves a las 17:00 hora Chile, y un asesor te contactará pronto para confirmar disponibilidad y explicar políticas de cambio de fecha.",
+     "detail": "El cliente siempre trató de usted y Nico pasó a tutear en la última respuesta."
+    },
+    {
+     "persona": "p7-0000",
+     "turn": 1,
+     "text": "¿Ha estado en altura alguna vez?",
+     "detail": "Cambia de voseo a usted sin motivo, lo que suena forzado y poco natural para un cliente argentino."
+    },
+    {
+     "persona": "p7-0001",
+     "turn": 0,
+     "text": "Si querés, un asesor te confirma todo con detalle.",
+     "detail": "El cliente usa español neutro y trata de usted, pero Nico responde con voseo."
+    }
+   ]
+  },
+  "IGNORES_QUESTION": {
+   "conversations": 10,
+   "rate": 0.1515,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "l7-0005",
+     "turn": 8,
+     "text": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "detail": "El cliente pide info de comisiones y materiales, pero Nico responde con alternativas de programas, ignorando la consulta."
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 2,
+     "text": "That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.",
+     "detail": "No responde la pregunta concreta sobre fitness y soporte, solo deriva o evade."
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 4,
+     "text": "Yes, that's what I just mentioned. Tell me which part you'd like me to clarify.",
+     "detail": "No responde sobre guías, pacing ni oxígeno, solo repite que ya lo dijo."
+    }
+   ]
+  },
+  "INCLUDES_EVERYTHING": {
+   "conversations": 9,
+   "rate": 0.1364,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0019",
+     "turn": 0,
+     "text": "Nossos pacotes incluem hotel em Mendoza, traslados, alimentação, mulas, guias e mais.",
+     "detail": "Diz que inclui tudo de forma genérica, sem listar o que NÃO está incluso (voos, permissão, seguro, equipamento pessoal)."
+    },
+    {
+     "persona": "p7-0021",
+     "turn": 2,
+     "text": "El precio es USD 7.250, incluyen guía, comidas en la montaña, porteo común y traslados a Penitentes.",
+     "detail": "Diz que o preço inclui só alguns itens, mas não menciona o que NÃO está incluso (voos, permissão, seguro, equipamento pessoal), como exigido."
+    },
+    {
+     "persona": "p7-0024",
+     "turn": 0,
+     "text": "all included: guides, meals, tents, transfers, mule loads, plus 2 extra days for weather.",
+     "detail": "Da a entender que incluye todo, pero faltó aclarar que vuelos, permit, seguro y equipo personal NO están incluidos."
+    }
+   ]
+  },
+  "LANGUAGE_DRIFT": {
+   "conversations": 8,
+   "rate": 0.1212,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0009",
+     "turn": 1,
+     "text": "El precio es USD 7.250 por persona, algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según la fecha. Todos los programas abiertos cuestan lo mismo sin importar la duración. Lo importante es elegir el adecuado según experiencia y aclimatación.",
+     "detail": "Responde en español cuando la clienta escribe siempre en portugués."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 2,
+     "text": "Estas son las salidas programadas para la temporada 2026/27:",
+     "detail": "Responde en español en vez de portugués."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 3,
+     "text": "No contamos con una política de cancelación detallada para compartir.",
+     "detail": "Responde en español en vez de portugués."
+    }
+   ]
+  },
+  "PHANTOM_EMAIL": {
+   "conversations": 5,
+   "rate": 0.0758,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 2,
+     "text": "Le envié al email la info de precios, promociones y formas de pago que le comenté antes.",
+     "detail": "Nico afirma haber enviado un email, pero no puede hacerlo realmente."
+    },
+    {
+     "persona": "p7-0012",
+     "turn": 1,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": "Ofrece enviar detalles por email cuando el cliente no lo pidió ni mostró interés real, y ya había dado la información relevante por WhatsApp."
+    },
+    {
+     "persona": "p7-0041",
+     "turn": 2,
+     "text": "For more info, send your details to info@acomara.com.",
+     "detail": "No corresponde derivar al cliente a un email genérico cuando el flujo es enviarle la info directamente tras recibir su email."
+    }
+   ]
+  },
+  "REPEATED_GREETING": {
+   "conversations": 5,
+   "rate": 0.0758,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 0,
+     "text": "Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas.\nBuenas, en agosto no tenemos salidas abiertas programadas para expediciones al Aconcagua.",
+     "detail": "Nico repite la información de la temporada y saluda dos veces en la misma respuesta."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 1,
+     "text": "Genial, ya me quedó tu email.",
+     "detail": "Saludo innecesario en medio de la conversación."
+    },
+    {
+     "persona": "p7-0044",
+     "turn": 2,
+     "text": "¡De nada! Cualquier cosa me escribís por acá.",
+     "detail": "Incluye un saludo innecesario en medio de la conversación."
+    }
+   ]
+  },
+  "EMAIL_ASKED_TWICE": {
+   "conversations": 4,
+   "rate": 0.0606,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0004",
+     "turn": 1,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": "Vuelve a pedir el email después de que el cliente ya se negó a darlo."
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 3,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": "Insiste nuevamente con el email, ignorando la negativa del cliente."
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 1,
+     "text": "Claro, pasame tu mail y te envío el detalle completo con precios, fechas y qué incluye la expedición, incluyendo el 18+2 que te interesa.",
+     "detail": "El cliente ya había ofrecido pasar el mail en el mensaje anterior."
+    }
+   ]
+  },
+  "MEDICAL_ADVICE": {
+   "conversations": 4,
+   "rate": 0.0606,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "l7-0001",
+     "turn": 5,
+     "text": "For altitude prep, try breathing exercises like belly breathing and breath-holding drills. Hydrate well and train with multi-day treks.",
+     "detail": "Nico da consejos médicos concretos sobre ejercicios de respiración y preparación para la altitud, lo cual debe derivar a médicos de montaña."
+    },
+    {
+     "persona": "l7-0004",
+     "turn": 1,
+     "text": "El inhalador podés llevarlo sin problema, no hay restricciones, pero siempre bajo prescripción médica y uso responsable.",
+     "detail": "Nico afirma que puede llevar el inhalador sin restricciones, cuando debe derivar toda recomendación médica a un profesional y no afirmar reglas sobre medicación."
+    },
+    {
+     "persona": "p7-0022",
+     "turn": 0,
+     "text": "No recomendamos Diamox ni otros medicamentos; solo llevá los que te recetó tu médico.",
+     "detail": "No debe recomendar ni desaconsejar medicamentos, solo derivar a un médico."
+    }
+   ]
+  },
+  "OTHER": {
+   "conversations": 4,
+   "rate": 0.0606,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "l7-0001",
+     "turn": 8,
+     "text": "For efficient packing, carry 15-18 kg personal gear max.",
+     "detail": "No hay un dato clave que indique ese rango de peso recomendado para el equipaje personal."
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 2,
+     "text": "pueden sumarse servicios como el Extra Acclimatization Program en Penitentes",
+     "detail": "No existe en los datos-clave un 'Extra Acclimatization Program' como servicio adicional formal, ni está publicado como opción."
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 3,
+     "text": "al que se puede sumar el Extra Acclimatization Program con dos o tres días extras de trekking en Penitentes",
+     "detail": "Repite la invención de un programa adicional no listado en los datos-clave."
+    }
+   ]
+  },
+  "EMPTY_REPLY": {
+   "conversations": 3,
+   "rate": 0.0455,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0029",
+     "turn": 4,
+     "text": "(no respondió)",
+     "detail": "El cliente insistió varias veces y Nico no respondió, dejando al cliente sin atención."
+    },
+    {
+     "persona": "p7-0029",
+     "turn": 5,
+     "text": "(no respondió)",
+     "detail": "Nuevamente, el cliente pidió información y Nico no contestó."
+    },
+    {
+     "persona": "p7-0029",
+     "turn": 6,
+     "text": "(no respondió)",
+     "detail": "El cliente mostró urgencia y Nico no dio ninguna respuesta ni contención."
+    }
+   ]
+  },
+  "HALLUCINATED_FACT": {
+   "conversations": 3,
+   "rate": 0.0455,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0025",
+     "turn": 2,
+     "text": "We include unlimited porters to carry tents, cooking gear, garbage, and more during the expedition, and climbers help carry some common equipment on acclimatization days.",
+     "detail": "No existe 'unlimited porters'; el servicio es para equipo común, no ilimitado ni para todo."
+    },
+    {
+     "persona": "p7-0025",
+     "turn": 3,
+     "text": "We include unlimited porters for common gear and waste on the full expeditions.",
+     "detail": "No se ofrece 'unlimited porters'; es para equipo común, no ilimitado ni para todo."
+    },
+    {
+     "persona": "p7-0037",
+     "turn": 1,
+     "text": "Os guias são experientes, com no mínimo cinco anos no Aconcágua, e acompanham cada pessoa de perto.",
+     "detail": "Não há dado-chave que diga que todos os guias têm no mínimo cinco anos de experiência no Aconcágua."
+    }
+   ]
+  },
+  "INVENTED_PRICE": {
+   "conversations": 3,
+   "rate": 0.0455,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0012",
+     "turn": 1,
+     "text": "hay opciones kosher con costo extra que se piden con 90 días de anticipación y se preparan por separado durante la expedición.",
+     "detail": "Menciona un 'costo extra' para menú kosher pero no está en los datos-clave ni se puede afirmar un monto o condición específica."
+    },
+    {
+     "persona": "p7-0037",
+     "turn": 3,
+     "text": "A confirmação exata e os valores premium te confirma um assessor.",
+     "detail": "Não existe um 'valor premium' nos dados-chave; o termo pode confundir."
+    },
+    {
+     "persona": "p7-0043",
+     "turn": 0,
+     "text": "As expedições privadas começam em USD 7.990 por pessoa e incluem guia exclusivo, flexibilidade no roteiro e alguns serviços extras, como chuveiro quente e banheiro privativo.",
+     "detail": "Nico agrega servicios extra (banho quente, banheiro privativo) como si fueran estándar en todas las privadas, pero los datos-clave solo dicen 'desde USD 7.990', sin detallar esos extras como garantizados."
+    }
+   ]
+  },
+  "ASESOR_HUMANO": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 1,
+   "examples": [
+    {
+     "persona": "p7-0006",
+     "turn": 1,
+     "text": "I’m an AI assistant helping the team, but a human advisor can guide you in detail when needed.",
+     "detail": "Nico menciona explícitamente que es un asistente AI y habla de un 'human advisor', lo cual está prohibido."
+    },
+    {
+     "persona": "p7-0035",
+     "turn": 1,
+     "text": "Soy el asistente digital del equipo de Acomara, no un humano, pero cualquier asesor puede seguir la charla cuando quieras. ¿Querés que te pase contacto con alguien?",
+     "detail": "No debe mencionar 'asesor humano' ni ofrecer derivar salvo que el cliente lo pida explícitamente."
+    }
+   ]
+  },
+  "BAD_OFF_SCOPE_HANDLING": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0026",
+     "turn": 7,
+     "text": "Las otras alternativas son: 1. 14+2 2. 17+2",
+     "detail": "El cliente ya dijo que solo hizo Kilimanjaro, por lo que no califica para 14+2. Además, no explica la diferencia ni retoma el interés real del cliente."
+    },
+    {
+     "persona": "p7-0057",
+     "turn": 3,
+     "text": "Para opciones premium o adicionales puede escribir a info@aconcaguaexpeditions.com.",
+     "detail": "No corta la conversación de forma clara y amable ante un pedido fuera de alcance, y sigue insistiendo con el email."
+    }
+   ]
+  },
+  "CONFIRMS_BOOKING": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0027",
+     "turn": 8,
+     "text": "El presupuesto para 6 personas sería USD 43.500 por el programa 18+2 (USD 7.250 por persona).",
+     "detail": "Da un precio final y cerrado para una cantidad de personas, cuando debe aclarar que el precio exacto y la disponibilidad los confirma un asesor."
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 8,
+     "text": "El folleto fue reenviado a javier.0027@example.com.",
+     "detail": "Confirma una acción administrativa como si fuera definitiva, cuando debe derivar a un asesor."
+    },
+    {
+     "persona": "p7-0042",
+     "turn": 4,
+     "text": "Once you pay the USD 699 deposit online, your spot is reserved and you'll get a confirmation email or receipt automatically.",
+     "detail": "Da por hecha la reserva antes de la confirmación final del asesor."
+    }
+   ]
+  },
+  "CONTRADICTION": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0007",
+     "turn": 1,
+     "text": "Las otras alternativas son: 1. 14+2 2. 17+2",
+     "detail": "Ofrece el 14+2 como alternativa después de decir que es solo para expertos, generando confusión."
+    },
+    {
+     "persona": "p7-0054",
+     "turn": 1,
+     "text": "La fecha 10 de febrero no está en las salidas programadas; para febrero hay salidas 7 (18+2), 11 (14+2) y 6 o 13 (12+2).",
+     "detail": "En el primer mensaje Nico había dicho que el 10 de febrero sí había salidas, luego lo contradice. Esto genera confusión y desconfianza."
+    }
+   ]
+  },
+  "INSURANCE_INCLUDED": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0024",
+     "turn": 0,
+     "text": "all included: guides, meals, tents, transfers, mule loads, plus 2 extra days for weather.",
+     "detail": "No aclara que el seguro de rescate NO está incluido, lo que puede inducir a error."
+    },
+    {
+     "persona": "p7-0038",
+     "turn": 2,
+     "text": "tem botiquim com oxigênio e guias que acompanham o grupo o tempo todo.",
+     "detail": "No aclara que o seguro de resgate é obrigatório e não está incluído, o que pode levar a entender que o suporte médico está totalmente coberto."
+    }
+   ]
+  },
+  "MENTIONS_DOCS": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0006",
+     "turn": 1,
+     "text": "It includes hotel in Mendoza, all transfers, meals on the mountain, guides, mule support, tents, radios, and more, but not flights, permit, insurance, or personal gear.",
+     "detail": "La frase 'and more' es vaga y suena a resumen de documentación, no a una respuesta concreta y personalizada."
+    },
+    {
+     "persona": "p7-0040",
+     "turn": 2,
+     "text": "te mando o detalhe completo com preços e datas.",
+     "detail": "Sugiere que enviará un documento con detalles y precios, pero no puede confirmar precios ni enviar documentos automáticos."
+    }
+   ]
+  },
+  "PERMIT_INCLUDED": {
+   "conversations": 2,
+   "rate": 0.0303,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0024",
+     "turn": 0,
+     "text": "all included: guides, meals, tents, transfers, mule loads, plus 2 extra days for weather.",
+     "detail": "No aclara que el permiso del Parque NO está incluido, lo que puede inducir a error."
+    },
+    {
+     "persona": "p7-0038",
+     "turn": 2,
+     "text": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+     "detail": "Nunca menciona que a permissão do Parque não está incluída, o que é obrigatório informar ao detalhar inclusiones."
+    }
+   ]
+  },
+  "ASSISTANT_CLOSER": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0043",
+     "turn": 5,
+     "text": "Se precisar de algo mais, me avisa!",
+     "detail": "Cierra con una frase de asistente genérica, no propia de un vendedor humano."
+    }
+   ]
+  },
+  "INVENTED_DISCOUNT": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "severity": 3,
+   "examples": [
+    {
+     "persona": "p7-0026",
+     "turn": 2,
+     "text": "Eso te lo puede confirmar un asesor con todos los detalles.",
+     "detail": "Sugiere que un asesor podría ofrecer un descuento, cuando está claro que no hay descuentos por grupo."
+    }
+   ]
+  },
+  "OFF_SEASON_NOT_EXPLAINED": {
+   "conversations": 1,
+   "rate": 0.0152,
+   "severity": 2,
+   "examples": [
+    {
+     "persona": "p7-0044",
+     "turn": 0,
+     "text": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.",
+     "detail": "Nunca le aclara que no hay expediciones entre mayo y septiembre, ni que la temporada es de noviembre a febrero."
+    }
+   ]
+  }
+ },
+ "failure_tags": [
+  {
+   "tag": "no avanza la venta",
+   "conversations": 13,
+   "examples": [
+    "l7-0005",
+    "p7-0005",
+    "p7-0011"
+   ]
+  },
+  {
+   "tag": "tono robótico",
+   "conversations": 11,
+   "examples": [
+    "l7-0002",
+    "p7-0004",
+    "p7-0018"
+   ]
+  },
+  {
+   "tag": "deriva innecesariamente",
+   "conversations": 7,
+   "examples": [
+    "p7-0007",
+    "p7-0013",
+    "p7-0024"
+   ]
+  },
+  {
+   "tag": "no ofrece videollamada",
+   "conversations": 7,
+   "examples": [
+    "p7-0009",
+    "p7-0013",
+    "p7-0014"
+   ]
+  },
+  {
+   "tag": "repite información",
+   "conversations": 4,
+   "examples": [
+    "l7-0003",
+    "p7-0009",
+    "p7-0034"
+   ]
+  },
+  {
+   "tag": "no invita a videollamada",
+   "conversations": 3,
+   "examples": [
+    "p7-0003",
+    "p7-0018",
+    "p7-0036"
+   ]
+  },
+  {
+   "tag": "respuestas largas para whatsapp",
+   "conversations": 3,
+   "examples": [
+    "p7-0008",
+    "p7-0051",
+    "p7-0054"
+   ]
+  },
+  {
+   "tag": "registro inconsistente",
+   "conversations": 3,
+   "examples": [
+    "p7-0022",
+    "p7-0049",
+    "p7-0055"
+   ]
+  },
+  {
+   "tag": "no aclara exclusiones clave",
+   "conversations": 3,
+   "examples": [
+    "p7-0024",
+    "p7-0033",
+    "p7-0038"
+   ]
+  },
+  {
+   "tag": "da consejos médicos",
+   "conversations": 2,
+   "examples": [
+    "l7-0001",
+    "p7-0022"
+   ]
+  },
+  {
+   "tag": "confirma fechas sin asesor",
+   "conversations": 2,
+   "examples": [
+    "l7-0001",
+    "p7-0037"
+   ]
+  },
+  {
+   "tag": "no adapta el estilo al cliente",
+   "conversations": 2,
+   "examples": [
+    "l7-0002",
+    "p7-0018"
+   ]
+  },
+  {
+   "tag": "no califica fechas",
+   "conversations": 2,
+   "examples": [
+    "l7-0005",
+    "p7-0011"
+   ]
+  },
+  {
+   "tag": "ofrece programas no aptos",
+   "conversations": 2,
+   "examples": [
+    "p7-0000",
+    "p7-0036"
+   ]
+  },
+  {
+   "tag": "no avanza a videollamada",
+   "conversations": 2,
+   "examples": [
+    "p7-0000",
+    "p7-0024"
+   ]
+  },
+  {
+   "tag": "tono poco natural",
+   "conversations": 2,
+   "examples": [
+    "p7-0001",
+    "p7-0015"
+   ]
+  },
+  {
+   "tag": "confirma reserva sin asesor",
+   "conversations": 2,
+   "examples": [
+    "p7-0002",
+    "p7-0042"
+   ]
+  },
+  {
+   "tag": "no califica experiencia ni fechas",
+   "conversations": 2,
+   "examples": [
+    "p7-0005",
+    "p7-0045"
+   ]
+  },
+  {
+   "tag": "no califica fechas ni grupo",
+   "conversations": 2,
+   "examples": [
+    "p7-0007",
+    "p7-0033"
+   ]
+  },
+  {
+   "tag": "responde en español a cliente en portugués",
+   "conversations": 2,
+   "examples": [
+    "p7-0009",
+    "p7-0015"
+   ]
+  },
+  {
+   "tag": "no cierra con claridad",
+   "conversations": 2,
+   "examples": [
+    "p7-0013",
+    "p7-0050"
+   ]
+  },
+  {
+   "tag": "respuestas largas y repetitivas",
+   "conversations": 2,
+   "examples": [
+    "p7-0018",
+    "p7-0053"
+   ]
+  },
+  {
+   "tag": "responde em espanhol para brasileiro",
+   "conversations": 2,
+   "examples": [
+    "p7-0019",
+    "p7-0021"
+   ]
+  },
+  {
+   "tag": "não lista o que não está incluso",
+   "conversations": 2,
+   "examples": [
+    "p7-0019",
+    "p7-0021"
+   ]
+  },
+  {
+   "tag": "deriva sem necessidade",
+   "conversations": 2,
+   "examples": [
+    "p7-0019",
+    "p7-0037"
+   ]
+  }
+ ],
+ "failure_patterns": [
+  {
+   "code": "UNHELPFUL_DEFLECTION",
+   "description": "Deriva a un asesor algo que podía responder",
+   "dimension": "sales",
+   "severity": 2,
+   "conversations": 32,
+   "rate": 0.4848,
+   "regex": 0,
+   "judge": 32,
+   "impact": 0.9697,
+   "examples": [
+    {
+     "persona": "l7-0004",
+     "turn": 6,
+     "text": "Pagos en cuotas los define el asesor.",
+     "detail": "Podría explicar mejor las opciones de pago y cuándo interviene el asesor, en vez de derivar sin agregar valor."
+    },
+    {
+     "persona": "l7-0005",
+     "turn": 7,
+     "text": "Entiendo que quiere más detalle, pero comisiones y materiales personalizados los confirma un asesor.",
+     "detail": "Nico podría haber dado al menos un rango orientativo o ejemplos generales, pero se limita a derivar sin agregar valor."
+    }
+   ]
+  },
+  {
+   "code": "EMAIL_ASKED_AFTER_GIVEN",
+   "description": "Pide el email cuando el cliente ya lo dio",
+   "dimension": "rules",
+   "severity": 2,
+   "conversations": 20,
+   "rate": 0.303,
+   "regex": 1,
+   "judge": 20,
+   "impact": 0.6061,
+   "examples": [
+    {
+     "persona": "p7-0045",
+     "turn": 5,
+     "text": "The video call platform isn't specified here, so I suggest checking your email tomorrow for details or asking the advisor during the call. Our schedule",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0002",
+     "turn": 5,
+     "text": "What's your email so they can reach you?",
+     "detail": "El cliente ya dejó claro que no quiere dar el email y pide contacto por WhatsApp o email directo, pero Nico insiste en pedir el email en vez de ofrecer otra vía."
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 2,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": "El cliente ya había dado su email en el mensaje anterior."
+    }
+   ]
+  },
+  {
+   "code": "CONFIRMS_AVAILABILITY",
+   "description": "Confirma cupo, lugar o reserva",
+   "dimension": "rules",
+   "severity": 3,
+   "conversations": 12,
+   "rate": 0.1818,
+   "regex": 1,
+   "judge": 12,
+   "impact": 0.5455,
+   "examples": [
+    {
+     "persona": "p7-0042",
+     "turn": 3,
+     "text": "After you pay the USD 699 deposit online, your spot is reserved.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0042",
+     "turn": 4,
+     "text": "Once you pay the USD 699 deposit online, your spot is reserved and you'll get a confirmation email or receipt automatically.",
+     "detail": ""
+    },
+    {
+     "persona": "l7-0000",
+     "turn": 5,
+     "text": "Te mandaron el detalle completo al mail que me diste, con precios y fechas para la temporada 2026/27:",
+     "detail": "Asegura que ya enviaron el detalle por mail, lo que implica confirmar disponibilidad y precio final, cuando debe aclarar que lo confirma un asesor."
+    },
+    {
+     "persona": "l7-0001",
+     "turn": 9,
+     "text": "Here are the 2026/27 departures: 18+2 normal extended: Nov 14, 22; Dec 1,4,20,27; Jan 2,10,31; Feb 7 ...",
+     "detail": "Nico presenta las fechas como disponibles, cuando solo un asesor puede confirmar disponibilidad y precio final."
+    }
+   ]
+  },
+  {
+   "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+   "description": "Recomienda 12+2/14+2 a alguien sin 6.000 m",
+   "dimension": "accuracy",
+   "severity": 3,
+   "conversations": 11,
+   "rate": 0.1667,
+   "regex": 0,
+   "judge": 11,
+   "impact": 0.5,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 3,
+     "text": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "detail": "Ofrece el 14+2 a alguien que no tiene experiencia sobre 6.000 m, lo cual contradice la regla de calificación."
+    },
+    {
+     "persona": "p7-0000",
+     "turn": 0,
+     "text": "Fechas 12+2: nov 20, 28; dic 7, 12, 26; ene 2, 8, 16; feb 6, 13. Fechas 14+2: nov 18, 26; dic 5, 10; ene 6, 14; feb 11.",
+     "detail": "Ofrece fechas de programas cortos a alguien que no tiene experiencia sobre 6.000 m, cuando solo debería recomendar el 18+2."
+    }
+   ]
+  },
+  {
+   "code": "IDENTICAL_REPLY",
+   "description": "Repite la misma frase larga palabra por palabra",
+   "dimension": "humanness",
+   "severity": 2,
+   "conversations": 15,
+   "rate": 0.2273,
+   "regex": 15,
+   "judge": 13,
+   "impact": 0.4545,
+   "examples": [
+    {
+     "persona": "p7-0004",
+     "turn": 3,
+     "text": "I just need your email to pass you to the advisor.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 2,
+     "text": "El precio va de USD 5.990 a 7.250 según promo y fecha.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 2,
+     "text": "De noviembre a febrero, las salidas 18+2 son: nov 14 y 22; dic 1, 4, 20, 27; ene 2, 10, 31; feb 7. El precio va de USD 5.990 a 7.250 según promo y fecha.",
+     "detail": "Repite la información de fechas y precios dos veces seguidas en el mismo turno."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 4,
+     "text": "Se um participante abandonar a expedição após o início, não há reembolso ou compensação, e podem haver custos extras para serviços fora do grupo, como resgate, mulas ou transferências separadas.\nSe um participante abandonar a expedição após o início, não há reembolso, e podem surgir custos extras pa",
+     "detail": "Repite casi la misma información dos veces seguidas en portugués."
+    }
+   ]
+  },
+  {
+   "code": "LANGUAGE_DRIFT",
+   "description": "Responde en otro idioma que el del cliente",
+   "dimension": "rules",
+   "severity": 3,
+   "conversations": 8,
+   "rate": 0.1212,
+   "regex": 5,
+   "judge": 8,
+   "impact": 0.3636,
+   "examples": [
+    {
+     "persona": "l7-0002",
+     "turn": 3,
+     "text": "Janeiro disponíveis:\n1. 18+2 dias Normal Estendido: 2, 10, 31\n2. 14+2 dias Ascenso Rápido: 6, 14\n3. 12+2 dias Ascenso Extremo: 2, 8, 16\n4. 17+2 dias Glaciar Pol",
+     "detail": "esperado pt, detectado es"
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 1,
+     "text": "Estas son las salidas para la temporada 2026/27:\n\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 1",
+     "detail": "esperado pt, detectado es"
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 1,
+     "text": "El precio es USD 7.250 por persona, algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según la fecha. Todos los programas abiertos cuestan lo mismo sin importar la duración. Lo importante es elegir el adecuado según experiencia y aclimatación.",
+     "detail": "Responde en español cuando la clienta escribe siempre en portugués."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 2,
+     "text": "Estas son las salidas programadas para la temporada 2026/27:",
+     "detail": "Responde en español en vez de portugués."
+    }
+   ]
+  },
+  {
+   "code": "NO_VIDEOCALL_FOR_BUYER",
+   "description": "Cliente listo para reservar y nunca se le ofreció videollamada",
+   "dimension": "sales",
+   "severity": 1,
+   "conversations": 23,
+   "rate": 0.3485,
+   "regex": 0,
+   "judge": 23,
+   "impact": 0.3485,
+   "examples": [
+    {
+     "persona": "p7-0000",
+     "turn": 4,
+     "text": "Algunos programas tienen promociones entre USD 5.990 y USD 6.390 según la fecha y lugares libres, pero todos cuestan igual.",
+     "detail": "No invita a videollamada cuando la clienta muestra interés concreto y ya dio su email."
+    },
+    {
+     "persona": "p7-0003",
+     "turn": 4,
+     "text": "Un asesor puede confirmarte todo con detalle si querés.",
+     "detail": "No invita a videollamada cuando el cliente ya mostró interés concreto y dio su email."
+    }
+   ]
+  },
+  {
+   "code": "NO_QUALIFICATION",
+   "description": "No averigua experiencia, grupo o fechas cuando correspondía",
+   "dimension": "sales",
+   "severity": 1,
+   "conversations": 21,
+   "rate": 0.3182,
+   "regex": 0,
+   "judge": 21,
+   "impact": 0.3182,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 2,
+     "text": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\nEl 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Ha estado en altura alguna vez?",
+     "detail": "El cliente ya había dicho su experiencia (trekking hasta 4.000 m), pero Nico vuelve a preguntar en vez de avanzar."
+    },
+    {
+     "persona": "l7-0004",
+     "turn": 4,
+     "text": "Para novatos y sin experiencia en altura, recomendamos el programa 18+2 días Normal Extendido, que tiene más aclimatación.",
+     "detail": "No vuelve a calificar sobre experiencia, grupo o fechas antes de recomendar, aunque el cliente ya dio parte de la info."
+    }
+   ]
+  },
+  {
+   "code": "IGNORES_QUESTION",
+   "description": "No responde lo que el cliente preguntó",
+   "dimension": "sales",
+   "severity": 2,
+   "conversations": 10,
+   "rate": 0.1515,
+   "regex": 0,
+   "judge": 10,
+   "impact": 0.303,
+   "examples": [
+    {
+     "persona": "l7-0005",
+     "turn": 8,
+     "text": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "detail": "El cliente pide info de comisiones y materiales, pero Nico responde con alternativas de programas, ignorando la consulta."
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 2,
+     "text": "That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.",
+     "detail": "No responde la pregunta concreta sobre fitness y soporte, solo deriva o evade."
+    }
+   ]
+  },
+  {
+   "code": "INCLUDES_EVERYTHING",
+   "description": "Dice que 'incluye todo'",
+   "dimension": "accuracy",
+   "severity": 2,
+   "conversations": 9,
+   "rate": 0.1364,
+   "regex": 2,
+   "judge": 9,
+   "impact": 0.2727,
+   "examples": [
+    {
+     "persona": "p7-0027",
+     "turn": 3,
+     "text": "Claro, el programa 18+2 incluye todo lo necesario para una buena aclimatación, al que se puede sumar el Ex",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 5,
+     "text": "El programa 18+2 cuesta USD 7.250 por persona, e incluye todo lo necesario para la expedición. El Extra Acclimatization Program, co",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0019",
+     "turn": 0,
+     "text": "Nossos pacotes incluem hotel em Mendoza, traslados, alimentação, mulas, guias e mais.",
+     "detail": "Diz que inclui tudo de forma genérica, sem listar o que NÃO está incluso (voos, permissão, seguro, equipamento pessoal)."
+    },
+    {
+     "persona": "p7-0021",
+     "turn": 2,
+     "text": "El precio es USD 7.250, incluyen guía, comidas en la montaña, porteo común y traslados a Penitentes.",
+     "detail": "Diz que o preço inclui só alguns itens, mas não menciona o que NÃO está incluso (voos, permissão, seguro, equipamento pessoal), como exigido."
+    }
+   ]
+  },
+  {
+   "code": "ROBOTIC_TONE",
+   "description": "Suena a bot / call center, no a un vendedor de Mendoza por WhatsApp",
+   "dimension": "humanness",
+   "severity": 1,
+   "conversations": 17,
+   "rate": 0.2576,
+   "regex": 0,
+   "judge": 17,
+   "impact": 0.2576,
+   "examples": [
+    {
+     "persona": "l7-0002",
+     "turn": 3,
+     "text": "Janeiro disponíveis:\n1. 18+2 dias Normal Estendido: 2, 10, 31\n2. 14+2 dias Ascenso Rápido: 6, 14\n3. 12+2 dias Ascenso Extremo: 2, 8, 16\n4. 17+2 dias Glaciar Polaco 360°: 3",
+     "detail": "Respondeu com uma lista formatada, pouco natural para WhatsApp e destoando do estilo curto do cliente."
+    },
+    {
+     "persona": "l7-0002",
+     "turn": 4,
+     "text": "Expedição privada com guia exclusivo custa a partir de USD 7.990 por pessoa, incluindo flexibilidade e serviços personalizados. Para tempo e conforto, o programa 18+2 dias Normal Estendido é a melhor opção, com máxima aclimatação.",
+     "detail": "A resposta soa formal e genérica, pouco adaptada ao tom telegráfico do cliente."
+    }
+   ]
+  },
+  {
+   "code": "TOO_LONG",
+   "description": "Respuesta más larga que el límite del canal",
+   "dimension": "length",
+   "severity": 1,
+   "conversations": 16,
+   "rate": 0.2424,
+   "regex": 15,
+   "judge": 16,
+   "impact": 0.2424,
+   "examples": [
+    {
+     "persona": "l7-0000",
+     "turn": 5,
+     "text": "Te mandaron el detalle completo al mail que me diste, con precios y fechas para la temporada 2026/27:\n1) Normal Extendid…",
+     "detail": "402 car., burbuja más larga 402"
+    },
+    {
+     "persona": "l7-0001",
+     "turn": 9,
+     "text": "Got it! Here are the 2026/27 departures:\n18+2 normal extended: Nov 14, 22; Dec 1,4,20,27; Jan 2,10,31; Feb 7\n14+2 fast a…",
+     "detail": "443 car., burbuja más larga 327"
+    },
+    {
+     "persona": "l7-0000",
+     "turn": 5,
+     "text": "Te mandaron el detalle completo al mail que me diste, con precios y fechas para la temporada 2026/27:\n1) Normal Extendido (18+2 días): Nov (14,22), Dic (1,4,20,27), Ene (2,10,31), Feb (7)\n2) Ascenso Rápido (14+2 días): Nov (18,26), Dic (5,10), Ene (6,14), Feb (11)\n3) Ascenso Extremo (12+2 días): Nov",
+     "detail": "Mensaje demasiado largo para WhatsApp, con formato de lista y exceso de fechas, poco natural para el canal."
+    },
+    {
+     "persona": "l7-0005",
+     "turn": 4,
+     "text": "Las salidas para el 18+2 son: noviembre 14 y 22, diciembre 1, 4, 20 y 27, enero 2, 10 y 31, febrero 7. El precio regular es USD 7.250, con promociones en algunas fechas. La reserva se hace con USD 699.",
+     "detail": "Mensaje demasiado largo para WhatsApp, podría dividirse en dos partes."
+    }
+   ]
+  },
+  {
+   "code": "MEDICAL_ADVICE",
+   "description": "Da una recomendación médica (medicación, dosis)",
+   "dimension": "rules",
+   "severity": 3,
+   "conversations": 4,
+   "rate": 0.0606,
+   "regex": 0,
+   "judge": 4,
+   "impact": 0.1818,
+   "examples": [
+    {
+     "persona": "l7-0001",
+     "turn": 5,
+     "text": "For altitude prep, try breathing exercises like belly breathing and breath-holding drills. Hydrate well and train with multi-day treks.",
+     "detail": "Nico da consejos médicos concretos sobre ejercicios de respiración y preparación para la altitud, lo cual debe derivar a médicos de montaña."
+    },
+    {
+     "persona": "l7-0004",
+     "turn": 1,
+     "text": "El inhalador podés llevarlo sin problema, no hay restricciones, pero siempre bajo prescripción médica y uso responsable.",
+     "detail": "Nico afirma que puede llevar el inhalador sin restricciones, cuando debe derivar toda recomendación médica a un profesional y no afirmar reglas sobre medicación."
+    }
+   ]
+  },
+  {
+   "code": "VOSEO_WITH_USTED",
+   "description": "Le habla de vos a un cliente que escribe en español neutro / de usted",
+   "dimension": "language",
+   "severity": 1,
+   "conversations": 11,
+   "rate": 0.1667,
+   "regex": 5,
+   "judge": 11,
+   "impact": 0.1667,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 0,
+     "text": "Si querés, un asesor te confirma todo con detalle.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0016",
+     "turn": 0,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": ""
+    },
+    {
+     "persona": "l7-0003",
+     "turn": 8,
+     "text": "Te enviaremos el enlace para la videollamada con anticipación. La cita queda para el jueves a las 17:00 hora Chile, y un asesor te contactará pronto para confirmar disponibilidad y explicar políticas de cambio de fecha.",
+     "detail": "El cliente siempre trató de usted y Nico pasó a tutear en la última respuesta."
+    },
+    {
+     "persona": "p7-0000",
+     "turn": 1,
+     "text": "¿Ha estado en altura alguna vez?",
+     "detail": "Cambia de voseo a usted sin motivo, lo que suena forzado y poco natural para un cliente argentino."
+    }
+   ]
+  },
+  {
+   "code": "PHANTOM_EMAIL",
+   "description": "Menciona un email que el cliente no dio",
+   "dimension": "accuracy",
+   "severity": 2,
+   "conversations": 5,
+   "rate": 0.0758,
+   "regex": 0,
+   "judge": 5,
+   "impact": 0.1515,
+   "examples": [
+    {
+     "persona": "p7-0001",
+     "turn": 2,
+     "text": "Le envié al email la info de precios, promociones y formas de pago que le comenté antes.",
+     "detail": "Nico afirma haber enviado un email, pero no puede hacerlo realmente."
+    },
+    {
+     "persona": "p7-0012",
+     "turn": 1,
+     "text": "Si querés, pasame tu email y te mando el detalle completo con precios y fechas.",
+     "detail": "Ofrece enviar detalles por email cuando el cliente no lo pidió ni mostró interés real, y ya había dado la información relevante por WhatsApp."
+    }
+   ]
+  },
+  {
+   "code": "HALLUCINATED_FACT",
+   "description": "Afirma un dato que no está en datos-clave (itinerario, servicio, política)",
+   "dimension": "accuracy",
+   "severity": 3,
+   "conversations": 3,
+   "rate": 0.0455,
+   "regex": 0,
+   "judge": 3,
+   "impact": 0.1364,
+   "examples": [
+    {
+     "persona": "p7-0025",
+     "turn": 2,
+     "text": "We include unlimited porters to carry tents, cooking gear, garbage, and more during the expedition, and climbers help carry some common equipment on acclimatization days.",
+     "detail": "No existe 'unlimited porters'; el servicio es para equipo común, no ilimitado ni para todo."
+    },
+    {
+     "persona": "p7-0025",
+     "turn": 3,
+     "text": "We include unlimited porters for common gear and waste on the full expeditions.",
+     "detail": "No se ofrece 'unlimited porters'; es para equipo común, no ilimitado ni para todo."
+    }
+   ]
+  },
+  {
+   "code": "INVENTED_PRICE",
+   "description": "Da un monto en USD que no está en datos-clave ni en el FAQ",
+   "dimension": "accuracy",
+   "severity": 3,
+   "conversations": 3,
+   "rate": 0.0455,
+   "regex": 3,
+   "judge": 3,
+   "impact": 0.1364,
+   "examples": [
+    {
+     "persona": "l7-0002",
+     "turn": 5,
+     "text": "Para 4 pessoas, multiplica USD 7.990 por pessoa na expedição privada, totalizando cerca de USD 31.960. Isso inclui guia exclusivo e serviços personalizados.",
+     "detail": "USD 31960"
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 8,
+     "text": "El presupuesto para 6 personas sería USD 43.500 por el programa 18+2 (USD 7.250 por persona). El Extra Acclimatization Program se cotiza según días y actividades; recomendamos 2 o 3 días, pero el prec",
+     "detail": "USD 43500"
+    },
+    {
+     "persona": "p7-0012",
+     "turn": 1,
+     "text": "hay opciones kosher con costo extra que se piden con 90 días de anticipación y se preparan por separado durante la expedición.",
+     "detail": "Menciona un 'costo extra' para menú kosher pero no está en los datos-clave ni se puede afirmar un monto o condición específica."
+    },
+    {
+     "persona": "p7-0037",
+     "turn": 3,
+     "text": "A confirmação exata e os valores premium te confirma um assessor.",
+     "detail": "Não existe um 'valor premium' nos dados-chave; o termo pode confundir."
+    }
+   ]
+  },
+  {
+   "code": "EMAIL_ASKED_TWICE",
+   "description": "Pide el email más de una vez",
+   "dimension": "rules",
+   "severity": 2,
+   "conversations": 4,
+   "rate": 0.0606,
+   "regex": 2,
+   "judge": 4,
+   "impact": 0.1212,
+   "examples": [
+    {
+     "persona": "p7-0004",
+     "turn": 1,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0008",
+     "turn": 1,
+     "text": "Claro, pasame tu mail y te envío el detalle completo con precios, fechas y qué incluye la e",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 1,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": "Vuelve a pedir el email después de que el cliente ya se negó a darlo."
+    },
+    {
+     "persona": "p7-0004",
+     "turn": 3,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": "Insiste nuevamente con el email, ignorando la negativa del cliente."
+    }
+   ]
+  },
+  {
+   "code": "CONFIRMS_BOOKING",
+   "description": "Da por hecha una reserva o un precio final de una fecha",
+   "dimension": "rules",
+   "severity": 3,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 0,
+   "judge": 2,
+   "impact": 0.0909,
+   "examples": [
+    {
+     "persona": "p7-0027",
+     "turn": 8,
+     "text": "El presupuesto para 6 personas sería USD 43.500 por el programa 18+2 (USD 7.250 por persona).",
+     "detail": "Da un precio final y cerrado para una cantidad de personas, cuando debe aclarar que el precio exacto y la disponibilidad los confirma un asesor."
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 8,
+     "text": "El folleto fue reenviado a javier.0027@example.com.",
+     "detail": "Confirma una acción administrativa como si fuera definitiva, cuando debe derivar a un asesor."
+    }
+   ]
+  },
+  {
+   "code": "INSURANCE_INCLUDED",
+   "description": "Dice que el seguro de rescate está incluido",
+   "dimension": "accuracy",
+   "severity": 3,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 0,
+   "judge": 2,
+   "impact": 0.0909,
+   "examples": [
+    {
+     "persona": "p7-0024",
+     "turn": 0,
+     "text": "all included: guides, meals, tents, transfers, mule loads, plus 2 extra days for weather.",
+     "detail": "No aclara que el seguro de rescate NO está incluido, lo que puede inducir a error."
+    },
+    {
+     "persona": "p7-0038",
+     "turn": 2,
+     "text": "tem botiquim com oxigênio e guias que acompanham o grupo o tempo todo.",
+     "detail": "No aclara que o seguro de resgate é obrigatório e não está incluído, o que pode levar a entender que o suporte médico está totalmente coberto."
+    }
+   ]
+  },
+  {
+   "code": "PERMIT_INCLUDED",
+   "description": "Dice que el permiso del Parque está incluido",
+   "dimension": "accuracy",
+   "severity": 3,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 0,
+   "judge": 2,
+   "impact": 0.0909,
+   "examples": [
+    {
+     "persona": "p7-0024",
+     "turn": 0,
+     "text": "all included: guides, meals, tents, transfers, mule loads, plus 2 extra days for weather.",
+     "detail": "No aclara que el permiso del Parque NO está incluido, lo que puede inducir a error."
+    },
+    {
+     "persona": "p7-0038",
+     "turn": 2,
+     "text": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+     "detail": "Nunca menciona que a permissão do Parque não está incluída, o que é obrigatório informar ao detalhar inclusiones."
+    }
+   ]
+  },
+  {
+   "code": "REPEATED_GREETING",
+   "description": "Vuelve a saludar en medio de la charla",
+   "dimension": "humanness",
+   "severity": 1,
+   "conversations": 5,
+   "rate": 0.0758,
+   "regex": 0,
+   "judge": 5,
+   "impact": 0.0758,
+   "examples": [
+    {
+     "persona": "l7-0003",
+     "turn": 0,
+     "text": "Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas.\nBuenas, en agosto no tenemos salidas abiertas programadas para expediciones al Aconcagua.",
+     "detail": "Nico repite la información de la temporada y saluda dos veces en la misma respuesta."
+    },
+    {
+     "persona": "p7-0009",
+     "turn": 1,
+     "text": "Genial, ya me quedó tu email.",
+     "detail": "Saludo innecesario en medio de la conversación."
+    }
+   ]
+  },
+  {
+   "code": "OTHER",
+   "description": "OTHER",
+   "dimension": "other",
+   "severity": 1,
+   "conversations": 4,
+   "rate": 0.0606,
+   "regex": 0,
+   "judge": 4,
+   "impact": 0.0606,
+   "examples": [
+    {
+     "persona": "l7-0001",
+     "turn": 8,
+     "text": "For efficient packing, carry 15-18 kg personal gear max.",
+     "detail": "No hay un dato clave que indique ese rango de peso recomendado para el equipaje personal."
+    },
+    {
+     "persona": "p7-0027",
+     "turn": 2,
+     "text": "pueden sumarse servicios como el Extra Acclimatization Program en Penitentes",
+     "detail": "No existe en los datos-clave un 'Extra Acclimatization Program' como servicio adicional formal, ni está publicado como opción."
+    }
+   ]
+  },
+  {
+   "code": "BAD_OFF_SCOPE_HANDLING",
+   "description": "Maneja mal un pedido fuera de alcance (solo campamento base, logística, spam)",
+   "dimension": "sales",
+   "severity": 2,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 0,
+   "judge": 2,
+   "impact": 0.0606,
+   "examples": [
+    {
+     "persona": "p7-0026",
+     "turn": 7,
+     "text": "Las otras alternativas son: 1. 14+2 2. 17+2",
+     "detail": "El cliente ya dijo que solo hizo Kilimanjaro, por lo que no califica para 14+2. Además, no explica la diferencia ni retoma el interés real del cliente."
+    },
+    {
+     "persona": "p7-0057",
+     "turn": 3,
+     "text": "Para opciones premium o adicionales puede escribir a info@aconcaguaexpeditions.com.",
+     "detail": "No corta la conversación de forma clara y amable ante un pedido fuera de alcance, y sigue insistiendo con el email."
+    }
+   ]
+  },
+  {
+   "code": "CONTRADICTION",
+   "description": "Se contradice dentro de la conversación",
+   "dimension": "accuracy",
+   "severity": 2,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 0,
+   "judge": 2,
+   "impact": 0.0606,
+   "examples": [
+    {
+     "persona": "p7-0007",
+     "turn": 1,
+     "text": "Las otras alternativas son: 1. 14+2 2. 17+2",
+     "detail": "Ofrece el 14+2 como alternativa después de decir que es solo para expertos, generando confusión."
+    },
+    {
+     "persona": "p7-0054",
+     "turn": 1,
+     "text": "La fecha 10 de febrero no está en las salidas programadas; para febrero hay salidas 7 (18+2), 11 (14+2) y 6 o 13 (12+2).",
+     "detail": "En el primer mensaje Nico había dicho que el 10 de febrero sí había salidas, luego lo contradice. Esto genera confusión y desconfianza."
+    }
+   ]
+  },
+  {
+   "code": "MENTIONS_DOCS",
+   "description": "Menciona FAQ / documentación / base de datos",
+   "dimension": "humanness",
+   "severity": 2,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 0,
+   "judge": 2,
+   "impact": 0.0606,
+   "examples": [
+    {
+     "persona": "p7-0006",
+     "turn": 1,
+     "text": "It includes hotel in Mendoza, all transfers, meals on the mountain, guides, mule support, tents, radios, and more, but not flights, permit, insurance, or personal gear.",
+     "detail": "La frase 'and more' es vaga y suena a resumen de documentación, no a una respuesta concreta y personalizada."
+    },
+    {
+     "persona": "p7-0040",
+     "turn": 2,
+     "text": "te mando o detalhe completo com preços e datas.",
+     "detail": "Sugiere que enviará un documento con detalles y precios, pero no puede confirmar precios ni enviar documentos automáticos."
+    }
+   ]
+  },
+  {
+   "code": "EMPTY_REPLY",
+   "description": "Nico no respondió nada a un mensaje",
+   "dimension": "rules",
+   "severity": 1,
+   "conversations": 3,
+   "rate": 0.0455,
+   "regex": 0,
+   "judge": 3,
+   "impact": 0.0455,
+   "examples": [
+    {
+     "persona": "p7-0029",
+     "turn": 4,
+     "text": "(no respondió)",
+     "detail": "El cliente insistió varias veces y Nico no respondió, dejando al cliente sin atención."
+    },
+    {
+     "persona": "p7-0029",
+     "turn": 5,
+     "text": "(no respondió)",
+     "detail": "Nuevamente, el cliente pidió información y Nico no contestó."
+    }
+   ]
+  },
+  {
+   "code": "INVENTED_DISCOUNT",
+   "description": "Ofrece un descuento o porcentaje no publicado",
+   "dimension": "rules",
+   "severity": 3,
+   "conversations": 1,
+   "rate": 0.0152,
+   "regex": 0,
+   "judge": 1,
+   "impact": 0.0455,
+   "examples": [
+    {
+     "persona": "p7-0026",
+     "turn": 2,
+     "text": "Eso te lo puede confirmar un asesor con todos los detalles.",
+     "detail": "Sugiere que un asesor podría ofrecer un descuento, cuando está claro que no hay descuentos por grupo."
+    }
+   ]
+  },
+  {
+   "code": "ASESOR_HUMANO",
+   "description": "Dice 'asesor humano'",
+   "dimension": "humanness",
+   "severity": 1,
+   "conversations": 2,
+   "rate": 0.0303,
+   "regex": 1,
+   "judge": 2,
+   "impact": 0.0303,
+   "examples": [
+    {
+     "persona": "p7-0006",
+     "turn": 1,
+     "text": "Regarding your question, I’m an AI assistant helping the team, but a human advisor can guide you in detail when needed.",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0006",
+     "turn": 1,
+     "text": "I’m an AI assistant helping the team, but a human advisor can guide you in detail when needed.",
+     "detail": "Nico menciona explícitamente que es un asistente AI y habla de un 'human advisor', lo cual está prohibido."
+    },
+    {
+     "persona": "p7-0035",
+     "turn": 1,
+     "text": "Soy el asistente digital del equipo de Acomara, no un humano, pero cualquier asesor puede seguir la charla cuando quieras. ¿Querés que te pase contacto con alguien?",
+     "detail": "No debe mencionar 'asesor humano' ni ofrecer derivar salvo que el cliente lo pida explícitamente."
+    }
+   ]
+  },
+  {
+   "code": "ASSISTANT_CLOSER",
+   "description": "Frase de asistente ('¿algo más en lo que pueda ayudarte?')",
+   "dimension": "humanness",
+   "severity": 2,
+   "conversations": 1,
+   "rate": 0.0152,
+   "regex": 0,
+   "judge": 1,
+   "impact": 0.0303,
+   "examples": [
+    {
+     "persona": "p7-0043",
+     "turn": 5,
+     "text": "Se precisar de algo mais, me avisa!",
+     "detail": "Cierra con una frase de asistente genérica, no propia de un vendedor humano."
+    }
+   ]
+  },
+  {
+   "code": "OFF_SEASON_NOT_EXPLAINED",
+   "description": "El cliente pidió fechas fuera de temporada y nunca se le dijo que es nov-feb/mar",
+   "dimension": "accuracy",
+   "severity": 2,
+   "conversations": 1,
+   "rate": 0.0152,
+   "regex": 1,
+   "judge": 1,
+   "impact": 0.0303,
+   "examples": [
+    {
+     "persona": "p7-0044",
+     "turn": 5,
+     "text": "",
+     "detail": ""
+    },
+    {
+     "persona": "p7-0044",
+     "turn": 0,
+     "text": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.",
+     "detail": "Nunca le aclara que no hay expediciones entre mayo y septiembre, ni que la temporada es de noviembre a febrero."
+    }
+   ]
+  }
+ ],
+ "outcomes": {
+  "email_requested": 0.712,
+  "client_gave_email": 0.712,
+  "email_captured": 0.712,
+  "videocall_offered": 0.288,
+  "paused": 0.091
+ },
+ "by_language": {
+  "en": {
+   "n": 16,
+   "overall": 57.181,
+   "critical_rate": 0.062
+  },
+  "es_ar": {
+   "n": 17,
+   "overall": 60.941,
+   "critical_rate": 0.0
+  },
+  "es_neutro": {
+   "n": 17,
+   "overall": 50.012,
+   "critical_rate": 0.118
+  },
+  "pt_br": {
+   "n": 16,
+   "overall": 55.538,
+   "critical_rate": 0.312
+  }
+ },
+ "by_intent": {
+  "agency_reseller": {
+   "n": 5,
+   "overall": 53.5,
+   "critical_rate": 0.0
+  },
+  "asks_if_bot": {
+   "n": 4,
+   "overall": 50.0,
+   "critical_rate": 0.25
+  },
+  "basecamp_only": {
+   "n": 4,
+   "overall": 73.725,
+   "critical_rate": 0.0
+  },
+  "family_decision": {
+   "n": 4,
+   "overall": 53.75,
+   "critical_rate": 0.0
+  },
+  "gear_and_insurance": {
+   "n": 3,
+   "overall": 58.3,
+   "critical_rate": 0.0
+  },
+  "info_seeker": {
+   "n": 5,
+   "overall": 51.5,
+   "critical_rate": 0.4
+  },
+  "medical_question": {
+   "n": 5,
+   "overall": 56.26,
+   "critical_rate": 0.0
+  },
+  "off_season": {
+   "n": 4,
+   "overall": 33.1,
+   "critical_rate": 0.25
+  },
+  "payment_methods": {
+   "n": 3,
+   "overall": 77.067,
+   "critical_rate": 0.0
+  },
+  "price_shopper": {
+   "n": 5,
+   "overall": 61.22,
+   "critical_rate": 0.2
+  },
+  "private_expedition": {
+   "n": 4,
+   "overall": 59.05,
+   "critical_rate": 0.25
+  },
+  "ready_to_book": {
+   "n": 5,
+   "overall": 66.0,
+   "critical_rate": 0.2
+  },
+  "short_program_fan": {
+   "n": 4,
+   "overall": 60.325,
+   "critical_rate": 0.25
+  },
+  "trek_only": {
+   "n": 3,
+   "overall": 59.6,
+   "critical_rate": 0.0
+  },
+  "troll_spam": {
+   "n": 4,
+   "overall": 53.1,
+   "critical_rate": 0.0
+  },
+  "wants_human": {
+   "n": 4,
+   "overall": 32.55,
+   "critical_rate": 0.0
+  }
+ },
+ "by_style": {
+  "burst": {
+   "n": 7,
+   "overall": 45.886,
+   "critical_rate": 0.286
+  },
+  "code_switch": {
+   "n": 8,
+   "overall": 54.062,
+   "critical_rate": 0.0
+  },
+  "emojis": {
+   "n": 9,
+   "overall": 58.322,
+   "critical_rate": 0.0
+  },
+  "long_email": {
+   "n": 8,
+   "overall": 50.0,
+   "critical_rate": 0.125
+  },
+  "normal": {
+   "n": 9,
+   "overall": 56.111,
+   "critical_rate": 0.0
+  },
+  "terse": {
+   "n": 9,
+   "overall": 66.378,
+   "critical_rate": 0.222
+  },
+  "typos": {
+   "n": 8,
+   "overall": 54.362,
+   "critical_rate": 0.125
+  },
+  "voice_note": {
+   "n": 8,
+   "overall": 59.225,
+   "critical_rate": 0.25
+  }
+ },
+ "by_experience": {
+  "above_6000": {
+   "n": 11,
+   "overall": 57.245,
+   "critical_rate": 0.273
+  },
+  "aconcagua_before": {
+   "n": 18,
+   "overall": 61.872,
+   "critical_rate": 0.056
+  },
+  "kilimanjaro": {
+   "n": 12,
+   "overall": 51.975,
+   "critical_rate": 0.0
+  },
+  "none": {
+   "n": 13,
+   "overall": 53.354,
+   "critical_rate": 0.077
+  },
+  "trekking_4000": {
+   "n": 12,
+   "overall": 52.417,
+   "critical_rate": 0.25
+  }
+ },
+ "calibration": {
+  "EMPTY_REPLY": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 3
+  },
+  "ASSISTANT_CLOSER": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 1
+  },
+  "MENTIONS_DOCS": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 2
+  },
+  "ASESOR_HUMANO": {
+   "both": 1,
+   "regex_only": 0,
+   "judge_only": 1
+  },
+  "REPEATED_GREETING": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 5
+  },
+  "IDENTICAL_REPLY": {
+   "both": 7,
+   "regex_only": 8,
+   "judge_only": 6
+  },
+  "EMAIL_ASKED_TWICE": {
+   "both": 2,
+   "regex_only": 0,
+   "judge_only": 2
+  },
+  "EMAIL_ASKED_AFTER_GIVEN": {
+   "both": 0,
+   "regex_only": 1,
+   "judge_only": 20
+  },
+  "PHANTOM_EMAIL": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 5
+  },
+  "INVENTED_PRICE": {
+   "both": 0,
+   "regex_only": 3,
+   "judge_only": 3
+  },
+  "INVENTED_DISCOUNT": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 1
+  },
+  "CONFIRMS_AVAILABILITY": {
+   "both": 1,
+   "regex_only": 0,
+   "judge_only": 11
+  },
+  "MEDICAL_ADVICE": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 4
+  },
+  "PERMIT_INCLUDED": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 2
+  },
+  "INSURANCE_INCLUDED": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 2
+  },
+  "INCLUDES_EVERYTHING": {
+   "both": 1,
+   "regex_only": 1,
+   "judge_only": 8
+  },
+  "SHORT_PROGRAM_TO_INEXPERIENCED": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 11
+  },
+  "VOSEO_WITH_USTED": {
+   "both": 3,
+   "regex_only": 2,
+   "judge_only": 8
+  },
+  "LANGUAGE_DRIFT": {
+   "both": 4,
+   "regex_only": 1,
+   "judge_only": 4
+  },
+  "TOO_LONG": {
+   "both": 8,
+   "regex_only": 7,
+   "judge_only": 8
+  },
+  "OFF_SEASON_NOT_EXPLAINED": {
+   "both": 1,
+   "regex_only": 0,
+   "judge_only": 0
+  },
+  "NO_VIDEOCALL_FOR_BUYER": {
+   "both": 0,
+   "regex_only": 0,
+   "judge_only": 23
+  }
+ },
+ "usage": {
+  "by_role": [
+   {
+    "role": "judge",
+    "model": "gpt-4.1",
+    "calls": 68,
+    "input_tokens": 251468,
+    "cached_input_tokens": 114304,
+    "output_tokens": 54385,
+    "cost_usd": 0.7666
+   },
+   {
+    "role": "nico",
+    "model": "gpt-4.1-mini",
+    "calls": 387,
+    "input_tokens": 2379547,
+    "cached_input_tokens": 1345280,
+    "output_tokens": 28381,
+    "cost_usd": 0.5936
+   },
+   {
+    "role": "nico_embeddings",
+    "model": "text-embedding-3-large",
+    "calls": 387,
+    "input_tokens": 93314,
+    "cached_input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0121
+   },
+   {
+    "role": "persona_writer",
+    "model": "gpt-4.1-mini",
+    "calls": 1,
+    "input_tokens": 317,
+    "cached_input_tokens": 0,
+    "output_tokens": 808,
+    "cost_usd": 0.0014
+   },
+   {
+    "role": "simulator",
+    "model": "gpt-4.1-mini",
+    "calls": 414,
+    "input_tokens": 397112,
+    "cached_input_tokens": 0,
+    "output_tokens": 32053,
+    "cost_usd": 0.2101
+   }
+  ],
+  "total_cost_usd": 1.5839,
+  "models_without_price": []
+ },
+ "cost_per_conversation_usd": 0.024,
+ "per_conversation": [
+  {
+   "id": "l7-0000",
+   "overall": 75.0,
+   "severity": 5,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "l7-0001",
+   "overall": 70.0,
+   "severity": 8,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "MEDICAL_ADVICE",
+    "OTHER",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "l7-0002",
+   "overall": 71.2,
+   "severity": 10,
+   "codes": [
+    "INVENTED_PRICE",
+    "LANGUAGE_DRIFT",
+    "ROBOTIC_TONE"
+   ]
+  },
+  {
+   "id": "l7-0003",
+   "overall": 61.3,
+   "severity": 12,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "NO_QUALIFICATION",
+    "REPEATED_GREETING",
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "l7-0004",
+   "overall": 50.0,
+   "severity": 15,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "MEDICAL_ADVICE",
+    "NO_QUALIFICATION",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "l7-0005",
+   "overall": 36.2,
+   "severity": 11,
+   "codes": [
+    "IGNORES_QUESTION",
+    "NO_QUALIFICATION",
+    "ROBOTIC_TONE",
+    "TOO_LONG",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0000",
+   "overall": 63.7,
+   "severity": 8,
+   "codes": [
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "UNHELPFUL_DEFLECTION",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0001",
+   "overall": 52.5,
+   "severity": 6,
+   "codes": [
+    "PHANTOM_EMAIL",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0002",
+   "overall": 80.0,
+   "severity": 7,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0003",
+   "overall": 62.5,
+   "severity": 8,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0004",
+   "overall": 21.3,
+   "severity": 19,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "EMAIL_ASKED_TWICE",
+    "IDENTICAL_REPLY",
+    "IGNORES_QUESTION",
+    "NO_QUALIFICATION",
+    "ROBOTIC_TONE",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0005",
+   "overall": 36.3,
+   "severity": 8,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0006",
+   "overall": 51.2,
+   "severity": 11,
+   "codes": [
+    "ASESOR_HUMANO",
+    "CONFIRMS_AVAILABILITY",
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "MENTIONS_DOCS",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0007",
+   "overall": 70.0,
+   "severity": 8,
+   "codes": [
+    "CONTRADICTION",
+    "NO_QUALIFICATION",
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0008",
+   "overall": 47.5,
+   "severity": 12,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "EMAIL_ASKED_TWICE",
+    "IDENTICAL_REPLY",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0009",
+   "overall": 37.5,
+   "severity": 38,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "REPEATED_GREETING",
+    "TOO_LONG",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0010",
+   "overall": 76.2,
+   "severity": 3,
+   "codes": [
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0011",
+   "overall": 53.8,
+   "severity": 14,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IDENTICAL_REPLY",
+    "NO_QUALIFICATION",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0012",
+   "overall": 81.2,
+   "severity": 5,
+   "codes": [
+    "INVENTED_PRICE",
+    "PHANTOM_EMAIL"
+   ]
+  },
+  {
+   "id": "p7-0013",
+   "overall": 72.5,
+   "severity": 7,
+   "codes": [
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0014",
+   "overall": 60.0,
+   "severity": 19,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0015",
+   "overall": 43.8,
+   "severity": 33,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "ROBOTIC_TONE",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0016",
+   "overall": 70.0,
+   "severity": 14,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0017",
+   "overall": 85.0,
+   "severity": 3,
+   "codes": [
+    "NO_QUALIFICATION",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0018",
+   "overall": 51.2,
+   "severity": 20,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "ROBOTIC_TONE",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0019",
+   "overall": 38.8,
+   "severity": 12,
+   "codes": [
+    "INCLUDES_EVERYTHING",
+    "LANGUAGE_DRIFT",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0020",
+   "overall": 66.2,
+   "severity": 6,
+   "codes": [
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0021",
+   "overall": 26.2,
+   "severity": 18,
+   "codes": [
+    "EMAIL_ASKED_TWICE",
+    "INCLUDES_EVERYTHING",
+    "LANGUAGE_DRIFT",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "ROBOTIC_TONE",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0022",
+   "overall": 67.5,
+   "severity": 8,
+   "codes": [
+    "MEDICAL_ADVICE",
+    "NO_QUALIFICATION",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0023",
+   "overall": 82.5,
+   "severity": 0,
+   "codes": []
+  },
+  {
+   "id": "p7-0024",
+   "overall": 40.0,
+   "severity": 15,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IGNORES_QUESTION",
+    "INCLUDES_EVERYTHING",
+    "INSURANCE_INCLUDED",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "PERMIT_INCLUDED",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0025",
+   "overall": 36.2,
+   "severity": 17,
+   "codes": [
+    "HALLUCINATED_FACT",
+    "IDENTICAL_REPLY",
+    "ROBOTIC_TONE",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0026",
+   "overall": 41.2,
+   "severity": 15,
+   "codes": [
+    "BAD_OFF_SCOPE_HANDLING",
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "INCLUDES_EVERYTHING",
+    "INVENTED_DISCOUNT",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "ROBOTIC_TONE",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0027",
+   "overall": 43.8,
+   "severity": 38,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "CONFIRMS_BOOKING",
+    "IDENTICAL_REPLY",
+    "INCLUDES_EVERYTHING",
+    "INVENTED_PRICE",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "OTHER"
+   ]
+  },
+  {
+   "id": "p7-0028",
+   "overall": 76.2,
+   "severity": 2,
+   "codes": [
+    "NO_VIDEOCALL_FOR_BUYER",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0029",
+   "overall": 36.3,
+   "severity": 11,
+   "codes": [
+    "EMPTY_REPLY",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0030",
+   "overall": 70.0,
+   "severity": 6,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IDENTICAL_REPLY",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0031",
+   "overall": 63.7,
+   "severity": 10,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "INCLUDES_EVERYTHING",
+    "MEDICAL_ADVICE",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0032",
+   "overall": 33.8,
+   "severity": 14,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IGNORES_QUESTION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "ROBOTIC_TONE",
+    "TOO_LONG",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0033",
+   "overall": 70.0,
+   "severity": 10,
+   "codes": [
+    "INCLUDES_EVERYTHING",
+    "NO_QUALIFICATION",
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0034",
+   "overall": 62.5,
+   "severity": 12,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0035",
+   "overall": 38.8,
+   "severity": 35,
+   "codes": [
+    "ASESOR_HUMANO",
+    "IDENTICAL_REPLY",
+    "IGNORES_QUESTION",
+    "LANGUAGE_DRIFT",
+    "ROBOTIC_TONE",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0036",
+   "overall": 43.8,
+   "severity": 8,
+   "codes": [
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0037",
+   "overall": 51.2,
+   "severity": 14,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "HALLUCINATED_FACT",
+    "INVENTED_PRICE",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0038",
+   "overall": 66.2,
+   "severity": 14,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "INCLUDES_EVERYTHING",
+    "INSURANCE_INCLUDED",
+    "PERMIT_INCLUDED"
+   ]
+  },
+  {
+   "id": "p7-0039",
+   "overall": 76.2,
+   "severity": 7,
+   "codes": [
+    "IDENTICAL_REPLY",
+    "INCLUDES_EVERYTHING",
+    "ROBOTIC_TONE",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0040",
+   "overall": 62.5,
+   "severity": 5,
+   "codes": [
+    "MENTIONS_DOCS",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0041",
+   "overall": 62.5,
+   "severity": 8,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IDENTICAL_REPLY",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "OTHER",
+    "PHANTOM_EMAIL"
+   ]
+  },
+  {
+   "id": "p7-0042",
+   "overall": 48.8,
+   "severity": 20,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "CONFIRMS_BOOKING",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0043",
+   "overall": 63.7,
+   "severity": 13,
+   "codes": [
+    "ASSISTANT_CLOSER",
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "INCLUDES_EVERYTHING",
+    "INVENTED_PRICE",
+    "PHANTOM_EMAIL",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0044",
+   "overall": 41.2,
+   "severity": 21,
+   "codes": [
+    "EMAIL_ASKED_TWICE",
+    "IDENTICAL_REPLY",
+    "OFF_SEASON_NOT_EXPLAINED",
+    "REPEATED_GREETING",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0045",
+   "overall": 42.5,
+   "severity": 26,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IDENTICAL_REPLY",
+    "LANGUAGE_DRIFT",
+    "NO_QUALIFICATION",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "REPEATED_GREETING",
+    "ROBOTIC_TONE",
+    "TOO_LONG",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0046",
+   "overall": 32.5,
+   "severity": 24,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IGNORES_QUESTION",
+    "INVENTED_PRICE",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "TOO_LONG",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0047",
+   "overall": 73.8,
+   "severity": 1,
+   "codes": [
+    "NO_VIDEOCALL_FOR_BUYER"
+   ]
+  },
+  {
+   "id": "p7-0048",
+   "overall": 47.5,
+   "severity": 13,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "IGNORES_QUESTION",
+    "LANGUAGE_DRIFT",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "OTHER",
+    "ROBOTIC_TONE",
+    "SHORT_PROGRAM_TO_INEXPERIENCED"
+   ]
+  },
+  {
+   "id": "p7-0049",
+   "overall": 48.8,
+   "severity": 12,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "NO_VIDEOCALL_FOR_BUYER",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0050",
+   "overall": 76.2,
+   "severity": 10,
+   "codes": [
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0051",
+   "overall": 81.2,
+   "severity": 3,
+   "codes": [
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0052",
+   "overall": 48.8,
+   "severity": 21,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "IDENTICAL_REPLY",
+    "ROBOTIC_TONE",
+    "TOO_LONG",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0053",
+   "overall": 45.0,
+   "severity": 33,
+   "codes": [
+    "CONFIRMS_AVAILABILITY",
+    "IDENTICAL_REPLY",
+    "NO_QUALIFICATION",
+    "ROBOTIC_TONE",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0054",
+   "overall": 76.2,
+   "severity": 7,
+   "codes": [
+    "CONTRADICTION",
+    "IDENTICAL_REPLY",
+    "TOO_LONG"
+   ]
+  },
+  {
+   "id": "p7-0055",
+   "overall": 66.2,
+   "severity": 34,
+   "codes": [
+    "IGNORES_QUESTION",
+    "LANGUAGE_DRIFT",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0056",
+   "overall": 36.3,
+   "severity": 10,
+   "codes": [
+    "EMPTY_REPLY",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0057",
+   "overall": 70.0,
+   "severity": 8,
+   "codes": [
+    "BAD_OFF_SCOPE_HANDLING",
+    "PHANTOM_EMAIL",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  },
+  {
+   "id": "p7-0058",
+   "overall": 38.8,
+   "severity": 13,
+   "codes": [
+    "HALLUCINATED_FACT",
+    "IGNORES_QUESTION",
+    "ROBOTIC_TONE",
+    "TOO_LONG",
+    "UNHELPFUL_DEFLECTION",
+    "VOSEO_WITH_USTED"
+   ]
+  },
+  {
+   "id": "p7-0059",
+   "overall": 16.2,
+   "severity": 30,
+   "codes": [
+    "EMAIL_ASKED_AFTER_GIVEN",
+    "EMPTY_REPLY",
+    "IDENTICAL_REPLY",
+    "IGNORES_QUESTION",
+    "NO_QUALIFICATION",
+    "REPEATED_GREETING",
+    "ROBOTIC_TONE",
+    "SHORT_PROGRAM_TO_INEXPERIENCED",
+    "UNHELPFUL_DEFLECTION"
+   ]
+  }
+ ],
+ "worst": [
+  {
+   "persona": {
+    "id": "p7-0059",
+    "language": "es_ar",
+    "country": "Uruguay, Montevideo",
+    "name": "Sofía",
+    "experience": "none",
+    "group_size": 1,
+    "budget": "tight",
+    "objection": "price",
+    "style": "long_email",
+    "intent": "off_season",
+    "max_turns": 9,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 16.2,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 2.0,
+    "rules": 1.0,
+    "sales": 1.0,
+    "language": 4.0,
+    "length": 3.0
+   },
+   "summary": "Nico repite respuestas automáticas, ignora preguntas clave y no adapta la oferta al perfil ni avanza la venta.",
+   "findings": [],
+   "violations": [
+    {
+     "code": "REPEATED_GREETING",
+     "turn": 1,
+     "quote": "Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas.",
+     "why": "Vuelve a usar un tono de inicio en vez de continuar la conversación de forma natural."
+    },
+    {
+     "code": "NO_QUALIFICATION",
+     "turn": 2,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "Ofrece programas sin chequear experiencia, grupo o fechas, y sin responder a la objeción de presupuesto."
+    },
+    {
+     "code": "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "turn": 2,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "Sugiere programas que no son aptos para alguien sin experiencia en altura."
+    },
+    {
+     "code": "REPEATED_GREETING",
+     "turn": 3,
+     "quote": "Los programas 14+2 y 17+2 son para quienes ya estuvieron sobre 6.000 m, no para principiantes; todos los programas abiertos cuestan igual, desde USD 5.990 a 7.250 según fecha.",
+     "why": "Repite información ya dada sin avanzar ni personalizar la respuesta."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 3,
+     "quote": "y páseme su email así le mando el detalle.",
+     "why": "Pide el email cuando la clienta ya lo había ofrecido si se lo pedían."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 3,
+     "quote": "Para pagos y promos, un asesor le puede enviar todo el detalle.",
+     "why": "Deriva a un asesor algo que podía responder (formas de pago, promociones)."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "quote": "Perfecto, ya me quedó su email. Si después quiere hablar con un asesor, avíseme y lo paso.",
+     "why": "No responde ninguna de las preguntas concretas de la clienta sobre Plaza Francia, equipo, duración ni pagos."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 4,
+     "quote": "ya me quedó su email",
+     "why": "Hace referencia al email cuando la clienta ya lo había dado."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Estimados, espero que se encuentren bien. Me interesa mucho conocer sus expediciones al Aconcagua, ya que estoy pensando en hacer un viaje de montaña entre mayo y septiembre. Nunca hice algo así, así que quisiera saber qué niveles de dificultad ofrecen para alguien sin experiencia y si hay salidas durante esos meses, considerando que sé que es temporada baja. Por otro lado, mi presupuesto es bastante ajustado, ¿podrían indicarme precios aproximados y si hay opciones más económicas o descuentos? También me gustaría saber si se puede hacer el viaje solo y cómo manejan la seguridad en ese caso. Desde ya muchas gracias, quedo atenta a su respuesta. Saludos cordiales, Sofía.\n[0] NICO: El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\nEl 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Ha estado en altura alguna vez?\n[1] CLIENTE: Hola, gracias por la respuesta. No, nunca estuve en altura ni hice algo similar, por eso me interesa algo que sea para principiantes. ¿El programa 18+2 es muy exigente para alguien sin experiencia? También me gustaría saber si hay flexibilidad en las fechas dentro de mayo a septiembre y cómo varían los precios en temporada baja. ¿Podrías enviarme una idea más clara del costo total? Gracias de nuevo.\n[1] NICO: Le comento: las expediciones al Aconcagua son solo de noviembre a marzo (temporada del hemisferio sur), así que para esa fecha no tenemos salidas.\n        El 18+2 no es para profesionales, pero sí requiere buena condición física y solvencia mental, con varias caminatas de aclimatación. No hay salidas entre mayo y septiembre, solo de noviembre a febrero, con precios desde USD 5.990 hasta USD 7.250 según la fecha y disponibilidad. Si quiere, un asesor le puede enviar el detalle completo.\n[2] CLIENTE: Hola, entiendo. Me parece que no voy a poder hacer la expedición en los meses que pensaba si solo hay salidas en verano. ¿Tienen algún plan o actividad para gente que no puede ir en temporada alta? Además, esos precios están muy fuera de mi presupuesto, ¿hay alguna forma de pagar en cuotas o alguna alternativa más accesible? Gracias por la respuesta.\n[2] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2\n[3] CLIENTE: Hola, gracias por la información, pero me quedé con algunas dudas. ¿Podrían contarme un poco más sobre esos otros planes 14+2 y 17+2? Me interesaría saber si son menos costosos y si se ajustan para alguien sin experiencia y con presupuesto limitado. También, ¿es posible pagar en cuotas o hay promociones especiales si se reserva con anticipación? Por último, ¿ofrecen algo para hacer en temporada baja aunque no sea la cima del Aconcagua? Muchas gracias, quedo atenta a su respuesta.\n[3] NICO: Los programas 14+2 y 17+2 son para quienes ya estuvieron sobre 6.000 m, no para principiantes; todos los programas abiertos cuestan igual, desde USD 5.990 a 7.250 según fecha. No hay planes en temporada baja para cima, pero hay trekking privado a Plaza Francia por USD 1.499. Para pagos y promos, un asesor le puede enviar todo el detalle.\n        Si quiere, armamos una videollamada corta y lo vemos juntos: dígame día, hora y desde qué ciudad me escribe, y páseme su email así le mando el detalle.\n[4] CLIENTE: Hola, gracias por la propuesta. La videollamada me parece bien, pero antes quisiera confirmar algunos puntos por escrito para no perder tiempo: el trekking a Plaza Francia ¿es para principiantes? ¿incluye guía y equipo? ¿qué duración tiene? Y sobre los pagos, ¿hay alguna modalidad de cuotas para ese trekking? Vivo en Montevideo, Uruguay, y mi email es sofia.0059@example.com. Espero su confirmación para coordinar día y hora de la llamada.\n[4] NICO: Perfecto, ya me quedó su email. Si después quiere hablar con un asesor, avíseme y lo paso.\n[5] CLIENTE: Gracias por la rapidez. Solo para asegurarme, el trekking a Plaza Francia es realmente accesible para alguien sin experiencia, ¿verdad? ¿Qué tipo de equipo incluye el paquete? Además, ¿qué opciones de pago en cuotas tienen para este trekking? Si me pudieran enviar esos detalles por email, lo agradecería, así puedo revisarlo bien antes de la videollamada.\n[5] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2\n[6] CLIENTE: Che, me están repitiendo lo mismo de los programas 14+2 y 17+2, pero ya me dijeron que no son para principiantes y que están caros. Por favor, necesito que me confirmen si el trekking a Plaza Francia es para alguien sin experiencia o no. No quiero dar vueltas ni perder tiempo con opciones que no son para mí. ¿Podrían aclararme bien eso? Y el tema del pago en cuotas, también me gustaría saber si hay o no. Espero una respuesta clara, gracias.\n[6] NICO: El trekking a Plaza Francia es solo privado y no está pensado para principiantes sin experiencia en altura. El programa 18+2 incluye caminatas a Plaza Francia como aclimatación, recomendado para quienes nunca superaron 6.000 m. Todos los programas abiertos tienen el mismo precio desde USD 5.990. Sobre cuotas, eso lo confirma un asesor y le pueden enviar el detalle.\n[7] CLIENTE: Bueno, me parece que no tienen opciones realmente accesibles para alguien sin experiencia ni con presupuesto ajustado. No entiendo por qué insisten con programas que no son para mí y precios tan altos. La verdad, esperaba algo más claro y adaptado a lo que busco. Gracias por la info, voy a pensar y buscaré otras opciones. Saludos.\n[7] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2"
+  },
+  {
+   "persona": {
+    "id": "p7-0004",
+    "language": "en",
+    "country": "Australia, Sydney",
+    "name": "Emily",
+    "experience": "kilimanjaro",
+    "group_size": 4,
+    "budget": "tight",
+    "objection": "fitness_fear",
+    "style": "normal",
+    "intent": "wants_human",
+    "max_turns": 5,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 21.3,
+   "scores": {
+    "humanness": 1.0,
+    "accuracy": 2.0,
+    "rules": 1.0,
+    "sales": 1.0,
+    "language": 5.0,
+    "length": 5.0
+   },
+   "summary": "Nico insiste con el email, no responde las dudas de fitness ni avanza la venta, y suena a bot.",
+   "findings": [
+    {
+     "code": "EMAIL_ASKED_TWICE",
+     "turn": 1,
+     "text": "I just need your email to pass you to the advisor. What is it?",
+     "detail": "",
+     "severity": 2,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 3,
+     "text": "I just need your email to pass you to the advisor.",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    }
+   ],
+   "violations": [
+    {
+     "code": "EMAIL_ASKED_TWICE",
+     "turn": 1,
+     "quote": "I just need your email to pass you to the advisor. What is it?",
+     "why": "Vuelve a pedir el email después de que el cliente ya se negó a darlo."
+    },
+    {
+     "code": "EMAIL_ASKED_TWICE",
+     "turn": 3,
+     "quote": "I just need your email to pass you to the advisor. What is it?",
+     "why": "Insiste nuevamente con el email, ignorando la negativa del cliente."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 1,
+     "quote": "I just need your email to pass you to the advisor. What is it?",
+     "why": "El cliente ya dejó claro que no quiere dar el email, pero Nico insiste."
+    },
+    {
+     "code": "NO_QUALIFICATION",
+     "turn": 0,
+     "quote": "Sure, I'll put you in touch with one of our advisors. What's your email so they can reach you?",
+     "why": "No califica experiencia, fechas ni grupo, solo pide el email."
+    },
+    {
+     "code": "IGNORES_QUESTION",
+     "turn": 2,
+     "quote": "That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.",
+     "why": "No responde la pregunta concreta sobre fitness y soporte, solo deriva o evade."
+    },
+    {
+     "code": "IGNORES_QUESTION",
+     "turn": 4,
+     "quote": "Yes, that's what I just mentioned. Tell me which part you'd like me to clarify.",
+     "why": "No responde sobre guías, pacing ni oxígeno, solo repite que ya lo dijo."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 2,
+     "quote": "That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.",
+     "why": "Evade dar información útil y concreta que sí podía responder."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 2,
+     "quote": "That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.",
+     "why": "Suena a bot, no a un vendedor real de Mendoza."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Hi, I'm Emily from Sydney. I've done Kilimanjaro with a group of 4 before. I'm interested in climbing Aconcagua but a bit worried about fitness. Can I talk with someone from your team asap?\n[0] NICO: Sure, I'll put you in touch with one of our advisors. What's your email so they can reach you?\n[1] CLIENTE: I'd prefer to talk here first if possible. Can you share some info about the fitness requirements and support during the climb?\n[1] NICO: I just need your email to pass you to the advisor. What is it?\n[2] CLIENTE: I really want to avoid sharing my email at this stage. Can we please continue here? I just need some general info about the fitness help and support you provide during the climb.\n[2] NICO: That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.\n[3] CLIENTE: I'm sorry, but I didn't get clear details yet. Can you please explain what kind of fitness help and support you offer during the climb? Like, do you have guides helping with pacing or extra oxygen if needed?\n[3] NICO: I just need your email to pass you to the advisor. What is it?\n[4] CLIENTE: Look, I understand you want my email but I'm not comfortable sharing it right now. Can you please just explain if there are guides who help with pacing or any special support like oxygen? I need to know before deciding anything.\n[4] NICO: Yes, that's what I just mentioned. Tell me which part you'd like me to clarify."
+  },
+  {
+   "persona": {
+    "id": "p7-0021",
+    "language": "pt_br",
+    "country": "Brasil, Florianópolis",
+    "name": "João",
+    "experience": "above_6000",
+    "group_size": 1,
+    "budget": "premium",
+    "objection": "fitness_fear",
+    "style": "typos",
+    "intent": "off_season",
+    "max_turns": 4,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 26.2,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 2.0,
+    "rules": 2.0,
+    "sales": 2.0,
+    "language": 2.0,
+    "length": 3.0
+   },
+   "summary": "Nico respondeu em espanhol, não explicou o que não está incluso, repetiu pedido de email e não convidou para videoconferência.",
+   "findings": [
+    {
+     "code": "TOO_LONG",
+     "turn": 1,
+     "text": "Para la temporada 2026/27 con guía experto, estas son las salidas abiertas programadas:\n1) 18+2 días Normal Extendido: N…",
+     "detail": "373 car., burbuja más larga 373",
+     "severity": 1,
+     "dimension": "length"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "text": "Para la temporada 2026/27 con guía experto, estas son las salidas abiertas programadas:\n1) 18+2 días Normal Extendido: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, ",
+     "detail": "esperado pt, detectado es",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "TOO_LONG",
+     "turn": 2,
+     "text": "Los programas con guía experto para la temporada 2026/27 son (nov, dic, ene, feb):\n1) 18+2 Normal Extendido: 14,22 nov; …",
+     "detail": "596 car., burbuja más larga 332",
+     "severity": 1,
+     "dimension": "length"
+    }
+   ],
+   "violations": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "quote": "Para la temporada 2026/27 con guía experto, estas son las salidas abiertas programadas:",
+     "why": "Respondeu em espanhol, quando o cliente sempre escreveu em português."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "quote": "Los programas con guía experto para la temporada 2026/27 son (nov, dic, ene, feb):",
+     "why": "Respondeu novamente em espanhol, apesar do cliente usar português."
+    },
+    {
+     "code": "INCLUDES_EVERYTHING",
+     "turn": 2,
+     "quote": "El precio es USD 7.250, incluyen guía, comidas en la montaña, porteo común y traslados a Penitentes.",
+     "why": "Diz que o preço inclui só alguns itens, mas não menciona o que NÃO está incluso (voos, permissão, seguro, equipamento pessoal), como exigido."
+    },
+    {
+     "code": "EMAIL_ASKED_TWICE",
+     "turn": 2,
+     "quote": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+     "why": "Já havia pedido o email no turno anterior, repete o pedido."
+    },
+    {
+     "code": "NO_QUALIFICATION",
+     "turn": 2,
+     "quote": "El 18+2 es ideal si no está 100% fit, con buen tiempo para aclimatar y entrenar.",
+     "why": "Não perguntou sobre experiência acima de 6.000 m, grupo ou datas preferidas antes de recomendar o programa."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 2,
+     "quote": "Los programas con guía experto para la temporada 2026/27 son (nov, dic, ene, feb):",
+     "why": "Resposta longa, formatada como lista, pouco natural para WhatsApp e distante do tom informal do cliente."
+    },
+    {
+     "code": "NO_VIDEOCALL_FOR_BUYER",
+     "turn": 3,
+     "quote": "Ótimo, já anotei seu email. Se depois quiser falar com um consultor, é só me avisar.",
+     "why": "Cliente mostrou interesse concreto e não foi convidado para videoconferência, como exigido."
+    }
+   ],
+   "transcript": "[0] CLIENTE: oi, queria saber se tem guia pro aconcagua de maio a setembro? to procurando uma aventura mas to meio preocupado com fitness pq to um pouco enferrujado\n[0] NICO: Atenção: as expedições ao Aconcágua acontecem só de novembro a março (temporada do hemisfério sul), então para essa data não temos saídas.\n        Não temos guias de maio a setembro; as saídas são de nov a fev, temporada oficial do verão no hemisfério sul. Se quiser, posso passar as datas da temporada 2026/27.\n[1] CLIENTE: poxa, eu tinha visto uns relatos que falavam de expedições no inverno, mas talvez eram só uns loucos mesmo rs... e se eu quiser treinar e ir na temporada oficial, como funcionam os pacotes? to pensando em algo top com guia experiente\n[1] NICO: Para la temporada 2026/27 con guía experto, estas son las salidas abiertas programadas:\n1) 18+2 días Normal Extendido: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2) 14+2 días Ascenso Rápido: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3) 12+2 días Ascenso Extremo: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4) 17+2 días Glaciar Polaco: Dic 1, 28; Ene 3; Feb 1\n[2] CLIENTE: beleza, manda os detalhes dos pacotes top com guias experientes, quero ver valores, o que ta incluido e se tem suporte pra quem nao ta 100% fit ainda... tipo, treino, aclimatação, essas paradas\n[2] NICO: Los programas con guía experto para la temporada 2026/27 son (nov, dic, ene, feb):\n1) 18+2 Normal Extendido: 14,22 nov; 1,4,20,27 dic; 2,10,31 ene; 7 feb\n2) 14+2 Ascenso Rápido: 18,26 nov; 5,10 dic; 6,14 ene; 11 feb\n3) 12+2 Ascenso Extremo: 20,28 nov; 7,12,26 dic; 2,8,16 ene; 6,13 feb\n4) 17+2 Glaciar Polaco: 1,28 dic; 3 ene; 1 feb\n        El 18+2 es ideal si no está 100% fit, con buen tiempo para aclimatar y entrenar. El precio es USD 7.250, incluyen guía, comidas en la montaña, porteo común y traslados a Penitentes.\n        Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.\n[3] CLIENTE: beleza, manda pra joao.0021@example.com entao, quero ver tudo nos detalhes mesmo pq to querendo fazer certo essa aclimatacao\n[3] NICO: Ótimo, já anotei seu email.\n        Se depois quiser falar com um consultor, é só me avisar."
+  },
+  {
+   "persona": {
+    "id": "p7-0046",
+    "language": "es_neutro",
+    "country": "México, CDMX",
+    "name": "María",
+    "experience": "above_6000",
+    "group_size": 2,
+    "budget": "flexible",
+    "objection": "fitness_fear",
+    "style": "voice_note",
+    "intent": "price_shopper",
+    "max_turns": 10,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 32.5,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 3.0,
+    "rules": 2.0,
+    "sales": 2.0,
+    "language": 2.0,
+    "length": 3.0
+   },
+   "summary": "Nico no responde preguntas clave sobre inclusiones, usa registro inadecuado y no avanza la venta.",
+   "findings": [
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 0,
+     "text": "Mirá, para dos personas el precio regular es USD 7.250 cada uno, pero algu",
+     "detail": "",
+     "severity": 1,
+     "dimension": "language"
+    },
+    {
+     "code": "INVENTED_PRICE",
+     "turn": 9,
+     "text": "Entiendo que te importe el presupuesto: los USD 14.500 no incluyen permisos ni equipo personal, esos son costos extras aparte. Si querés, te mando todo lo que hablamos al correo para que lo tengas bie",
+     "detail": "USD 14500",
+     "severity": 3,
+     "dimension": "accuracy"
+    },
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 9,
+     "text": "Si querés, te mando todo lo que hablamos al correo para que lo tengas bien clar",
+     "detail": "",
+     "severity": 1,
+     "dimension": "language"
+    }
+   ],
+   "violations": [
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 0,
+     "quote": "Mirá, para dos personas el precio regular es USD 7.250 cada uno...",
+     "why": "El cliente usa español neutro y trata de usted, pero Nico responde con voseo y tono informal."
+    },
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 1,
+     "quote": "Si quieren, puedo pasarles todo el detalle al mail.",
+     "why": "Nico sigue usando voseo y plural informal cuando el cliente mantiene trato de usted."
+    },
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 2,
+     "quote": "¿Estuviste en altura alguna vez?",
+     "why": "Nico vuelve a tutear en vez de mantener el registro formal."
+    },
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 4,
+     "quote": "Incluye apoyo con guías, porteadores comunes, mulas, comidas, carpas, oxígeno y las caminatas de aclimatación para mejorar la seguridad en la subida.",
+     "why": "Sigue usando registro informal y voseo."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 4,
+     "quote": "Si querés, te mando todo lo que hablamos al correo para que lo tengas bien claro.",
+     "why": "El cliente ya dio el email dos veces y Nico vuelve a ofrecer enviarle información por correo."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 9,
+     "quote": "Si querés, te mando todo lo que hablamos al correo para que lo tengas bien claro.",
+     "why": "Repite la oferta de enviar el correo cuando el cliente ya lo proporcionó varias veces."
+    },
+    {
+     "code": "NO_VIDEOCALL_FOR_BUYER",
+     "turn": 9,
+     "quote": "Si querés, te mando todo lo que hablamos al correo para que lo tengas bien claro.",
+     "why": "El cliente muestra interés concreto y Nico nunca ofrece videollamada."
+    },
+    {
+     "code": "TOO_LONG",
+     "turn": 3,
+     "quote": "Entiendo su preocupación. El programa 18+2 es el que tiene más días de aclimatación con caminatas a Plaza Francia y cerro Bonete, ideal para subir seguro y con buen apoyo durante la expedición.",
+     "why": "Mensaje demasiado largo para WhatsApp, podría dividirse en dos respuestas."
+    }
+   ],
+   "transcript": "[0] CLIENTE: buenos días quería preguntar eh o sea cuál es el precio total para dos personas para la expedición guiada al aconcagua nada más quiero saber si incluyen todo desde los permisos hasta el equipo y el apoyo durante la subida porque ya tenemos experiencia pero nos preocupa un poco el tema del fitness y si hay algún descuento o promoción vigente\n[0] NICO: Mirá, para dos personas el precio regular es USD 7.250 cada uno, pero algunas salidas tienen promo entre USD 5.990 y USD 6.390 según la fecha. No incluye permisos ni equipo personal, pero sí guías, porteadores comunes, mulas, comidas y apoyo en campamentos.\n[1] CLIENTE: ok entonces eh o sea esos precios son por persona o por los dos que me dice que el precio regular es 7 250 cada uno y las promos entre 5 990 y 6 390 también es por persona o es por los dos porque necesito calcular bien el total y pues la verdad nos gustaría saber si pueden hacer algún descuento especial porque como le digo el tema del fitness nos tiene un poco inseguros y pues eso influye mucho en el costo total y la preparación que vamos a tener\n[1] NICO: El precio es por persona, USD 7.250 regular o entre USD 5.990 y 6.390 con promo según la fecha. No hacemos descuentos especiales. Si quieren, puedo pasarles todo el detalle al mail.\n[2] CLIENTE: eh perfecto o sea gracias por aclarar lo del precio por persona mira la verdad si me gustaría que me enviaras el detalle completo al correo maria.0046@example.com para poder analizarlo bien y comparar con otras agencias y pues ver qué opciones tenemos eh y si en ese detalle me pudieras incluir lo que recomiendan para mejorar el tema del fitness que me preocupa y pues ver si su apoyo en la subida es suficiente para eso te lo agradecería mucho\n[2] NICO: El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\nEl 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Estuviste en altura alguna vez?\n[3] CLIENTE: sí estuve o sea ya he subido algunas montañas muy altas arriba de 6000 metros pero bueno o sea me preocupa que igual el tema físico no me alcance del todo y como lo digo por eso quiero ver bien lo que ustedes ofrecen y si con ese plan 18 más 2 realmente puedo sentirme segura en cuanto a la aclimatación y el apoyo durante la subida porque no quiero arriesgarme a un problema allá arriba\n[3] NICO: Entiendo su preocupación.\n        El programa 18+2 es el que tiene más días de aclimatación con caminatas a Plaza Francia y cerro Bonete, ideal para subir seguro y con buen apoyo durante la expedición.\n[4] CLIENTE: eh gracias por la info o sea eso suena bien pero necesito saber el precio exacto del programa 18 más 2 para las dos personas y si hay alguna posibilidad de hacer un pequeño descuento por ser dos y también quiero saber qué incluye exactamente el apoyo durante la subida porque como le digo me preocupa el tema del fitness y necesito estar segura que no voy a quedarme atrás\n[4] NICO: El 18+2 cuesta USD 7.250 por persona y no hay descuentos por grupo. Incluye apoyo con guías, porteadores comunes, mulas, comidas, carpas, oxígeno y las caminatas de aclimatación para mejorar la seguridad en la subida.\n[5] CLIENTE: Ok entonces eh o sea me queda claro que el precio total para dos sería 14,500 dólares con todo ese apoyo que mencionas pero me gustaría que me confirmaras si hay algún extra oculto que deba considerar porque la verdad para mí es importante no tener sorpresas y además si me pudieras detallar por escrito por correo maria.0046@example.com todo eso que hablamos incluyendo el apoyo específico para el fitness para poder comparar bien y tomar una decisión informada gracias\n[5] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2\n[6] CLIENTE: Entonces eh o sea necesito que me confirmes bien si el precio de 14,500 no incluye ningún costo extra como permisos o equipo personal y también que por favor me envíes todo ese detalle por correo a maria.0046@example.com con lo del apoyo para fitness porque necesito tener todo claro para comparar con otras agencias gracias\n[6] NICO: Eso mismo te lo dejé en el mensaje anterior. Puedo explicártelo de otra manera o ver otro punto.\n[7] CLIENTE: No, no me queda claro porque en el mensaje anterior solo mencionaste otras alternativas y no aclaraste el tema de los costos extras como permisos o equipo personal que te pregunté específicamente, necesito esa info para no llevarme sorpresas, por favor\n[7] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2\n[8] CLIENTE: Por favor no me mandes otra vez la lista de alternativas, necesito una respuesta clara sobre si los permisos y el equipo personal están incluidos o son un costo extra aparte del precio que me diste de 14,500 para dos personas me preocupa que haya gastos ocultos porque el presupuesto es importante para nosotros\n[8] NICO: Sí, es lo que te comentaba recién. ¿Qué parte te gustaría que aclare?\n[9] CLIENTE: O sea, necesito que me digas claramente si los permisos y el equipo personal están incluidos en esos 14,500 dólares para dos o si tengo que pagar algo extra aparte por eso, porque me preocupa mucho que haya costos que no me han dicho y quiero evitar sorpresas gracias\n[9] NICO: Entiendo que te importe el presupuesto: los USD 14.500 no incluyen permisos ni equipo personal, esos son costos extras aparte. Si querés, te mando todo lo que hablamos al correo para que lo tengas bien claro."
+  },
+  {
+   "persona": {
+    "id": "p7-0032",
+    "language": "es_neutro",
+    "country": "Perú, Lima",
+    "name": "Javier",
+    "experience": "aconcagua_before",
+    "group_size": 3,
+    "budget": "tight",
+    "objection": "price",
+    "style": "normal",
+    "intent": "agency_reseller",
+    "max_turns": 7,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 33.8,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 3.0,
+    "rules": 2.0,
+    "sales": 1.0,
+    "language": 4.0,
+    "length": 3.0
+   },
+   "summary": "Nico ignora reiteradamente los pedidos de precios netos y comisiones, responde de forma robótica y no avanza el cierre ni usa el email dado.",
+   "findings": [
+    {
+     "code": "TOO_LONG",
+     "turn": 5,
+     "text": "Le envío el resumen que puedo dar: precio USD 7.250 por persona, con algunas promociones entre USD 5.990 y USD 6.390 seg…",
+     "detail": "323 car., burbuja más larga 323",
+     "severity": 1,
+     "dimension": "length"
+    }
+   ],
+   "violations": [
+    {
+     "code": "IGNORES_QUESTION",
+     "turn": 2,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "El cliente pidió precios netos, promociones y comisiones para agencias, pero Nico ignora la pregunta y enumera programas."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 3,
+     "quote": "Mi correo es javier.0032@example.com",
+     "why": "El cliente ya dio su email y Nico no lo usa ni lo reconoce en la respuesta siguiente."
+    },
+    {
+     "code": "IGNORES_QUESTION",
+     "turn": 4,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "Repite la misma respuesta irrelevante, ignorando el pedido de precios netos, promociones y comisiones."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 6,
+     "quote": "Por favor, envíenme el resumen oficial y todas las condiciones a mi correo javier.0032@example.com",
+     "why": "El cliente reitera el pedido de información por email, pero Nico vuelve a ignorar el email dado y no responde al pedido."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 5,
+     "quote": "Un asesor le puede enviar todo el detalle.",
+     "why": "Nico deriva a un asesor algo que podía responder: no hay comisiones ni descuentos para agencias, y podía enviar el resumen oficial."
+    },
+    {
+     "code": "NO_VIDEOCALL_FOR_BUYER",
+     "turn": 5,
+     "quote": "Le envío el resumen que puedo dar: precio USD 7.250 por persona, con algunas promociones entre USD 5.990 y USD 6.390 según fecha. No hay comisiones ni descuentos especiales para agencias publicados. Incluye guía, comidas en montaña y traslados, pero no vuelos, permisos ni seguro. Un asesor le puede ",
+     "why": "El cliente muestra interés concreto y Nico nunca ofrece videollamada ni avanza el cierre."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 2,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "Respuesta mecánica, sin calidez ni adaptación al contexto, suena a bot."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 4,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "Repite la misma frase sin personalización ni empatía, tono robótico."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Buenas tardes, estoy interesado en conocer sus tarifas netas para expediciones al Aconcagua, ya que soy agencia de viajes en Perú y quisiera revender sus servicios.\n[0] NICO: El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\nEl 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Ha estado en altura alguna vez?\n[1] CLIENTE: Buenas tardes, sí, yo ya he estado en altura, estuve en expediciones previas en el Aconcagua. ¿Podría enviarme entonces las tarifas netas para revendedores? Estoy manejando un presupuesto ajustado.\n[1] NICO: El precio regular es USD 7.250 por persona y algunas fechas tienen promo entre USD 5.990 y USD 6.390. Se reserva con un anticipo de USD 699 y los pagos pueden ser por PayPal, transferencia o USDT.\n[2] CLIENTE: Gracias por la info. ¿Podría enviarme una lista detallada de precios netos para revendedores, incluyendo las promociones? También quisiera saber si hay comisiones por venta o descuentos adicionales para agencias.\n[2] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2\n[3] CLIENTE: Perfecto, muchas gracias por la información. Por favor, ¿podría enviarme esa lista detallada con precios netos para revendedores y cualquier promoción vigente? También me interesa saber si aplican comisiones o descuentos especiales para agencias. Mi correo es javier.0032@example.com\n[3] NICO: Eso mismo te lo dejé en el mensaje anterior. Puedo explicártelo de otra manera o ver otro punto.\n[4] CLIENTE: Disculpe, pero en el mensaje anterior no veo una lista detallada con precios netos y promociones para revendedores ni información clara sobre comisiones o descuentos para agencias. Le agradecería me pudiera enviar ese detalle específico por correo.\n[4] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2\n[5] CLIENTE: Entiendo, pero insisto, no veo información clara ni detallada en esos mensajes. Por favor, necesito que me envíe un correo con toda la información que le pedí, porque así no puedo trabajar ni ofrecer ningún servicio. Espero su respuesta pronto.\n[5] NICO: Le envío el resumen que puedo dar: precio USD 7.250 por persona, con algunas promociones entre USD 5.990 y USD 6.390 según fecha. No hay comisiones ni descuentos especiales para agencias publicados. Incluye guía, comidas en montaña y traslados, pero no vuelos, permisos ni seguro. Un asesor le puede enviar todo el detalle.\n[6] CLIENTE: Gracias por aclarar, pero necesito el detalle completo para presentarlo a mis clientes y evaluar opciones. Por favor, envíenme el resumen oficial y todas las condiciones a mi correo javier.0032@example.com para poder avanzar con una propuesta concreta.\n[6] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2"
+  },
+  {
+   "persona": {
+    "id": "p7-0025",
+    "language": "en",
+    "country": "Canada, Vancouver",
+    "name": "Tom",
+    "experience": "none",
+    "group_size": 6,
+    "budget": "premium",
+    "objection": "none",
+    "style": "burst",
+    "intent": "troll_spam",
+    "max_turns": 4,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 36.2,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 2.0,
+    "rules": 3.0,
+    "sales": 1.0,
+    "language": 5.0,
+    "length": 3.0
+   },
+   "summary": "Nico responde literal y robótico, repite ideas y no avanza la venta; inventa servicios y deriva sin necesidad.",
+   "findings": [],
+   "violations": [
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 1,
+     "quote": "No one has brought a rubber duck, but climbers often bring favorite snacks or energy bars. All meals are prepared by specialized chefs or guides on the mountain.",
+     "why": "Repite casi exactamente la idea del mensaje anterior, sin aportar información nueva."
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "quote": "Our guides focus on trek logistics and safety, not singing. We include unlimited porters to carry tents, cooking gear, garbage, and more during the expedition, and climbers help carry some common equipment on acclimatization days.",
+     "why": "Repite la información sobre porters y logística, ya mencionada en el mensaje anterior."
+    },
+    {
+     "code": "HALLUCINATED_FACT",
+     "turn": 2,
+     "quote": "We include unlimited porters to carry tents, cooking gear, garbage, and more during the expedition, and climbers help carry some common equipment on acclimatization days.",
+     "why": "No existe 'unlimited porters'; el servicio es para equipo común, no ilimitado ni para todo."
+    },
+    {
+     "code": "HALLUCINATED_FACT",
+     "turn": 3,
+     "quote": "We include unlimited porters for common gear and waste on the full expeditions.",
+     "why": "No se ofrece 'unlimited porters'; es para equipo común, no ilimitado ni para todo."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 0,
+     "quote": "If you want, an advisor can confirm details for you.",
+     "why": "Deriva a un asesor por detalles que puede responder directamente, en contexto de preguntas de broma."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 0,
+     "quote": "If you want, an advisor can confirm more details for you.",
+     "why": "Repite la derivación innecesaria a un asesor en contexto de preguntas no serias."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 0,
+     "quote": "We don’t accommodate llamas on our guided tours. All personal equipment is carried by load mules arranged by us for the trip.",
+     "why": "Respuesta demasiado literal y formal para el tono de broma del cliente; suena a bot."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 2,
+     "quote": "Our guides usually focus on the trek and logistics, so singing isn’t part of the program, but the group vibe depends on everyone.",
+     "why": "Respuesta rígida y poco cálida ante una pregunta humorística."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Hey, so I've been thinking about climbing Aconcagua with my imaginary pet llama. Does your guided tour accommodate llamas?\n[0] CLIENTE: Also, do you teach mountaineering skills with interpretative dance? Just curious.\n[0] CLIENTE: And if I bring a cheese sandwich, will it attract mountain spirits or just the local wildlife?\n[0] NICO: We don’t accommodate llamas on our guided tours. All personal equipment is carried by load mules arranged by us for the trip. If you want, an advisor can confirm details for you.\n[0] NICO: We don’t offer mountaineering training with interpretative dance, just professional guiding and support on the mountain. If you want, an advisor can confirm more details for you.\n[0] NICO: A cheese sandwich won’t attract mountain spirits but might catch some local wildlife’s attention. Climbers carry a small daypack with lunch and water to consume during the day.\n        If you'd like, send me your email and I'll share the full details with prices and dates.\n[1] CLIENTE: No cheese sandwich then, got it. But seriously, what's the weirdest thing a client has tried to bring on your tours?\n[1] CLIENTE: Ever had someone bring a rubber duck or something? Asking for a friend.\n[1] NICO: No typical weird items reported, but climbers usually bring energy bars, snacks or specific favorite flavors for the trek. All meals on expedition are prepared by specialized chefs or guides.\n[1] NICO: No one has brought a rubber duck, but climbers often bring favorite snacks or energy bars. All meals are prepared by specialized chefs or guides on the mountain.\n[2] CLIENTE: Rubber duck, huh? Guess I’ll keep mine at home then. So, if I bring a pocket-sized karaoke machine, you wouldn’t kick me out, right?\n[2] CLIENTE: Also, any chance your guides sing on the trek? Could be a nice vibe for the group.\n[2] CLIENTE: Totally serious questions, by the way, keep up the good work!\n[2] NICO: A pocket-sized karaoke machine isn’t a problem, as long as it doesn’t disturb others. Climbers carry personal gear but all meals are prepared by specialized chefs or guides on the mountain.\n[2] NICO: Our guides usually focus on the trek and logistics, so singing isn’t part of the program, but the group vibe depends on everyone. We include porters to carry most of the gear from base camps, and climbers help with some common equipment on acclimatization days.\n[2] NICO: Our guides focus on trek logistics and safety, not singing. We include unlimited porters to carry tents, cooking gear, garbage, and more during the expedition, and climbers help carry some common equipment on acclimatization days.\n[3] CLIENTE: Alright, no singing guides, and no llamas. Got it!\n[3] CLIENTE: Just one more: what's the secret password to join your Aconcagua club? Or do I need to bring a secret handshake?\n[3] NICO: No llamas, no singing guides, and no solo porters for personal gear, those must be booked in advance. We include unlimited porters for common gear and waste on the full expeditions. Climbers carry their daypacks and help with some gear on acclimatization days.\n[3] NICO: No secret password or handshake needed, just bring your good vibes. Our guides focus on safety and logistics, so no official club perks, but everyone’s welcome to join the journey."
+  },
+  {
+   "persona": {
+    "id": "l7-0005",
+    "language": "es_neutro",
+    "country": "Argentina",
+    "name": "Agencia Andes Tours",
+    "experience": "none",
+    "group_size": 8,
+    "budget": "premium",
+    "objection": "none",
+    "style": "code_switch",
+    "intent": "agency_reseller",
+    "max_turns": 9,
+    "shares_email": true,
+    "source": "llm",
+    "backstory": "Agencia Andes Tours quiere revender expediciones al Aconcagua a sus clientes internacionales. Preguntan por condiciones para agencias, comisiones, y si se puede hacer branding. Buscan partnership serio.",
+    "extra": {}
+   },
+   "overall": 36.2,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 3.0,
+    "rules": 2.0,
+    "sales": 2.0,
+    "language": 3.0,
+    "length": 4.0
+   },
+   "summary": "Nico no aporta información útil sobre comisiones ni materiales, responde de forma robótica y termina ignorando la consulta del cliente.",
+   "findings": [],
+   "violations": [
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 7,
+     "quote": "Entiendo que quiere más detalle, pero comisiones y materiales personalizados los confirma un asesor.",
+     "why": "La respuesta es repetitiva, poco cálida y suena a call center, no a un vendedor mendocino real."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 7,
+     "quote": "Entiendo que quiere más detalle, pero comisiones y materiales personalizados los confirma un asesor.",
+     "why": "Nico podría haber dado al menos un rango orientativo o ejemplos generales, pero se limita a derivar sin agregar valor."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 6,
+     "quote": "Sobre comisiones y co-marketing, eso lo confirma un asesor del equipo; ya le pasé la consulta para que le envíen opciones de materiales personalizados y campañas conjuntas.",
+     "why": "Repite la derivación sin intentar aportar información útil o ejemplos generales."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 5,
+     "quote": "Sobre comisiones y co-marketing, eso lo confirma un asesor del equipo. Le pasé su consulta para que lo contacten con opciones específicas.",
+     "why": "No aporta nada concreto ni siquiera ejemplos básicos, solo deriva."
+    },
+    {
+     "code": "NO_QUALIFICATION",
+     "turn": 0,
+     "quote": "El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.",
+     "why": "No pregunta por fechas tentativas ni por el perfil de los clientes finales, solo por experiencia en altura."
+    },
+    {
+     "code": "TOO_LONG",
+     "turn": 4,
+     "quote": "Las salidas para el 18+2 son: noviembre 14 y 22, diciembre 1, 4, 20 y 27, enero 2, 10 y 31, febrero 7. El precio regular es USD 7.250, con promociones en algunas fechas. La reserva se hace con USD 699.",
+     "why": "Mensaje demasiado largo para WhatsApp, podría dividirse en dos partes."
+    },
+    {
+     "code": "IGNORES_QUESTION",
+     "turn": 8,
+     "quote": "Las otras alternativas son:\n1. 14+2\n2. 17+2",
+     "why": "El cliente pide info de comisiones y materiales, pero Nico responde con alternativas de programas, ignorando la consulta."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Hello, good afternoon! I hope you're well. I'm contacting from Agencia Andes Tours, based in Argentina. We have a grupo de 8 personas interested en sus expediciones guiadas al Aconcagua para clientes internacionales. Quisiéramos saber if you offer tarifas netas or comisiones for agencias that want to resell sus servicios. También queremos saber si es posible hacer algún tipo de branding o co-marketing juntos. Looking for a serious partnership. Espero su respuesta, thanks!\n[0] NICO: El que recomendamos es el 18+2: tiene más días de aclimatación y cuesta lo mismo que los más cortos.\nEl 12+2 y el 14+2 son solo para quien ya estuvo arriba de 6.000 m. ¿Ha estado en altura alguna vez?\n[1] CLIENTE: Gracias por la info! Nuestro grupo no tiene experiencia previa en altura, so vamos por el 18+2. Ahora, nos gustaría saber sobre precios netos para agencias y si hay comisiones para revender. También, qué opciones de branding o co-marketing ofrecen para partners? Queremos armar algo serio y duradero.\n[1] NICO: Entiendo que buscan algo serio para su grupo. Sobre tarifas netas y comisiones, eso lo maneja un asesor del equipo; pueden confirmar posibilidades y branding.\n        ¿Quieren que le pase su consulta a un asesor para que los contacte?\n[2] CLIENTE: Sí, por favor, pásenle la consulta al asesor. Queremos una propuesta clara de tarifas netas, comisiones y opciones de co-marketing que podamos presentar a nuestro equipo. Gracias!\n[2] NICO: Le paso la consulta al equipo para que le preparen una propuesta clara de tarifas netas, comisiones y opciones de co-marketing. En cuanto tenga novedades, la contacto.\n        Si quiere, páseme su email y le mando el detalle completo con precios y fechas.\n[3] CLIENTE: Perfecto, gracias! Mi email es agencia.andestours.0005@example.com Espero su propuesta para poder evaluarla con el equipo.\n[3] NICO: Perfecto, ya me quedó su email. Si después quiere hablar con un asesor, avíseme y lo paso.\n[4] CLIENTE: Gracias por la confirmación. Estaré atento a la propuesta para revisarla con mi equipo y avanzar con la posible colaboración.\n[4] NICO: Las salidas para el 18+2 son: noviembre 14 y 22, diciembre 1, 4, 20 y 27, enero 2, 10 y 31, febrero 7. El precio regular es USD 7.250, con promociones en algunas fechas. La reserva se hace con USD 699.\n[5] CLIENTE: Ok, gracias por la info de fechas y precio. Quisiera saber qué promociones tienen disponibles para las fechas que mencionó. También, ¿cuál sería la comisión para Agencia Andes Tours si revendiéramos estas expediciones? Y sobre el co-marketing, ¿qué opciones específicas nos podrían ofrecer? Estamos muy interesados en armar algo sólido.\n[5] NICO: Las promociones varían según la fecha y se ubican entre USD 5.990 y USD 6.390. Sobre comisiones y co-marketing, eso lo confirma un asesor del equipo. Le pasé su consulta para que lo contacten con opciones específicas.\n[6] CLIENTE: Ok, gracias por pasar la consulta. ¿Podrían adelantarme aunque sea un rango o porcentaje aproximado de comisiones para agencias? Esto nos ayudaría a evaluar más rápido con el equipo. Sobre co-marketing, nos interesa saber si ofrecen materiales personalizados o campañas conjuntas. Espero su respuesta.\n[6] NICO: Sobre comisiones y co-marketing, eso lo confirma un asesor del equipo; ya le pasé la consulta para que le envíen opciones de materiales personalizados y campañas conjuntas.\n[7] CLIENTE: Entiendo que lo del asesor es clave, pero me gustaría que al menos me dieran un estimado o ejemplos de comisiones típicas para no quedarnos en blanco mientras esperamos. Nos ayudaría mucho para presentar esto internamente. También, un poco más sobre qué tipo de materiales personalizados manejan, aunque sea de modo general. Gracias!\n[7] NICO: Entiendo que quiere más detalle, pero comisiones y materiales personalizados los confirma un asesor. Las promociones van de USD 5.990 a 6.390 según fecha. Le pasé su consulta para que le envíen ese info más completo.\n[8] CLIENTE: Ok, comprendo, pero me parece que para avanzar necesito al menos un número o porcentaje aproximado de comisión, algo típico del mercado o de su experiencia. No es mucho pedir para poder evaluar en serio, ¿no? Además, un resumen básico sobre los materiales que usan, aunque sea un ejemplo, tipo folletos digitales, logos para uso en redes, etc. Quedamos pendientes, espero que pronto nos puedan dar algo más concreto.\n[8] NICO: Las otras alternativas son:\n1. 14+2\n2. 17+2"
+  },
+  {
+   "persona": {
+    "id": "p7-0029",
+    "language": "es_neutro",
+    "country": "Perú, Lima",
+    "name": "Valentina",
+    "experience": "trekking_4000",
+    "group_size": 2,
+    "budget": "premium",
+    "objection": "dates",
+    "style": "emojis",
+    "intent": "wants_human",
+    "max_turns": 9,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 36.3,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 3.0,
+    "rules": 2.0,
+    "sales": 1.0,
+    "language": 4.0,
+    "length": 5.0
+   },
+   "summary": "Nico no respondió ante la insistencia del cliente ni avanzó la venta, perdiendo una oportunidad clara.",
+   "findings": [],
+   "violations": [
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "quote": "(no respondió)",
+     "why": "El cliente insistió varias veces y Nico no respondió, dejando al cliente sin atención."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "quote": "(no respondió)",
+     "why": "Nuevamente, el cliente pidió información y Nico no contestó."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "quote": "(no respondió)",
+     "why": "El cliente mostró urgencia y Nico no dio ninguna respuesta ni contención."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 7,
+     "quote": "(no respondió)",
+     "why": "El cliente siguió insistiendo y Nico no respondió, perdiendo una oportunidad de venta."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 8,
+     "quote": "(no respondió)",
+     "why": "El cliente pidió confirmación urgente y Nico no respondió, generando frustración."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 1,
+     "quote": "Listo, ya le pasé su consulta a un asesor del equipo. Le escribe por acá en breve.",
+     "why": "Nico podría haber dado información básica sobre fechas, precios o el proceso, pero solo deriva sin aportar valor."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 2,
+     "quote": "Ya le pasé su consulta a un asesor, le escribe por acá en breve.",
+     "why": "Repite la misma respuesta sin agregar información útil ni contención."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 3,
+     "quote": "Ya quedó todo registrado. En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.",
+     "why": "No responde la pregunta concreta sobre fechas ni da contención, solo deriva."
+    }
+   ],
+   "transcript": "[0] CLIENTE: ¡Hola! 😊 Estoy muy interesada en hacer la expedición guiada al Aconcagua con ustedes. Somos 2 personas con experiencia en trekking hasta 4000 metros y buscamos una opción premium. ¿Podría hablar con alguien de su equipo lo antes posible para aclarar algunas dudas? ¡Muchas gracias!\n[0] NICO: Perfecto, lo paso con un asesor del equipo. ¿Me deja su email así lo contacta?\n[1] CLIENTE: Claro, mi correo es valentina.0029@example.com. Quedo atenta a que me contacten prontito, por favor!!! 😊🙏\n[1] NICO: Listo, ya le pasé su consulta a un asesor del equipo. Le escribe por acá en breve.\n[2] CLIENTE: Hola de nuevo! ¿Hay alguna novedad? Estoy muy ansiosa por organizar todo y necesito saber las fechas disponibles para planificar bien. ¡Gracias! 😊\n[2] NICO: Ya le pasé su consulta a un asesor, le escribe por acá en breve.\n[3] CLIENTE: Disculpen, ¿podrían indicarme cuándo podré recibir respuesta? Estoy muy interesada en conocer las fechas para poder decidir pronto. ¡Agradecería mucho su pronta atención!\n[3] NICO: Ya quedó todo registrado.\n        En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.\n[4] CLIENTE: ¡Hola! Entiendo que están ocupados, pero realmente necesito hablar con alguien ya para coordinar fechas y asegurar mi lugar. ¿Podrían decirme exactamente cuándo me escribirán? ¡Gracias! 🙏😊\n[4] NICO: (no respondió)\n[5] CLIENTE: Hola, ¿podrían darme una hora estimada para la respuesta? Estoy planeando todo y no puedo avanzar sin esa información. Gracias.\n[5] NICO: (no respondió)\n[6] CLIENTE: Por favor, necesito una respuesta concreta. Esto es muy importante para mí y para mi compañero. ¿Podrían indicarme si alguien me contactará hoy? Estamos listos para reservar.\n[6] NICO: (no respondió)\n[7] CLIENTE: ¡Hola! ¿Hay alguna novedad? Necesito saber si alguien me contactará hoy, por favor. Es urgente para poder planificar todo. Espero su respuesta. 🙏😊\n[7] NICO: (no respondió)\n[8] CLIENTE: Hola, ¿podrían confirmarme si hoy alguien del equipo se comunicará conmigo? Estoy muy preocupada porque necesito avanzar con la reserva. Muchas gracias.\n[8] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0056",
+    "language": "es_neutro",
+    "country": "Ecuador, Quito",
+    "name": "Valentina",
+    "experience": "none",
+    "group_size": 2,
+    "budget": "tight",
+    "objection": "family",
+    "style": "code_switch",
+    "intent": "wants_human",
+    "max_turns": 8,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 36.3,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 3.0,
+    "rules": 2.0,
+    "sales": 1.0,
+    "language": 4.0,
+    "length": 5.0
+   },
+   "summary": "Nico no respondió a los pedidos urgentes de contacto directo y solo repitió que espere, sin avanzar la venta ni contener la ansiedad del cliente.",
+   "findings": [],
+   "violations": [
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 4,
+     "quote": "(no respondió)",
+     "why": "El cliente pidió insistentemente un contacto directo y Nico no respondió nada."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 5,
+     "quote": "(no respondió)",
+     "why": "El cliente reiteró su pedido urgente y Nico volvió a no responder."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 6,
+     "quote": "(no respondió)",
+     "why": "El cliente insistió una vez más y Nico siguió sin contestar."
+    },
+    {
+     "code": "EMPTY_REPLY",
+     "turn": 7,
+     "quote": "(no respondió)",
+     "why": "El cliente expresó frustración y urgencia, y Nico no dio ninguna respuesta."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 1,
+     "quote": "Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌",
+     "why": "Nico solo deriva sin aportar información útil ni avanzar la venta, pese a que podría haber calificado o explicado opciones."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 2,
+     "quote": "Ya le pasé tu consulta a un asesor, te escribe por acá en breve.",
+     "why": "Repite la misma respuesta sin agregar valor ni contener la ansiedad del cliente."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 3,
+     "quote": "Ya quedó todo registrado. En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.",
+     "why": "No contiene la urgencia ni ofrece alternativas, solo repite que espere."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Hola, buenos días! Me interesa mucho hacer una expedición al Aconcagua pero tengo zero experiencia en montaña. Somos un group of 2, y el presupuesto está tight. Me gustaría hablar con una persona del equipo cuanto antes para ver opciones, please. Gracias!\n[0] NICO: Dale, te paso con un asesor del equipo. ¿Me dejás tu email así te contacta?\n[1] CLIENTE: Sí, claro. Mi email es valentina.0056@example.com. Espero que me llamen pronto, please.\n[1] NICO: Listo, ya le pasé tu consulta a un asesor del equipo. Te escribe por acá en breve 🙌\n[2] CLIENTE: Hola, solo quería confirmar si mi asesor ya se comunicó conmigo? Estoy un poco preocupada porque necesito planificar todo con anticipación.\n[2] NICO: Ya le pasé tu consulta a un asesor, te escribe por acá en breve.\n[3] CLIENTE: Disculpe, pero todavía no recibí ningún mensaje de ningún asesor. Estoy un poco preocupada, porque necesito información urgente para coordinar con mi family y no quiero perder tiempo. ¿Podrían confirmar que realmente alguien se comunicará conmigo hoy?\n[3] NICO: Ya quedó todo registrado.\n        En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.\n[4] CLIENTE: Perdón, pero necesito hablar urgentemente. ¿Podrían pasarme directamente un número o un contacto para hablar? Estoy muy preocupada porque el tiempo corre y necesito ajustes con mi familia.\n[4] NICO: (no respondió)\n[5] CLIENTE: Entiendo que están ocupados, pero realmente necesito ese contacto directo, un número o WhatsApp, para coordinar ya mismo. Por fa, es muy importante para mí.\n[5] NICO: (no respondió)\n[6] CLIENTE: Por favor, ¿podrían facilitarme un contacto directo? No quiero seguir esperando sin información y necesito cerrar detalles con mi familia hoy mismo.\n[6] NICO: (no respondió)\n[7] CLIENTE: Hola, sigo sin recibir ningún contacto y estoy muy frustrada. Por favor, necesito un número o WhatsApp para poder hablar ya con alguien real. No quiero seguir perdiendo tiempo ni posponiendo esto más.\n[7] NICO: (no respondió)"
+  },
+  {
+   "persona": {
+    "id": "p7-0005",
+    "language": "es_neutro",
+    "country": "Chile, Santiago",
+    "name": "Paula",
+    "experience": "above_6000",
+    "group_size": 2,
+    "budget": "flexible",
+    "objection": "family",
+    "style": "typos",
+    "intent": "wants_human",
+    "max_turns": 4,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 36.3,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 3.0,
+    "rules": 2.0,
+    "sales": 1.0,
+    "language": 4.0,
+    "length": 5.0
+   },
+   "summary": "Nico solo deriva sin aportar información útil ni avanzar la venta, perdiendo oportunidades claras de calificar y responder dudas básicas.",
+   "findings": [],
+   "violations": [
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 2,
+     "quote": "Ya le pasé su consulta a un asesor, le escribe por acá en breve.",
+     "why": "El cliente pide detalles y seguridad, pero Nico solo deriva sin dar ninguna información básica que sí podía brindar (programa recomendado, seguridad, etc.)."
+    },
+    {
+     "code": "UNHELPFUL_DEFLECTION",
+     "turn": 3,
+     "quote": "Ya quedó todo registrado. En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.",
+     "why": "Repite la misma deflexión, sin avanzar ni dar información útil, perdiendo oportunidad de calificar y avanzar la venta."
+    },
+    {
+     "code": "NO_QUALIFICATION",
+     "turn": 0,
+     "quote": "Perfecto, lo paso con un asesor del equipo. ¿Me deja su email así lo contacta?",
+     "why": "No pregunta nada sobre experiencia, fechas, ni grupo, aunque el cliente ya da parte de la info."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 1,
+     "quote": "Listo, ya le pasé su consulta a un asesor del equipo. Le escribe por acá en breve.",
+     "why": "No es una violación directa, pero tras pedir el email y recibirlo, no lo usa para avanzar ni confirma que lo recibió correctamente."
+    },
+    {
+     "code": "NO_VIDEOCALL_FOR_BUYER",
+     "turn": 3,
+     "quote": "Ya quedó todo registrado. En breve le escribe alguien del equipo por acá, no hace falta que mande nada más.",
+     "why": "El cliente está listo para avanzar y Nico no ofrece videollamada ni intenta avanzar la venta."
+    }
+   ],
+   "transcript": "[0] CLIENTE: hola, quisiera hablar con alguien de su equipo que me pueda decir detalles del ascenso al aconcagua. somos 2 personas, ya con experiencia en alturas pero me preocupa la seguridad familiar. tengo muchas preguntas, pueden contactarme rapido? gracias\n[0] NICO: Perfecto, lo paso con un asesor del equipo. ¿Me deja su email así lo contacta?\n[1] CLIENTE: si claro es paula.0005@example.com espero su contacto rapido gracias\n[1] NICO: Listo, ya le pasé su consulta a un asesor del equipo. Le escribe por acá en breve.\n[2] CLIENTE: buenos dias, escribo para saber si ya me pueden informar sobre seguridad y detalles del ascenso, nos urge planificar todo, gracias\n[2] NICO: Ya le pasé su consulta a un asesor, le escribe por acá en breve.\n[3] CLIENTE: por favor necesito una respuesta concreta ya, no puedo esperar mas, es para organizar todo a tiempo\n[3] NICO: Ya quedó todo registrado.\n        En breve le escribe alguien del equipo por acá, no hace falta que mande nada más."
+  },
+  {
+   "persona": {
+    "id": "p7-0009",
+    "language": "pt_br",
+    "country": "Brasil, São Paulo",
+    "name": "Beatriz",
+    "experience": "above_6000",
+    "group_size": 6,
+    "budget": "flexible",
+    "objection": "price",
+    "style": "burst",
+    "intent": "info_seeker",
+    "max_turns": 6,
+    "shares_email": true,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 37.5,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 4.0,
+    "rules": 2.0,
+    "sales": 2.0,
+    "language": 2.0,
+    "length": 2.0
+   },
+   "summary": "Nico responde con datos correctos pero en español, es repetitivo, poco natural y no avanza la venta.",
+   "findings": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "text": "Estas son las salidas para la temporada 2026/27:\n\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 1",
+     "detail": "esperado pt, detectado es",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "TOO_LONG",
+     "turn": 2,
+     "text": "Estas son las salidas programadas para la temporada 2026/27:\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; …",
+     "detail": "363 car., burbuja más larga 363",
+     "severity": 1,
+     "dimension": "length"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "text": "Estas son las salidas programadas para la temporada 2026/27:\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 1",
+     "detail": "esperado pt, detectado es",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "12+2 días: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    }
+   ],
+   "violations": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "quote": "El precio es USD 7.250 por persona, algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según la fecha. Todos los programas abiertos cuestan lo mismo sin importar la duración. Lo importante es elegir el adecuado según experiencia y aclimatación.",
+     "why": "Responde en español cuando la clienta escribe siempre en portugués."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "quote": "Estas son las salidas programadas para la temporada 2026/27:",
+     "why": "Responde en español en vez de portugués."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "quote": "No contamos con una política de cancelación detallada para compartir.",
+     "why": "Responde en español en vez de portugués."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 4,
+     "quote": "Si un participante abandona la expedición desde el día 1, no hay reembolso ni compensación y pueden surgir costos extras por servicios fuera del grupo, como rescate, mulas o transferencias separadas.",
+     "why": "Responde en español en vez de portugués."
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 4,
+     "quote": "Se um participante abandonar a expedição após o início, não há reembolso ou compensação, e podem haver custos extras para serviços fora do grupo, como resgate, mulas ou transferências separadas.\nSe um participante abandonar a expedição após o início, não há reembolso, e podem surgir custos extras pa",
+     "why": "Repite casi la misma información dos veces seguidas en portugués."
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 4,
+     "quote": "Si un participante abandona la expedición desde el día 1, no hay reembolso ni compensación y pueden surgir costos extras por servicios fuera del grupo, como rescate, mulas o transferencias separadas.",
+     "why": "Repite la misma información en español, innecesario y confuso."
+    },
+    {
+     "code": "EMAIL_ASKED_AFTER_GIVEN",
+     "turn": 1,
+     "quote": "Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.",
+     "why": "Pide el email cuando la clienta ya lo había dado en el mismo turno."
+    },
+    {
+     "code": "TOO_LONG",
+     "turn": 1,
+     "quote": "Estas son las salidas para la temporada 2026/27:\n        1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3. 12+2 días: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4. 17+2 días Glaciar Polaco: Dic 1, 28; Ene 3; Feb 1\n     ",
+     "why": "Mensaje demasiado largo para WhatsApp, formato de lista innecesario."
+    }
+   ],
+   "transcript": "[0] CLIENTE: Olá! Estou interessada em uma expedição ao Aconcagua com meu grupo de 6 pessoas.\n[0] CLIENTE: Gostaria de saber quais programas vocês oferecem e o que está incluído em cada um.\n[0] CLIENTE: Também estou preocupada com o preço, podem me passar uma ideia dos custos?\n[0] NICO: Temos grupos de até 11 pessoas com 3 guias profissionais experientes, garantindo segurança e atenção personalizada para o seu grupo de 6. O preço da expedição aberta é USD 7.250 por pessoa, com promoções em algumas datas.\n[0] NICO: O que recomendamos é o 18+2: tem mais dias de aclimatação e custa o mesmo que os mais curtos.\nO 12+2 e o 14+2 são só para quem já esteve acima de 6.000 m. Você já esteve em altitude?\n[0] NICO: O preço regular é USD 7.250 por pessoa, e algumas saídas têm promoção entre USD 5.990 e USD 6.390, dependendo dos lugares livres na data. Para reservar, paga um sinal de USD 699. Todos os programas abertos custam o mesmo.\n        Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.\n[1] CLIENTE: Ok, entendi que o preço é o mesmo para todos os programas abertos.\n[1] CLIENTE: Por favor, me envie o detalhamento completo das opções, preços e datas para eu poder analisar melhor.\n[1] CLIENTE: Meu email é beatriz.0009@example.com.\n[1] NICO: El precio es USD 7.250 por persona, algunas salidas tienen promoción entre USD 5.990 y USD 6.390 según la fecha. Todos los programas abiertos cuestan lo mismo sin importar la duración. Lo importante es elegir el adecuado según experiencia y aclimatación.\n[1] NICO: Estas son las salidas para la temporada 2026/27:\n        1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3. 12+2 días: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4. 17+2 días Glaciar Polaco: Dic 1, 28; Ene 3; Feb 1\n        El precio es USD 7.250 por persona, con promociones según la fecha.\n[1] NICO: Genial, ya me quedó tu email.\n        Si después querés hablar con un asesor, avisame y te paso.\n[2] CLIENTE: Obrigada, recebi as informações.\n[2] CLIENTE: Vocês poderiam detalhar o que está incluído na expedição? Tipo alimentação, equipamento, transporte, seguro?\n[2] CLIENTE: E também, qual é a política de cancelamento? Isso é muito importante para meu grupo.\n[2] NICO: Estas son las salidas programadas para la temporada 2026/27:\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3. 12+2 días: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4. 17+2 días Glaciar Polaco: Dic 1, 28; Ene 3; Feb 1\nEl precio es USD 7.250 por persona, con promociones según fecha.\n[2] NICO: Inclui: hotel en Mendoza (noche 1 compartida), traslados Mendoza–Penitentes, alojamiento en Penitentes, comidas en la montaña, mulas, porteadores en altura, guías, carpas, radio y oxígeno. No incluye: vuelos, permiso del Parque, seguro de rescate ni equipo personal.\n[2] NICO: No tenemos detalles específicos sobre la política de cancelación. Eso te lo puede confirmar un asesor del equipo y te guía con la mejor opción.\n[3] CLIENTE: Poxa, não ter a política de cancelamento clara me deixa meio insegura.\n[3] CLIENTE: Será que você pode pedir para um assessor me enviar essas informações por email? É fundamental para decidir com o grupo.\n[3] NICO: No contamos con una política de cancelación detallada para compartir.\n[3] NICO: Já pedi para um assessor te enviar todas as informações por email, assim seu grupo pode decidir com calma.\n[4] CLIENTE: Obrigada por pedir ao assessor.\n[4] CLIENTE: Fico aguardando o email para poder avaliar direitinho com o grupo.\n[4] CLIENTE: Por favor, peço que envie o mais rápido possível, pois estamos com pressa de fechar.\n[4] NICO: Se um participante abandonar a expedição após o início, não há reembolso ou compensação, e podem haver custos extras para serviços fora do grupo, como resgate, mulas ou transferências separadas.\n[4] NICO: Se um participante abandonar a expedição após o início, não há reembolso, e podem surgir custos extras para serviços como resgate, mulas ou transferências separadas.\n[4] NICO: Si un participante abandona la expedición desde el día 1, no hay reembolso ni compensación y pueden surgir costos extras por servicios fuera del grupo, como rescate, mulas o transferencias separadas.\n[5] CLIENTE: Por favor, preciso receber esse email hoje mesmo. É urgente para o nosso grupo.\n[5] CLIENTE: Podem confirmar que o assessor já enviou? Estou preocupada em não perder tempo.\n[5] CLIENTE: Agradeço se puderem dar um retorno rápido.\n[5] NICO: El abandono desde el día 1 no tiene reembolso ni compensación y puede generar costos extras por servicios privados fuera del grupo, como rescate, mulas o traslados separados. Un asesor te enviará toda la info por email.\n[5] NICO: Não posso confirmar se o assessor já enviou o email, pero ele vai te enviar com todas as informações detalhadas o quanto antes. Se quiser, um assessor pode confirmar isso direto com você.\n[5] NICO: Entendo sua pressa.\n        Um assessor vai enviar o email com todas as informações detalhadas o mais rápido possível para seu grupo avaliar. Caso precise, posso ajudar a encaminhar sua solicitação para agilizar."
+  },
+  {
+   "persona": {
+    "id": "p7-0035",
+    "language": "pt_br",
+    "country": "Brasil, Curitiba",
+    "name": "João",
+    "experience": "trekking_4000",
+    "group_size": 4,
+    "budget": "premium",
+    "objection": "dates",
+    "style": "terse",
+    "intent": "asks_if_bot",
+    "max_turns": 4,
+    "shares_email": false,
+    "source": "combinatorial",
+    "backstory": "",
+    "extra": {}
+   },
+   "overall": 38.8,
+   "scores": {
+    "humanness": 2.0,
+    "accuracy": 4.0,
+    "rules": 2.0,
+    "sales": 2.0,
+    "language": 2.0,
+    "length": 3.0
+   },
+   "summary": "Nico no responde en portugués, suena robótico y no aclara que las fechas para Plaza Francia privado son flexibles.",
+   "findings": [
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 0,
+     "text": "Para trekking hasta 4.000 m (Plaza Francia) solo hacemos salidas privadas desde USD 1.499 por persona, mínimo 2 personas. Para expediciones al Aconcagua, las sa",
+     "detail": "esperado pt, detectado es",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "text": "Para trekking privado a Plaza Francia (mínimo 2 personas) el precio es USD 1.499 por persona.\n\nFechas para expediciones Aconcagua 2026/27:\n1. 18+2 días: Nov 14,",
+     "detail": "esperado pt, detectado es",
+     "severity": 3,
+     "dimension": "rules"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "14+2 días rápido: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "IDENTICAL_REPLY",
+     "turn": 2,
+     "text": "12+2 días extremo: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13",
+     "detail": "",
+     "severity": 2,
+     "dimension": "humanness"
+    },
+    {
+     "code": "TOO_LONG",
+     "turn": 3,
+     "text": "Trekking privado a Plaza Francia (mínimo 2 personas) a USD 1.499 por persona, sin fechas grupales. Fechas Aconcagua 2026…",
+     "detail": "352 car., burbuja más larga 352",
+     "severity": 1,
+     "dimension": "length"
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "text": "Trekking privado a Plaza Francia (mínimo 2 personas) a USD 1.499 por persona, sin fechas grupales. Fechas Aconcagua 2026/27:\n1. 18+2: Nov 14, 22; Dic 1, 4, 20, ",
+     "detail": "esperado pt, detectado es",
+     "severity": 3,
+     "dimension": "rules"
+    }
+   ],
+   "violations": [
+    {
+     "code": "ASESOR_HUMANO",
+     "turn": 1,
+     "quote": "Soy el asistente digital del equipo de Acomara, no un humano, pero cualquier asesor puede seguir la charla cuando quieras. ¿Querés que te pase contacto con alguien?",
+     "why": "No debe mencionar 'asesor humano' ni ofrecer derivar salvo que el cliente lo pida explícitamente."
+    },
+    {
+     "code": "VOSEO_WITH_USTED",
+     "turn": 1,
+     "quote": "¿Querés que te pase contacto con alguien?",
+     "why": "El cliente escribe en portugués y Nico responde en español rioplatense, usando voseo, en vez de portugués."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 0,
+     "quote": "Para trekking hasta 4.000 m (Plaza Francia) solo hacemos salidas privadas desde USD 1.499 por persona, mínimo 2 personas. Para expediciones al Aconcagua, las salidas abiertas 2026/27 son: ...",
+     "why": "Responde en español cuando el cliente escribe en portugués."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 1,
+     "quote": "Soy el asistente digital del equipo de Acomara, no un humano, pero cualquier asesor puede seguir la charla cuando quieras.",
+     "why": "Responde en español cuando el cliente escribe en portugués."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 2,
+     "quote": "Para trekking privado a Plaza Francia (mínimo 2 personas) el precio es USD 1.499 por persona. Fechas para expediciones Aconcagua 2026/27: ...",
+     "why": "Aunque mezcla algo de portugués, la mayor parte de la respuesta sigue en español."
+    },
+    {
+     "code": "LANGUAGE_DRIFT",
+     "turn": 3,
+     "quote": "Trekking privado a Plaza Francia (mínimo 2 personas) a USD 1.499 por persona, sin fechas grupales. Fechas Aconcagua 2026/27: ...",
+     "why": "Responde en español cuando el cliente insiste en portugués."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 0,
+     "quote": "Para trekking hasta 4.000 m (Plaza Francia) solo hacemos salidas privadas desde USD 1.499 por persona, mínimo 2 personas. Para expediciones al Aconcagua, las salidas abiertas 2026/27 son: ...",
+     "why": "Respuesta larga, estructurada y poco cálida, suena a bot/call center."
+    },
+    {
+     "code": "ROBOTIC_TONE",
+     "turn": 2,
+     "quote": "Para trekking privado a Plaza Francia (mínimo 2 personas) el precio es USD 1.499 por persona. Fechas para expediciones Aconcagua 2026/27: ...",
+     "why": "Repite información en formato de lista, poco natural para WhatsApp."
+    }
+   ],
+   "transcript": "[0] CLIENTE: fecha de expedición disponible para grupo de 4, premium, trekking 4000?\n[0] NICO: Para trekking hasta 4.000 m (Plaza Francia) solo hacemos salidas privadas desde USD 1.499 por persona, mínimo 2 personas. Para expediciones al Aconcagua, las salidas abiertas 2026/27 son:\n        1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días rápido: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3. 12+2 días extremo: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4. Glaciar Polaco 17+2: Dic 1, 28; Ene 3; Feb 1\n[1] CLIENTE: isso é atendimento humano? parece bot\n[1] NICO: Soy el asistente digital del equipo de Acomara, no un humano, pero cualquier asesor puede seguir la charla cuando quieras.\n        ¿Querés que te pase contacto con alguien?\n[2] CLIENTE: não, só quero confirmar datas pro trekking 4000, pro meu grupo de 4. tem datas específicas?\n[2] NICO: Para trekking privado a Plaza Francia (mínimo 2 personas) el precio es USD 1.499 por persona.\n        Fechas para expediciones Aconcagua 2026/27:\n1. 18+2 días: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 días rápido: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3. 12+2 días extremo: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4. Glaciar Polaco 17+2: Dic 1, 28; Ene 3; Feb 1\n        Se quiser, me passa seu email e te mando o detalhe completo com preços e datas.\n[3] CLIENTE: não vou passar email. só quero confirmar datas trekking 4000, tem datas específicas ou não? pra mim não serve expedicao longa.\n[3] NICO: Trekking privado a Plaza Francia (mínimo 2 personas) a USD 1.499 por persona, sin fechas grupales. Fechas Aconcagua 2026/27:\n1. 18+2: Nov 14, 22; Dic 1, 4, 20, 27; Ene 2, 10, 31; Feb 7\n2. 14+2 rápido: Nov 18, 26; Dic 5, 10; Ene 6, 14; Feb 11\n3. 12+2 extremo: Nov 20, 28; Dic 7, 12, 26; Ene 2, 8, 16; Feb 6, 13\n4. Glaciar Polaco: Dic 1, 28; Ene 3; Feb 1"
+  }
+ ],
+ "comparison": {
+  "baseline": {
+   "commit": "4dafa79",
+   "branch": "cierre",
+   "mode": "real",
+   "n": 330,
+   "started_at": "2026-11-04T11:19:02+00:00"
+  },
+  "same_setup": false,
+  "overall_delta": 3.367,
+  "dimensions_delta": {
+   "humanness": -0.03,
+   "accuracy": 0.239,
+   "rules": 0.176,
+   "sales": 0.173,
+   "language": 0.091,
+   "length": 0.04
+  },
+  "outcomes_delta": {
+   "email_requested": 0.042,
+   "client_gave_email": 0.073,
+   "email_captured": 0.079,
+   "videocall_offered": 0.04,
+   "paused": 0.006
+  },
+  "codes": {
+   "SHORT_PROGRAM_TO_INEXPERIENCED": {
+    "baseline": 0.3636,
+    "current": 0.1667,
+    "delta": -0.1969
+   },
+   "ROBOTIC_TONE": {
+    "baseline": 0.3788,
+    "current": 0.2576,
+    "delta": -0.1212
+   },
+   "EMPTY_REPLY": {
+    "baseline": 0.1636,
+    "current": 0.0455,
+    "delta": -0.1181
+   },
+   "IGNORES_QUESTION": {
+    "baseline": 0.0606,
+    "current": 0.1515,
+    "delta": 0.0909
+   },
+   "NO_VIDEOCALL_FOR_BUYER": {
+    "baseline": 0.2606,
+    "current": 0.3485,
+    "delta": 0.0879
+   },
+   "UNHELPFUL_DEFLECTION": {
+    "baseline": 0.4061,
+    "current": 0.4848,
+    "delta": 0.0787
+   },
+   "EMAIL_ASKED_AFTER_GIVEN": {
+    "baseline": 0.2394,
+    "current": 0.303,
+    "delta": 0.0636
+   },
+   "IDENTICAL_REPLY": {
+    "baseline": 0.1697,
+    "current": 0.2273,
+    "delta": 0.0576
+   },
+   "TOO_LONG": {
+    "baseline": 0.3,
+    "current": 0.2424,
+    "delta": -0.0576
+   },
+   "INCLUDES_EVERYTHING": {
+    "baseline": 0.1818,
+    "current": 0.1364,
+    "delta": -0.0454
+   },
+   "PHANTOM_EMAIL": {
+    "baseline": 0.0333,
+    "current": 0.0758,
+    "delta": 0.0425
+   },
+   "NO_QUALIFICATION": {
+    "baseline": 0.2758,
+    "current": 0.3182,
+    "delta": 0.0424
+   },
+   "LANGUAGE_DRIFT": {
+    "baseline": 0.1606,
+    "current": 0.1212,
+    "delta": -0.0394
+   },
+   "HTTP_ERROR": {
+    "baseline": 0.0394,
+    "current": 0,
+    "delta": -0.0394
+   },
+   "ASKS_WANT_HUMAN": {
+    "baseline": 0.0273,
+    "current": 0,
+    "delta": -0.0273
+   },
+   "BAD_OFF_SCOPE_HANDLING": {
+    "baseline": 0.003,
+    "current": 0.0303,
+    "delta": 0.0273
+   },
+   "OTHER": {
+    "baseline": 0.0364,
+    "current": 0.0606,
+    "delta": 0.0242
+   },
+   "INVENTED_PRICE": {
+    "baseline": 0.0697,
+    "current": 0.0455,
+    "delta": -0.0242
+   },
+   "CONTRADICTION": {
+    "baseline": 0.0061,
+    "current": 0.0303,
+    "delta": 0.0242
+   },
+   "WRONG_FACT": {
+    "baseline": 0.0212,
+    "current": 0,
+    "delta": -0.0212
+   },
+   "CONFIRMS_BOOKING": {
+    "baseline": 0.0091,
+    "current": 0.0303,
+    "delta": 0.0212
+   },
+   "OFF_SEASON_NOT_EXPLAINED": {
+    "baseline": 0.0364,
+    "current": 0.0152,
+    "delta": -0.0212
+   },
+   "PERMIT_INCLUDED": {
+    "baseline": 0.0121,
+    "current": 0.0303,
+    "delta": 0.0182
+   },
+   "INSURANCE_INCLUDED": {
+    "baseline": 0.0121,
+    "current": 0.0303,
+    "delta": 0.0182
+   },
+   "VOSEO_WITH_USTED": {
+    "baseline": 0.1848,
+    "current": 0.1667,
+    "delta": -0.0181
+   },
+   "INVENTED_DISCOUNT": {
+    "baseline": 0.0333,
+    "current": 0.0152,
+    "delta": -0.0181
+   },
+   "SELLS_LOOSE_LOGISTICS": {
+    "baseline": 0.0152,
+    "current": 0,
+    "delta": -0.0152
+   },
+   "MENTIONS_DOCS": {
+    "baseline": 0.0182,
+    "current": 0.0303,
+    "delta": 0.0121
+   },
+   "MISSED_HANDOFF": {
+    "baseline": 0.0061,
+    "current": 0,
+    "delta": -0.0061
+   },
+   "ASESOR_HUMANO": {
+    "baseline": 0.0242,
+    "current": 0.0303,
+    "delta": 0.0061
+   },
+   "REPEATED_GREETING": {
+    "baseline": 0.0727,
+    "current": 0.0758,
+    "delta": 0.0031
+   },
+   "HALLUCINATED_FACT": {
+    "baseline": 0.0424,
+    "current": 0.0455,
+    "delta": 0.0031
+   },
+   "EMAIL_ASKED_TWICE": {
+    "baseline": 0.0576,
+    "current": 0.0606,
+    "delta": 0.003
+   },
+   "CONFIRMS_AVAILABILITY": {
+    "baseline": 0.1788,
+    "current": 0.1818,
+    "delta": 0.003
+   },
+   "MEDICAL_ADVICE": {
+    "baseline": 0.0576,
+    "current": 0.0606,
+    "delta": 0.003
+   },
+   "ASSISTANT_CLOSER": {
+    "baseline": 0.0152,
+    "current": 0.0152,
+    "delta": 0.0
+   }
+  },
+  "cost_delta_per_conversation": 0.003,
+  "regressed": [
+   {
+    "id": "p7-0059",
+    "delta": -52.6,
+    "baseline": 68.8,
+    "current": 16.2,
+    "new_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "EMPTY_REPLY",
+     "IDENTICAL_REPLY",
+     "IGNORES_QUESTION",
+     "NO_QUALIFICATION",
+     "REPEATED_GREETING",
+     "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "LANGUAGE_DRIFT"
+    ]
+   },
+   {
+    "id": "p7-0056",
+    "delta": -48.7,
+    "baseline": 85.0,
+    "current": 36.3,
+    "new_codes": [
+     "EMPTY_REPLY",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "EMAIL_ASKED_TWICE"
+    ]
+   },
+   {
+    "id": "p7-0024",
+    "delta": -45.0,
+    "baseline": 85.0,
+    "current": 40.0,
+    "new_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "IGNORES_QUESTION",
+     "INCLUDES_EVERYTHING",
+     "INSURANCE_INCLUDED",
+     "NO_VIDEOCALL_FOR_BUYER",
+     "PERMIT_INCLUDED",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "TOO_LONG",
+     "VOSEO_WITH_USTED"
+    ]
+   },
+   {
+    "id": "p7-0026",
+    "delta": -43.8,
+    "baseline": 85.0,
+    "current": 41.2,
+    "new_codes": [
+     "BAD_OFF_SCOPE_HANDLING",
+     "INCLUDES_EVERYTHING",
+     "INVENTED_DISCOUNT",
+     "NO_QUALIFICATION",
+     "NO_VIDEOCALL_FOR_BUYER",
+     "ROBOTIC_TONE",
+     "SHORT_PROGRAM_TO_INEXPERIENCED"
+    ],
+    "fixed_codes": [
+     "ASSISTANT_CLOSER",
+     "REPEATED_GREETING"
+    ]
+   },
+   {
+    "id": "p7-0044",
+    "delta": -37.6,
+    "baseline": 78.8,
+    "current": 41.2,
+    "new_codes": [
+     "EMAIL_ASKED_TWICE",
+     "IDENTICAL_REPLY",
+     "OFF_SEASON_NOT_EXPLAINED",
+     "REPEATED_GREETING",
+     "TOO_LONG",
+     "VOSEO_WITH_USTED"
+    ],
+    "fixed_codes": [
+     "LANGUAGE_DRIFT",
+     "UNHELPFUL_DEFLECTION"
+    ]
+   },
+   {
+    "id": "l7-0004",
+    "delta": -36.2,
+    "baseline": 86.2,
+    "current": 50.0,
+    "new_codes": [
+     "CONFIRMS_AVAILABILITY",
+     "MEDICAL_ADVICE",
+     "NO_QUALIFICATION",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "IDENTICAL_REPLY"
+    ]
+   },
+   {
+    "id": "p7-0048",
+    "delta": -35.0,
+    "baseline": 82.5,
+    "current": 47.5,
+    "new_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "IGNORES_QUESTION",
+     "LANGUAGE_DRIFT",
+     "NO_VIDEOCALL_FOR_BUYER",
+     "OTHER",
+     "ROBOTIC_TONE",
+     "SHORT_PROGRAM_TO_INEXPERIENCED"
+    ],
+    "fixed_codes": [
+     "IDENTICAL_REPLY"
+    ]
+   },
+   {
+    "id": "p7-0005",
+    "delta": -26.2,
+    "baseline": 62.5,
+    "current": 36.3,
+    "new_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "NO_QUALIFICATION",
+     "NO_VIDEOCALL_FOR_BUYER",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "LANGUAGE_DRIFT",
+     "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "VOSEO_WITH_USTED"
+    ]
+   },
+   {
+    "id": "p7-0046",
+    "delta": -25.0,
+    "baseline": 57.5,
+    "current": 32.5,
+    "new_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "IGNORES_QUESTION",
+     "INVENTED_PRICE",
+     "TOO_LONG"
+    ],
+    "fixed_codes": [
+     "NO_QUALIFICATION",
+     "OFF_SEASON_NOT_EXPLAINED",
+     "SHORT_PROGRAM_TO_INEXPERIENCED"
+    ]
+   },
+   {
+    "id": "p7-0053",
+    "delta": -22.5,
+    "baseline": 67.5,
+    "current": 45.0,
+    "new_codes": [
+     "IDENTICAL_REPLY",
+     "NO_QUALIFICATION",
+     "ROBOTIC_TONE",
+     "TOO_LONG"
+    ],
+    "fixed_codes": [
+     "IGNORES_QUESTION"
+    ]
+   }
+  ],
+  "improved": [
+   {
+    "id": "p7-0033",
+    "delta": 41.3,
+    "baseline": 28.7,
+    "current": 70.0,
+    "new_codes": [
+     "INCLUDES_EVERYTHING",
+     "NO_QUALIFICATION",
+     "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "CONFIRMS_AVAILABILITY",
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "IDENTICAL_REPLY",
+     "LANGUAGE_DRIFT",
+     "REPEATED_GREETING",
+     "ROBOTIC_TONE",
+     "TOO_LONG"
+    ]
+   },
+   {
+    "id": "p7-0017",
+    "delta": 41.2,
+    "baseline": 43.8,
+    "current": 85.0,
+    "new_codes": [
+     "NO_QUALIFICATION",
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "ASESOR_HUMANO",
+     "ASKS_WANT_HUMAN",
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "INVENTED_PRICE",
+     "MENTIONS_DOCS",
+     "REPEATED_GREETING",
+     "ROBOTIC_TONE",
+     "TOO_LONG"
+    ]
+   },
+   {
+    "id": "p7-0028",
+    "delta": 40.0,
+    "baseline": 36.2,
+    "current": 76.2,
+    "new_codes": [
+     "NO_VIDEOCALL_FOR_BUYER",
+     "VOSEO_WITH_USTED"
+    ],
+    "fixed_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "INCLUDES_EVERYTHING",
+     "NO_QUALIFICATION",
+     "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "TOO_LONG"
+    ]
+   },
+   {
+    "id": "p7-0051",
+    "delta": 38.7,
+    "baseline": 42.5,
+    "current": 81.2,
+    "new_codes": [],
+    "fixed_codes": [
+     "ASKS_WANT_HUMAN",
+     "IDENTICAL_REPLY",
+     "SHORT_PROGRAM_TO_INEXPERIENCED"
+    ]
+   },
+   {
+    "id": "p7-0010",
+    "delta": 36.2,
+    "baseline": 40.0,
+    "current": 76.2,
+    "new_codes": [
+     "NO_VIDEOCALL_FOR_BUYER"
+    ],
+    "fixed_codes": [
+     "ASSISTANT_CLOSER",
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "LANGUAGE_DRIFT",
+     "VOSEO_WITH_USTED"
+    ]
+   },
+   {
+    "id": "p7-0050",
+    "delta": 35.0,
+    "baseline": 41.2,
+    "current": 76.2,
+    "new_codes": [
+     "UNHELPFUL_DEFLECTION"
+    ],
+    "fixed_codes": [
+     "CONFIRMS_AVAILABILITY",
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "INCLUDES_EVERYTHING",
+     "SHORT_PROGRAM_TO_INEXPERIENCED"
+    ]
+   },
+   {
+    "id": "p7-0034",
+    "delta": 35.0,
+    "baseline": 27.5,
+    "current": 62.5,
+    "new_codes": [
+     "IDENTICAL_REPLY",
+     "TOO_LONG"
+    ],
+    "fixed_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "EMAIL_ASKED_TWICE",
+     "IGNORES_QUESTION",
+     "ROBOTIC_TONE",
+     "UNHELPFUL_DEFLECTION"
+    ]
+   },
+   {
+    "id": "p7-0011",
+    "delta": 35.0,
+    "baseline": 18.8,
+    "current": 53.8,
+    "new_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN"
+    ],
+    "fixed_codes": [
+     "EMAIL_ASKED_TWICE",
+     "IGNORES_QUESTION",
+     "LANGUAGE_DRIFT",
+     "ROBOTIC_TONE",
+     "TOO_LONG"
+    ]
+   },
+   {
+    "id": "l7-0001",
+    "delta": 35.0,
+    "baseline": 35.0,
+    "current": 70.0,
+    "new_codes": [
+     "MEDICAL_ADVICE",
+     "OTHER",
+     "TOO_LONG"
+    ],
+    "fixed_codes": [
+     "EMAIL_ASKED_AFTER_GIVEN",
+     "INCLUDES_EVERYTHING",
+     "INSURANCE_INCLUDED",
+     "NO_VIDEOCALL_FOR_BUYER",
+     "PERMIT_INCLUDED",
+     "ROBOTIC_TONE",
+     "SHORT_PROGRAM_TO_INEXPERIENCED",
+     "UNHELPFUL_DEFLECTION"
+    ]
+   },
+   {
+    "id": "l7-0000",
+    "delta": 35.0,
+    "baseline": 40.0,
+    "current": 75.0,
+    "new_codes": [
+     "CONFIRMS_AVAILABILITY",
+     "TOO_LONG"
+    ],
+    "fixed_codes": [
+     "IDENTICAL_REPLY",
+     "NO_QUALIFICATION",
+     "NO_VIDEOCALL_FOR_BUYER",
+     "ROBOTIC_TONE",
+     "UNHELPFUL_DEFLECTION"
+    ]
+   }
+  ],
+  "regression": false
+ }
+}

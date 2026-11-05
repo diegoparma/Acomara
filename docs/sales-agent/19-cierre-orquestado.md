@@ -15,7 +15,7 @@ integra en una sola rama y despliega. Cada subagente agrega su reporte en su sec
 | A | Arreglos de frases fijas en código | A (código) | `orchestrator/server.py`, `orchestrator/policies.py`, `orchestrator/sales_rules.py`, `orchestrator/humanize.py`, `orchestrator/usted.py`, `tests/test_cierre_fixes.py` | en curso |
 | B | Ajustes de prompt/voz según `fallas-top10.md` | B (prompt) | `docs/sales-agent/02-system-prompt.md` | hecho |
 | C | Ordenar docs | C (docs) | `docs/sales-agent/15-reglas-de-nico.md`, `docs/estado-nico-para-fernando.md`, `docs/sales-agent/README.md` | hecho |
-| — | Integración, eval real (≤ USD 4), PR, deploy, verificación | orquestador | todo | pendiente |
+| — | Integración, eval real (≤ USD 4), PR, deploy, verificación | orquestador | todo | GO, en PR |
 
 ## Reporte A (código)
 
@@ -43,4 +43,10 @@ Solo documentación. `15-reglas-de-nico.md`: actualizadas reglas 1 (/reset compl
 
 ## Integración y despliegue
 
-_pendiente_
+- Rama única `claude/lucid-dirac-wa6foy`: 426 tests verdes; eval offline (n=320, semilla 7) **81.7** (offline-main 72.8; main de hoy 76.4).
+- Tope de costo duro nuevo en evals: `EVAL_MAX_COST_USD` (aborta la corrida al superarlo).
+- Eval real (n=66, 6 personas LLM, semilla 7, modelos de `cierre`), guardada en `evals/baselines/cierre-2/`. Costo **USD 1.58**.
+  Comparado con las mismas 66 conversaciones de `cierre`: overall **51.0 → 55.9**.
+  Reglas duras (conversaciones afectadas, mismas 66): 12+2/14+2 a inexpertos 29→11, email pedido de nuevo 24→21, cambio de idioma 15→9, confirma cupo 15→12.
+  Empeoran un poco: derivaciones inútiles 30→32 y respuestas idénticas 18→21.
+- Decisión: **GO**.
