@@ -8,6 +8,8 @@ PRICES when OpenAI changes them.
 from __future__ import annotations
 
 import json
+import os
+import sys
 import threading
 import time
 from dataclasses import dataclass, field
@@ -53,6 +55,7 @@ class UsageTracker:
 
     rows: dict[tuple[str, str], dict[str, int]] = field(default_factory=dict)
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
+    _spent: float = field(default=0.0, repr=False)
 
     def record(self, role: str, model: str, input_tokens: int = 0, cached_tokens: int = 0, output_tokens: int = 0) -> None:
         with self._lock:
@@ -61,6 +64,14 @@ class UsageTracker:
             row["input_tokens"] += int(input_tokens or 0)
             row["cached_input_tokens"] += int(cached_tokens or 0)
             row["output_tokens"] += int(output_tokens or 0)
+            cost = cost_usd(model, int(input_tokens or 0), int(cached_tokens or 0), int(output_tokens or 0)) or 0.0
+            self._spent += cost
+            spent = self._spent
+        cap = float(os.environ.get("EVAL_MAX_COST_USD") or 0)
+        if cap and spent > cap:
+            # Hard budget stop: abort the whole run immediately (threads included).
+            print(f"\nABORT: gasto estimado USD {spent:.3f} supera EVAL_MAX_COST_USD={cap}", file=sys.stderr, flush=True)
+            os._exit(3)
 
     def record_openai_usage(self, role: str, model: str, usage: Any) -> None:
         """Accept a Responses-API or Chat-Completions usage object (or None)."""
