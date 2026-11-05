@@ -370,7 +370,7 @@ def extract_customer_name(text: str) -> str | None:
 
 _USTED_RE = re.compile(
     r"\b(?:usted(?:es)?|le (?:agradezco|consulto|escribo|pregunto)|podr[ií]a (?:usted|indicarme|decirme|informarme)|"
-    r"me podr[ií]a|quisiera saber|disculpe|perdone|necesitar[ií]a)\b",
+    r"me podr[ií]a|quisiera|quisi[eé]ramos|disculpe|perdone|necesitar[ií]a)\b",
     re.IGNORECASE,
 )
 _VOS_RE = re.compile(r"\b(?:quer[eé]s|ten[eé]s|pod[eé]s|sab[eé]s|decime|pasame|contame|vos)\b", re.IGNORECASE)
@@ -383,6 +383,19 @@ def client_messages(recent_turns: Any) -> list[str]:
         for t in (recent_turns if isinstance(recent_turns, list) else [])
         if isinstance(t, dict) and t.get("role") == "user" and t.get("text")
     ]
+
+
+# "tú" forms (neutral Spanish): never rioplatense, so a voseo phrase reads foreign.
+_TUTEO_RE = re.compile(
+    r"\b(?:t[uú]|tienes|puedes|quieres|sabes|dime|cu[eé]ntame|p[aá]same|m[aá]ndame|env[ií]ame|planeas|recomiendas|ofreces)\b",
+    re.IGNORECASE,
+)
+
+
+def client_uses_tuteo(user_texts: list[str]) -> bool:
+    """True when the client writes with "tú" forms and never with vos."""
+    joined = " ".join(t for t in user_texts if t)
+    return bool(_TUTEO_RE.search(joined)) and not _VOS_RE.search(joined)
 
 
 def client_uses_usted(user_texts: list[str]) -> bool:

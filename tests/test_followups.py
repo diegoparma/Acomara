@@ -99,7 +99,10 @@ class ContextualRetrievalTests(unittest.TestCase):
 class DuplicateReplyTests(unittest.TestCase):
     def test_burst_duplicate_is_dropped(self):
         session = {"last_assistant_reply_ts": 1000}
-        self.assertEqual(resolve_duplicate_reply("Sale USD 6.990.", session, 1000 + OUTBOUND_DUPLICATE_BURST_SECONDS, "es"), "")
+        # A repeat inside the burst window still gets a short, different line (never silence).
+        out = resolve_duplicate_reply("Sale USD 6.990.", session, 1000 + OUTBOUND_DUPLICATE_BURST_SECONDS, "es")
+        self.assertTrue(out)
+        self.assertNotEqual(out, "Sale USD 6.990.")
 
     def test_asked_again_later_gets_an_answer(self):
         # Regression: the repeated reply was dropped and the client got nothing.

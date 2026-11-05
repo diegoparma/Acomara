@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Any, Callable
 
 
@@ -19,7 +20,35 @@ _EMAIL_ASK_CUE_RE = re.compile(
     r"\?|\b(?:pasame|pasás|pasas|mandame|dejame|compartime|escribime|send me|share|what'?s your|me passa|me manda)\b",
     re.IGNORECASE,
 )
-_EMAIL_KNOWN_KEYS = ("email_requested", "email_captured", "captured_email", "verified_email")
+_EMAIL_KNOWN_KEYS = ("email_requested", "email_captured", "captured_email", "verified_email", "email_declined")
+
+_EMAIL_NOUN = r"(?:e-?mail|mail|correo|email)"
+_EMAIL_DEFERRAL_RE = re.compile(
+    # "prefiero no dar mi mail", "no quiero pasar el correo", "prefiro nao passar o email"
+    rf"\b(?:prefiero|prefiro|preferimos|no quiero|no puedo|nao quero|nao posso|i(?:'d)? rather not|prefer not to|dont want to|do not want to)\s+(?:no\s+|nao\s+)?(?:dar|pasar|compartir|dejar|enviar|mandar|passar|dar|share|give|send|leave)\b[^.?!]{{0,25}}{_EMAIL_NOUN}"
+    # "no te doy mi mail", "no voy a pasar el email"
+    rf"|\bno (?:te |les )?(?:doy|paso|dejo|voy a (?:dar|pasar|dejar))\b[^.?!]{{0,20}}{_EMAIL_NOUN}"
+    # "despues te paso el mail", "te lo mando luego", "i'll send it later", "depois te mando"
+    rf"|\b(?:despues|luego|mas tarde|manana|depois|mais tarde|later|tomorrow)\b[^.?!]{{0,25}}\b(?:paso|mando|envio|escribo|doy|passo|mandarei|send|share|give)\b[^.?!]{{0,25}}{_EMAIL_NOUN}"
+    rf"|\b(?:te|les|lhe|you)\s+(?:lo |la |o |a )?(?:paso|mando|envio|escribo|passo|mandarei|will send|ll send|send)\b[^.?!]{{0,25}}{_EMAIL_NOUN}[^.?!]{{0,25}}\b(?:despues|luego|mas tarde|manana|depois|mais tarde|later|tomorrow)\b"
+    rf"|{_EMAIL_NOUN}[^.?!]{{0,20}}\b(?:te lo|lo|te a|a)\s*(?:paso|mando|envio|passo|mandarei)\b[^.?!]{{0,15}}\b(?:despues|luego|mas tarde|manana|depois|mais tarde)\b"
+    rf"|\b(?:send|share|give)\b[^.?!]{{0,15}}{_EMAIL_NOUN}[^.?!]{{0,15}}\blater\b"
+    # "prefiero por aca / por whatsapp / por aqui"
+    r"|\b(?:prefiero|prefiro|i prefer|rather)\b[^.?!]{0,15}\b(?:aca|aqui|here|whatsapp|este medio|por este canal)\b"
+)
+
+
+def _fold(text: str) -> str:
+    folded = unicodedata.normalize("NFKD", (text or "").lower())
+    return " ".join(folded.encode("ascii", "ignore").decode("ascii").split())
+
+
+def declines_or_defers_email(user_text: str) -> bool:
+    """The client says they will send the email later or would rather not give it.
+
+    Asking again after that read as a bot that does not listen (fallas-top10 #3).
+    """
+    return bool(_EMAIL_DEFERRAL_RE.search(_fold(user_text)))
 
 
 def drop_repeated_email_ask(reply: str, session_vars: dict[str, Any]) -> str:

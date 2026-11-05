@@ -64,6 +64,18 @@ USTED_PHRASES: dict[str, str] = {
     "Gracias por escribirnos. ¿En qué te puedo ayudar?\n\nSi te sirve, además de responderte por acá te mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones.": (
         "Gracias por escribirnos. ¿En qué le puedo ayudar?\n\nSi le sirve, además de responderle por acá le mando por email toda la info: precios, fechas, servicios, lista de equipo y recomendaciones."
     ),
+    "Eso mismo te lo dejé en el mensaje anterior. Puedo explicártelo de otra manera o ver otro punto.": (
+        "Eso mismo se lo dejé en el mensaje anterior. Puedo explicárselo de otra manera o ver otro punto."
+    ),
+    "Sí, es lo que te comentaba recién. ¿Qué parte te gustaría que aclare?": (
+        "Sí, es lo que le comentaba recién. ¿Qué parte le gustaría que aclare?"
+    ),
+    "Perdón si no fui claro. ¿Qué te gustaría saber? Te lo respondo puntual.": (
+        "Perdón si no fui claro. ¿Qué le gustaría saber? Se lo respondo puntual."
+    ),
+    "Te leo. Lo que te pasé arriba sigue valiendo, y si hay otra opción que te interese, la vemos.": (
+        "Lo leo. Lo que le pasé arriba sigue valiendo, y si hay otra opción que le interese, la vemos."
+    ),
     # sales_rules
     "Te soy sincero: el {program} es solo para quien ya estuvo arriba de los 6.000 m, está muy entrenado y llega aclimatado. ": (
         "Le soy sincero: el {program} es solo para quien ya estuvo arriba de los 6.000 m, está muy entrenado y llega aclimatado. "
@@ -86,6 +98,28 @@ USTED_PHRASES: dict[str, str] = {
     ),
 }
 
+# Not whole phrases of the I18N tables: pieces of other fixed replies.
+USTED_EXTRA: dict[str, str] = {
+    "¿Estuviste en altura alguna vez?": "¿Ha estado en altura alguna vez?",
+}
+# Imperatives the model or the FAQ copy in voseo.
+_WORD_SWAPS = (
+    (re.compile(r"\bMirá\b"), "Mire"),
+    (re.compile(r"\bmirá\b"), "mire"),
+    (re.compile(r"\bFijate\b"), "Fíjese"),
+    (re.compile(r"\bfijate\b"), "fíjese"),
+)
+# Voseo -> "tú", for clients who write neutral Spanish ("tienes", "puedes").
+_TUTEO_SWAPS = (
+    (r"\bquerés\b", "quieres"), (r"\bQuerés\b", "Quieres"), (r"\btenés\b", "tienes"), (r"\bpodés\b", "puedes"),
+    (r"\bsabés\b", "sabes"), (r"\bpreferís\b", "prefieres"), (r"\bescribís\b", "escribes"), (r"\bnecesitás\b", "necesitas"),
+    (r"\bdejás\b", "dejas"), (r"\bpasame\b", "pásame"), (r"\bPasame\b", "Pásame"), (r"\bavisame\b", "avísame"),
+    (r"\bcontame\b", "cuéntame"), (r"\bdecime\b", "dime"), (r"\bmandame\b", "mándame"), (r"\bdejame\b", "déjame"),
+    (r"\bmirá\b", "mira"), (r"\bMirá\b", "Mira"), (r"\bContame\b", "Cuéntame"), (r"\bDecime\b", "Dime"),
+    (r"\bAvisame\b", "Avísame"), (r"\bDejame\b", "Déjame"), (r"\bMandame\b", "Mándame"), (r"\bfijate\b", "fíjate"), (r"\bvos\b", "tú"), (r"\bsos\b", "eres"),
+)
+_TUTEO_COMPILED = [(re.compile(p), r) for p, r in _TUTEO_SWAPS]
+
 _PLACEHOLDER_RE = re.compile(r"\{(\w+)\}")
 
 
@@ -100,7 +134,8 @@ def _compile(source: str) -> re.Pattern[str]:
 
 # Longest first, so a phrase that contains a shorter one wins.
 _COMPILED = [
-    (_compile(src), dst) for src, dst in sorted(USTED_PHRASES.items(), key=lambda kv: -len(kv[0]))
+    (_compile(src), dst)
+    for src, dst in sorted({**USTED_PHRASES, **USTED_EXTRA}.items(), key=lambda kv: -len(kv[0]))
 ]
 
 
@@ -110,4 +145,15 @@ def to_usted(text: str) -> str:
         return text
     for pattern, target in _COMPILED:
         text = pattern.sub(lambda m: target.format(**m.groupdict()), text)
+    for pattern, target in _WORD_SWAPS:
+        text = pattern.sub(target, text)
+    return text
+
+
+def to_tuteo(text: str) -> str:
+    """Swap voseo words for "tú" forms (fixed phrases and the model's slips alike)."""
+    if not text:
+        return text
+    for pattern, target in _TUTEO_COMPILED:
+        text = pattern.sub(target, text)
     return text
