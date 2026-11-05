@@ -47,6 +47,7 @@ from orchestrator.policies import (
     apply_email_ack_or_request_policy as _apply_email_ack_or_request_policy,
     apply_language_commit_policy as _apply_language_commit_policy,
     apply_out_of_season_policy as _apply_out_of_season_policy,
+    declines_or_defers_email,
     drop_repeated_email_ask,
 )
 from orchestrator.observability import (
@@ -83,6 +84,7 @@ from orchestrator.humanize import (
     append_recent_turns,
     assistant_already_spoke,
     client_messages,
+    client_uses_tuteo,
     client_uses_usted,
     extract_customer_name,
     history_to_messages,
@@ -93,7 +95,7 @@ from orchestrator.humanize import (
     style_hints,
     trim_to_last_sentence,
 )
-from orchestrator.usted import to_usted
+from orchestrator.usted import to_tuteo, to_usted
 from orchestrator.human_activity import DEFAULT_NICO_AGENT_ID, human_replied_recently
 from orchestrator.conversation_audit import DEFAULT_ORG_ID, run_conversation_audit
 from orchestrator.caja_interno import internal_reply
@@ -174,6 +176,8 @@ class ReplyDecision:
 
 # A client who thanks several times gets a different short answer each time.
 THANKS_REPLY_VARIANTS = 4
+# Different short lines for a client who gets the same answer twice in a row.
+REPEAT_ALT_VARIANTS = 4
 
 # i18n: Internationalization layer for fixed phrases
 I18N_PHRASES = {
@@ -190,6 +194,10 @@ I18N_PHRASES = {
         "paused_proactive_email": "Pasame tu email cuando puedas y seguimos.",
         "paused_loop_final": "Ya quedó todo registrado. En breve te escribe alguien del equipo por acá, no hace falta que mandes nada más 👍",
         "repeat_prefix": "Como te decía,",
+        "repeat_alt_1": "Eso mismo te lo dejé en el mensaje anterior. Puedo explicártelo de otra manera o ver otro punto.",
+        "repeat_alt_2": "Sí, es lo que te comentaba recién. ¿Qué parte te gustaría que aclare?",
+        "repeat_alt_3": "Perdón si no fui claro. ¿Qué te gustaría saber? Te lo respondo puntual.",
+        "repeat_alt_4": "Te leo. Lo que te pasé arriba sigue valiendo, y si hay otra opción que te interese, la vemos.",
         "thanks_reply_1": "¡De nada! Cualquier cosa me escribís por acá.",
         "thanks_reply_2": "¡Un placer! Si te surge otra duda, acá estoy.",
         "thanks_reply_3": "De nada 🙌",
@@ -213,6 +221,10 @@ I18N_PHRASES = {
         "paused_proactive_email": "Send me your email whenever you can and we'll continue.",
         "paused_loop_final": "It's all noted. Someone from the team will message you here shortly, no need to send anything else 👍",
         "repeat_prefix": "As I mentioned,",
+        "repeat_alt_1": "That's what I shared in my previous message. If you'd like, I can explain it another way or we can look at something else.",
+        "repeat_alt_2": "Yes, that's what I just mentioned. Tell me which part you'd like me to clarify.",
+        "repeat_alt_3": "Sorry if I wasn't clear. Tell me what you'd like to know and I'll answer it directly.",
+        "repeat_alt_4": "I hear you. What I sent above still stands; if you'd like to see another option, just say so.",
         "thanks_reply_1": "You're welcome! Message me here anytime.",
         "thanks_reply_2": "My pleasure! If anything else comes up, I'm here.",
         "thanks_reply_3": "No worries 🙌",
@@ -236,6 +248,10 @@ I18N_PHRASES = {
         "paused_proactive_email": "Me passa seu email quando puder e seguimos.",
         "paused_loop_final": "Já ficou tudo registrado. Em breve alguém da equipe te escreve por aqui, não precisa mandar mais nada 👍",
         "repeat_prefix": "Como te falei,",
+        "repeat_alt_1": "Isso é o que te passei na mensagem anterior. Se quiser, explico de outra maneira ou vemos outro ponto.",
+        "repeat_alt_2": "Sim, é o que comentei agora há pouco. Me diz qual parte você quer que eu esclareça.",
+        "repeat_alt_3": "Desculpa se não fui claro. Me conta o que você gostaria de saber e respondo direto.",
+        "repeat_alt_4": "Te entendo. O que te passei acima continua valendo; se quiser ver outra opção, é só me avisar.",
         "thanks_reply_1": "De nada! Qualquer coisa me escreve por aqui.",
         "thanks_reply_2": "Imagina! Se surgir outra dúvida, estou por aqui.",
         "thanks_reply_3": "De nada 🙌",
@@ -258,6 +274,15 @@ def detect_language_from_text(text: str) -> str:
     greeting (which historically caused language drift).
     """
     return _detect_language_with_evidence(text) or "es"
+
+
+# Words and phrases that exist in Portuguese and not in Spanish or English
+# ("quanto custa?", "a permissão do parque está incluída?" were read as Spanish
+# and answered with Spanish fixed phrases). Accents are already folded.
+_PT_ONLY_RE = re.compile(
+    r"\b(?:quanto|custa|permissao|cume|voces|nao|tambem|muito|obrigad[oa]|quero|fiz|estive|tudo bem|boa tarde|bom dia|boa noite"
+    r"|valeu|saidas|roteiro|equipamentos|aclimatacao|ainda|tenho|gostaria|mais informacoes)\b"
+)
 
 
 def _detect_language_with_evidence(text: str) -> str | None:
@@ -324,6 +349,8 @@ def _detect_language_with_evidence(text: str) -> str | None:
     for tok in strong_pt_tokens:
         if tok in normalized_text:
             return "pt"
+    if _PT_ONLY_RE.search(normalized_text):
+        return "pt"
     for tok in strong_es_tokens:
         if tok in normalized_text:
             return "es"
@@ -483,6 +510,8 @@ def detect_language_confident(text: str) -> str | None:
     for tok in strong_pt_tokens:
         if tok in normalized_text:
             return "pt"
+    if _PT_ONLY_RE.search(normalized_text):
+        return "pt"
     for tok in strong_es_tokens:
         if tok in normalized_text:
             return "es"
@@ -991,6 +1020,25 @@ def build_reset_session_vars(now_ts: int) -> dict[str, Any]:
         "crm_last_consultation_date": None,
         "last_inbound_signature": "",
         "last_inbound_signature_ts": None,
+        # The session store merges on upsert (and the delete can fail), so
+        # anything the conversation added must be overwritten explicitly or
+        # /reset leaves the client "already greeted", email "already asked", etc.
+        "customer_name": None,
+        "emails_seen": [],
+        "captured_email": "",
+        "email_captured": False,
+        "email_captured_at_ts": None,
+        "email_received_acked": False,
+        "email_declined": False,
+        "email_in_breaches": False,
+        "bot_signal": "",
+        "out_of_season_warned": False,
+        "thanks_reply_count": 0,
+        "program_options_stage": 0,
+        "repeat_alt_count": 0,
+        "human_active_last_seen": None,
+        "new_lead_email_sent": False,
+        "new_lead_email_sent_ts": None,
     }
 
 
@@ -1562,6 +1610,19 @@ _INTEREST_RE = re.compile(
 )
 
 
+# Data about the client or a concrete ask, next to the interest phrase: "Hola,
+# quiero info, nunca estuve en altura" is not a bare "quiero info" and must be
+# answered, not welcomed with a template that ignores what they said.
+_OPENING_DATA_RE = re.compile(
+    r"\b(?:nunca|jamas|never|ja(?:mais)?|estuve|estive|estoy|tengo|tenho|somos|soy|sou|vengo|venho|vivo|moro|voy|vamos"
+    r"|hice|fiz|subi|climbed|summited|i(?:'ve| have| am|'m (?:from|a|an|not|new|in))|we(?:'re| are| have|'ve)|my|mi|mis|minha"
+    r"|experiencia|experience|experiencia|altura|altitud|altitude|enero|febrero|marzo|noviembre|diciembre|january|february"
+    r"|march|november|december|janeiro|fevereiro|marco|novembro|dezembro|desde|from|de (?:mexico|chile|espana|argentina|colombia|peru|brasil)"
+    r"|personas|amigos|grupo|group|friends|anos|years|edad|trekking|montana|mountain|kilimanjaro|presupuesto|budget|precio|price|preco"
+    r"|principiante|beginner|iniciante|novato|sin experiencia|no experience|sem experiencia)\b"
+)
+
+
 def is_generic_opening(text: str) -> bool:
     """First message that only shows interest ("Hi, I'm interested in climbing Aconcagua").
 
@@ -1570,6 +1631,8 @@ def is_generic_opening(text: str) -> bool:
     """
     normalized = normalize_for_intent(text)
     if "?" in normalized or re.search(r"\d", normalized) or len(normalized.split()) > 14:
+        return False
+    if _OPENING_DATA_RE.search(normalized):
         return False
     return bool(_INTEREST_RE.search(normalized))
 
@@ -1609,7 +1672,12 @@ def resolve_duplicate_reply(reply: str, session_vars: dict[str, Any], now_ts: in
     except (TypeError, ValueError):
         last_ts = 0
     if now_ts - last_ts <= OUTBOUND_DUPLICATE_BURST_SECONDS:
-        return ""
+        # The client wrote again (a repeat or a complaint) and got the same
+        # answer: a short different line, never silence (fallas-top10 #4).
+        # A truly parallel duplicate is dropped later, after re-reading the session.
+        count = int(session_vars.get("repeat_alt_count") or 0)
+        session_vars["repeat_alt_count"] = count + 1
+        return get_phrase(f"repeat_alt_{count % REPEAT_ALT_VARIANTS + 1}", lang)
     text = reply.strip()
     return f"{get_phrase('repeat_prefix', lang)} {text[:1].lower()}{text[1:]}"
 
@@ -1657,13 +1725,15 @@ def extract_command(text: str) -> str | None:
     - /RESET
     - /reset hola
     """
-    stripped = (text or "").strip()
+    # Gateways wrap or decorate the text: BOM/zero-width marks, quotes, and
+    # punctuation after the command ("/reset." never matched "/reset").
+    stripped = (text or "").strip().lstrip("\ufeff\u200b\u200e\u200f\"'`*_ ")
     if not stripped.startswith("/"):
         return None
     parts = stripped.split()
     if not parts:
         return None
-    return parts[0].lower()
+    return parts[0].lower().rstrip(".,;:!?\"'`*_")
 
 
 _HANDOFF_VERB = (
@@ -1799,6 +1869,12 @@ def _followup_program_options_reply(lang: str) -> str:
     if lang == "en":
         return (
             "The other alternatives are:\n"
+            "1. 14+2\n"
+            "2. 17+2"
+        )
+    if lang == "pt":
+        return (
+            "As outras alternativas são:\n"
             "1. 14+2\n"
             "2. 17+2"
         )
@@ -2280,6 +2356,12 @@ def process_inbound_message(
             session_vars["email_captured_at_ts"] = int(time.time())
         session_vars["email_requested"] = True
 
+    # "Después te lo paso" / "prefiero no darlo": never ask for it again.
+    if declines_or_defers_email(msg.text):
+        session_vars["email_declined"] = True
+        session_vars["email_requested"] = True
+        session_vars["proactive_email_capture_pending"] = False
+
     # Fix #4: remember the name the client introduces or signs with.
     if not session_vars.get("customer_name"):
         customer_name = extract_customer_name(msg.text)
@@ -2376,10 +2458,20 @@ def process_inbound_message(
 
     # --- HANDOFF DETECTION (before LLM) ---
     context.handoff_requested = wants_human_handoff(msg.text, session_vars)
+    # An email we already hold (even if the breach check failed or is still
+    # pending) or one the client declined to give is not asked for again.
+    email_not_needed = bool(
+        session_vars.get("email_verified_real")
+        or session_vars.get("email_captured")
+        or session_vars.get("captured_email")
+        or session_vars.get("emails_seen")
+        or session_vars.get("email_declined")
+        or context.extracted_email
+    )
     if (
         not context.handoff_requested
         and session_vars.get("handoff_pending_confirmation")
-        and session_vars.get("email_verified_real")
+        and email_not_needed
     ):
         context.handoff_requested = True
 
@@ -2397,7 +2489,7 @@ def process_inbound_message(
             runtime,
             context.now_ts,
         )
-    elif context.handoff_requested and not session_vars.get("email_verified_real"):
+    elif context.handoff_requested and not email_not_needed:
         lang = get_session_language(session_vars, msg.text)
         decision.reply = get_phrase("handoff_ask_email", lang)
         session_vars["handoff_pending_confirmation"] = True
@@ -2520,10 +2612,12 @@ def process_inbound_message(
                 decision.reply = apply_out_of_season_policy(decision.reply, msg.text, session_vars, lang)
 
     decision.reply = format_whatsapp_departure_dates(decision.reply, msg.channel)
-    if get_session_language(session_vars, msg.text) == "es" and client_uses_usted(
-        [*client_messages(session_vars.get("recent_turns")), msg.text]
-    ):
-        decision.reply = to_usted(decision.reply)
+    if get_session_language(session_vars, msg.text) == "es":
+        client_texts = [*client_messages(session_vars.get("recent_turns")), msg.text]
+        if client_uses_usted(client_texts):
+            decision.reply = to_usted(decision.reply)
+        elif client_uses_tuteo(client_texts):
+            decision.reply = to_tuteo(decision.reply)
 
     # Outbound safety filter: never send credential-like content.
     effective_lang = get_session_language(session_vars, msg.text)
